@@ -13,7 +13,7 @@ import {
   Settings, Trophy, Layers, Moon, Sun, ArrowRight, Users, Bell, BarChart2,
   Video, UserCheck, Wand2, Store, Megaphone as BannerIcon, UserCog, Gift, Repeat, Facebook, ScanBarcode, Calculator, Brain,
   Users2, ShoppingCart as CartIcon, Wallet, Truck, Undo2, Truck as TruckIcon, ClipboardList, ScrollText, Ticket, Map,
-  Sparkles, Palette, Ship, ShieldCheck
+  Sparkles, Palette, Ship, ShieldCheck, BadgeCheck
 } from 'lucide-react';
 
 const navItems = [
@@ -27,6 +27,7 @@ const navItems = [
   { to: '/admin/smart-manager', label: 'المدير الذكي', icon: Brain },
   { to: '/admin/slides', label: 'السلايدر', icon: Image },
   { to: '/admin/banners', label: 'البانرات الإعلانية', icon: BannerIcon },
+  { to: '/admin/home-highlights', label: 'مميزات الرئيسية', icon: BadgeCheck },
   { to: '/admin/offers', label: 'العروض', icon: Megaphone },
   { to: '/admin/bundles', label: 'الباقات', icon: Layers },
   { to: '/admin/marquee', label: 'الشريط النصي', icon: Type },

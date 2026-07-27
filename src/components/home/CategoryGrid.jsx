@@ -45,7 +45,7 @@ export default function CategoryGrid() {
               transition={{ delay: i * 0.06 }}
             >
               <Link
-                to={cat.store_key ? `/store/${cat.store_key}` : '/shop'}
+                to={cat.store_key ? `/shop?category=${cat.id}` : '/shop'}
                 className="block group"
               >
                 <div

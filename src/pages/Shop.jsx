@@ -14,6 +14,8 @@ import { revertExpiredDiscounts } from '@/lib/discountUtils';
 import { getStores } from '@/lib/navLinks';
 
 export default function Shop() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialCategory = urlParams.get('category') || 'all';
   const { isDark, toggle } = useTheme();
   const { addItem, count: cartCount } = useCart();
   const { toggleFav, isFav } = useFavorites();
@@ -25,7 +27,7 @@ export default function Shop() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
-  const [selectedCat, setSelectedCat] = useState('all');
+  const [selectedCat, setSelectedCat] = useState(initialCategory);
   const [selectedStore, setSelectedStore] = useState('all');
   const [loading, setLoading] = useState(true);
 

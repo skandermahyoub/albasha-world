@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Clock, Flame } from 'lucide-react';
 
@@ -88,6 +89,7 @@ export default function OffersCarousel({ offers = [] }) {
               {offer.countdown_end && <CountdownTimer endDate={offer.countdown_end} />}
               <h3 className="text-white font-heading font-bold text-lg mt-2">{offer.title}</h3>
               {offer.subtitle && <p className="text-white/70 text-sm">{offer.subtitle}</p>}
+              {offer.button_text && offer.button_link && <Link to={offer.button_link} className="inline-flex mt-3 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground">{offer.button_text}</Link>}
             </div>
           </motion.div>
         ))}

@@ -68,7 +68,7 @@ export function pathToPermissionKey(pathname) {
     settings: 'settings', 'store-configs': 'stores', 'store-identity': 'stores',
     products: 'products', categories: 'products', offers: 'products', bundles: 'products',
     brands: 'products', 'ai-tools': 'settings', 'image-gallery': 'settings',
-    slides: 'settings', banners: 'settings', marquee: 'settings', gallery: 'settings',
+    slides: 'settings', banners: 'settings', 'home-highlights': 'settings', marquee: 'settings', gallery: 'settings',
     videos: 'settings', 'dev-roadmap': 'settings', 'audit-log': 'settings',
     'system-admins': 'settings', 'system-accounts': 'settings', payments: 'settings',
     orders: 'orders', cashier: 'orders', 'abandoned-carts': 'orders', returns: 'orders',

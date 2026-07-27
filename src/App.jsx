@@ -74,6 +74,7 @@ import AdminDevRoadmap from './pages/admin/AdminDevRoadmap';
 import AdminSystemAdmins from './pages/admin/AdminSystemAdmins';
 import AdminSystemAccounts from './pages/admin/AdminSystemAccounts';
 import AdminShipping from './pages/admin/AdminShipping';
+import AdminHomeHighlights from './pages/admin/AdminHomeHighlights';
 import Videos from './pages/Videos';
 import WishLists from './pages/WishLists';
 import SharedWishlist from './pages/SharedWishlist';
@@ -187,6 +188,7 @@ const AuthenticatedApp = () => {
           <Route path="system-admins" element={<AdminSystemAdmins />} />
           <Route path="system-accounts" element={<AdminSystemAccounts />} />
           <Route path="shipping" element={<AdminShipping />} />
+          <Route path="home-highlights" element={<AdminHomeHighlights />} />
       </Route>
 
         <Route path="*" element={<PageNotFound />} />

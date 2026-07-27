@@ -19,17 +19,15 @@ import StoresSection from '@/components/home/StoresSection';
 import BottomNav from '@/components/BottomNav';
 import NotificationSystem from '@/components/NotificationSystem';
 import SEOHead from '@/components/SEOHead';
-import FeaturesSection from '@/components/home/FeaturesSection';
 import AdvertBanners from '@/components/home/AdvertBanners';
 // WhatsAppButton removed - contact via BottomNav chat
-import SmartPersonalization from '@/components/home/SmartPersonalization';
 import AdaptiveNightMode from '@/components/home/AdaptiveNightMode';
 import CartFlyAnimation from '@/components/CartFlyAnimation';
 import HomeSkeleton from '@/components/home/HomeSkeleton';
 
 import FacebookFeedSection from '@/components/home/FacebookFeedSection';
 import LiveActivityBar from '@/components/home/LiveActivityBar';
-import TrustBadgesBar from '@/components/home/TrustBadgesBar';
+import HomeHighlights from '@/components/home/HomeHighlights';
 import DailyDealBanner from '@/components/home/DailyDealBanner';
 import CategoryProductsSection from '@/components/home/CategoryProductsSection';
 import CategoryGrid from '@/components/home/CategoryGrid';
@@ -38,10 +36,6 @@ import FloatingCategories from '@/components/FloatingCategories';
 // Lazy-loaded below-the-fold sections for faster initial render
 const ShortVideosSection = lazy(() => import('@/components/home/ShortVideosSection'));
 const SocialFeedSection = lazy(() => import('@/components/home/SocialFeedSection'));
-const SpinWheelSection = lazy(() => import('@/components/home/SpinWheelSection'));
-const ReferFriendBanner = lazy(() => import('@/components/home/ReferFriendBanner'));
-const CreatorEngagementSection = lazy(() => import('@/components/home/CreatorEngagementSection'));
-const VIPCorner = lazy(() => import('@/components/home/VIPCorner'));
 const MagazineSection = lazy(() => import('@/components/home/MagazineSection'));
 
 const SectionFallback = () => null;
@@ -141,10 +135,10 @@ export default function Home() {
       <LiveActivityBar />
 
       {/* Creator Community */}
-      <Suspense fallback={<SectionFallback />}><CreatorEngagementSection settings={settings} /></Suspense>
+      
 
-      {/* Trust Badges */}
-      <TrustBadgesBar />
+      {/* Highlights managed from admin */}
+      <HomeHighlights />
 
       {/* Stores Section */}
       <StoresSection />
@@ -171,25 +165,15 @@ export default function Home() {
       />
 
       {/* Spin & Win */}
-      <Suspense fallback={<SectionFallback />}><SpinWheelSection /></Suspense>
+      
 
       {/* Bundles */}
       <BundlesSection bundles={bundles} format={currency.format} />
 
       {/* Refer a Friend */}
-      <Suspense fallback={<SectionFallback />}><ReferFriendBanner settings={settings} /></Suspense>
+      
 
-      {/* Smart Personalization */}
-      <SmartPersonalization
-        products={products}
-        onAddCart={addItem}
-        onToggleFav={toggleFav}
-        onToggleCompare={toggleCompare}
-        isFav={isFav}
-        isComparing={isComparing}
-        format={currency.format}
-        settings={settings}
-      />
+
 
       {/* Products Showcase */}
       <ProductsShowcase
@@ -219,10 +203,10 @@ export default function Home() {
       <AdvertBanners banners={banners} />
 
       {/* Features */}
-      <FeaturesSection />
+
 
       {/* VIP Corner */}
-      <Suspense fallback={<SectionFallback />}><VIPCorner products={products} format={currency.format} /></Suspense>
+      
 
       {/* Facebook Feed */}
       <FacebookFeedSection />
