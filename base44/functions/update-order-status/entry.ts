@@ -256,6 +256,27 @@ export default async function(req) {
     // ── 7. Update order ──
     await base44.asServiceRole.entities.Order.update(order.id, updateData);
 
+    if (order.customer_email) {
+      const statusMessages = {
+        confirmed: 'تم تأكيد طلبك وجارٍ تجهيزه.',
+        preparing: 'يجري الآن تجهيز طلبك.',
+        shipped: 'تم شحن طلبك وهو في طريقه إليك.',
+        delivered: 'تم تسليم طلبك بنجاح. شكراً لتسوقك معنا.',
+        cancelled: 'تم إلغاء طلبك. تواصل معنا إذا احتجت إلى مساعدة.',
+        returned: 'تم تسجيل إرجاع طلبك بنجاح.',
+      };
+      await base44.asServiceRole.entities.Notification.create({
+        title: `تحديث الطلب ${order.order_number}`,
+        message: statusMessages[new_status] || 'تم تحديث حالة طلبك.',
+        icon: new_status === 'delivered' ? '✅' : '📦',
+        type: new_status === 'cancelled' ? 'alert' : 'info',
+        customer_email: order.customer_email,
+        interval_minutes: 5,
+        sort_order: 0,
+        is_active: true,
+      });
+    }
+
     return Response.json({
       success: true,
       order: { id: order.id, order_number: order.order_number, status: new_status },

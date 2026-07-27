@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ShoppingCart, ReceiptText, Warehouse, Users, Trophy, Megaphone, Landmark, Truck, Cpu } from 'lucide-react';
+import { ShoppingCart, ReceiptText, Warehouse, Users, Trophy, Megaphone, Landmark, Truck } from 'lucide-react';
 
 const SYSTEMS = [
   {
@@ -57,13 +57,6 @@ const SYSTEMS = [
     title: 'نظام التوصيل والمرتجعات',
     desc: 'وكلاء توصيل، تتبع الشحنات، إدارة المرتجعات، وتذاكر الدعم الفني',
     features: ['وكلاء التوصيل', 'تتبع الشحنات', 'المرتجعات', 'تذاكر الدعم'],
-  },
-  {
-    icon: Cpu,
-    gradient: 'from-fuchsia-500 to-purple-600',
-    title: 'نظام الذكاء الاصطناعي',
-    desc: 'توليد صور وأوصاف للمنتجات، ومساعد محادثة داخل المتجر لإرشاد العميل.',
-    features: ['توليد الصور', 'توليد الأوصاف', 'مساعد ذكي', 'محتوى مرئي'],
   },
 ];
 

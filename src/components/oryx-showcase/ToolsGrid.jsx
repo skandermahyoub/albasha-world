@@ -1,12 +1,8 @@
 import { motion } from 'framer-motion';
-import { Image, FileText, MessageSquare, ScanLine, Bot, Gift, Bell, Ticket, Trophy, Star } from 'lucide-react';
+import { ScanLine, Gift, Bell, Ticket, Trophy, Star } from 'lucide-react';
 
 const TOOLS = [
-  { icon: Image, title: 'مولد الصور بالـ AI', color: 'from-purple-500 to-pink-500', desc: 'توليد صور احترافية للمنتجات والإعلانات بالذكاء الاصطناعي' },
-  { icon: FileText, title: 'مولد الأوصاف', color: 'from-blue-500 to-cyan-500', desc: 'كتابة أوصاف منتجات جذابة تلقائياً بضغطة زر' },
-  { icon: MessageSquare, title: 'المساعد الذكي', color: 'from-green-500 to-emerald-500', desc: 'شات بوت يساعد العملاء في اختيار المنتجات المناسبة' },
   { icon: ScanLine, title: 'ماسح الباركود', color: 'from-orange-500 to-red-500', desc: 'مسح متواصل للباركود للبيع وإدارة المخزون' },
-  { icon: Bot, title: 'المساعد الذكي داخل المتجر', color: 'from-green-600 to-teal-500', desc: 'محادثة مساعدة لاكتشاف المنتجات والرد على استفسارات العميل' },
   { icon: Gift, title: 'محتوى الرئيسية القابل للإدارة', color: 'from-rose-500 to-pink-500', desc: 'إدارة الشرائح والعروض والبنرات والمقالات ومميزات الصفحة الرئيسية' },
   { icon: Bell, title: 'رسائل وعروض المتجر', color: 'from-amber-500 to-yellow-500', desc: 'رسائل ترويجية وإشعارات تُدار من لوحة التحكم' },
   { icon: Ticket, title: 'الكوبونات وبطاقات الهدايا', color: 'from-indigo-500 to-purple-500', desc: 'نظام كوبونات خصم وبطاقات هدايا قابلة للبيع' },

@@ -240,6 +240,19 @@ export default async function(req) {
     let order;
     order = await base44.asServiceRole.entities.Order.create(orderData);
 
+    if (userEmail) {
+      await base44.asServiceRole.entities.Notification.create({
+        title: 'تم استلام طلبك',
+        message: `تم استلام الطلب ${orderNumber} وهو الآن قيد المراجعة.`,
+        icon: '📦',
+        type: 'info',
+        customer_email: userEmail,
+        interval_minutes: 5,
+        sort_order: 0,
+        is_active: true,
+      });
+    }
+
     // ── 18. Deduct wallet ──
     if (walletUsed > 0 && profileRecord) {
       const newBalance = (profileRecord.wallet_balance || 0) - walletUsed;
