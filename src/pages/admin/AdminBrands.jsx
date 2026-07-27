@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Search, Wand2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import AIImageField from '@/components/admin/AIImageField';
 
@@ -12,7 +12,7 @@ export default function AdminBrands() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
-  const [searching, setSearching] = useState(false);
+
 
   const load = () => base44.entities.Brand.list('sort_order').then(setBrands).catch(() => []);
   useEffect(() => { load(); }, []);
@@ -25,22 +25,6 @@ export default function AdminBrands() {
     setOpen(false); setForm({}); setEditing(null); load();
   };
 
-  const searchBrand = async () => {
-    if (!form.name) return;
-    setSearching(true);
-    const { url } = await base44.integrations.Core.GenerateImage({
-      prompt: `Clean minimalist logo of ${form.name} brand, white background, professional brand logo design, simple and recognizable`
-    });
-    setForm(f => ({ ...f, logo: url }));
-    setSearching(false);
-    toast.success('تم العثور على الشعار');
-  };
-
-  const handleUpload = async (e) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setForm(f => ({ ...f, logo: file_url }));
-  };
 
   return (
     <div>

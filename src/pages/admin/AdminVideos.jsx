@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Play, Image as ImageIcon, Loader2, Wand2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Play, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import AIImageField from '@/components/admin/AIImageField';
 
@@ -14,7 +14,7 @@ export default function AdminVideos() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
-  const [coverLoading, setCoverLoading] = useState(false);
+
 
   const load = () => base44.entities.VideoGallery.list('sort_order').catch(() => []).then(setVideos);
   useEffect(() => { load(); }, []);
@@ -40,15 +40,6 @@ export default function AdminVideos() {
     load();
   };
 
-  const generateCover = async () => {
-    if (!form.title) return toast.error('أدخل عنوان الفيديو أولاً');
-    setCoverLoading(true);
-    const { url } = await base44.integrations.Core.GenerateImage({
-      prompt: `Video thumbnail cover image for "${form.title}", luxury dark theme, elegant design, Arabic store, high quality`,
-    });
-    setForm(f => ({ ...f, cover_image: url }));
-    setCoverLoading(false);
-  };
 
   const getYoutubeId = (url) => {
     const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n]+)/);

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Image as ImageIcon, Wand2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import AIImageField from '@/components/admin/AIImageField';
 
@@ -13,7 +13,7 @@ export default function AdminBanners() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
-  const [genLoading, setGenLoading] = useState(false);
+
 
   const load = () => base44.entities.AdvertBanner.list('sort_order').catch(() => []).then(setBanners);
   useEffect(() => { load(); }, []);
@@ -39,22 +39,6 @@ export default function AdminBanners() {
     load();
   };
 
-  const generateImage = async () => {
-    if (!form.title) return toast.error('أدخل العنوان أولاً');
-    setGenLoading(true);
-    const { url } = await base44.integrations.Core.GenerateImage({
-      prompt: `Luxury Arabic e-commerce promotional banner for "${form.title}". Elegant dark purple background, golden accents, Arabic luxury aesthetic, professional advertisement, high quality`,
-    });
-    setForm(f => ({ ...f, image: url }));
-    setGenLoading(false);
-  };
-
-  const handleUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setForm(f => ({ ...f, image: file_url }));
-  };
 
   return (
     <div>

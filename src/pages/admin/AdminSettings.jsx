@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { Save, Image as ImageIcon, Link2, Palette, Store as StoreIcon, Phone, Share2, FileText, Bot, Plus, X, Navigation, Tags } from 'lucide-react';
 import { useStoreSettings } from '@/lib/useStoreSettings';
-import { uploadToR2 } from '@/lib/uploadToR2';
+
 import { logAction } from '@/lib/auditLog';
 
 const NAV_KEYS = [
@@ -87,7 +87,7 @@ export default function AdminSettings() {
     setUploadingLogo(true);
     try {
       toast.info('جاري رفع الشعار...');
-      const { file_url } = await uploadToR2(file);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       if (!file_url) throw new Error('لم يُرجع الخادم رابطاً للصورة');
       setSettings(s => ({ ...s, logo_url: file_url }));
       toast.success('تم رفع الشعار! لا تنسَ الحفظ.');
@@ -112,7 +112,7 @@ export default function AdminSettings() {
     setUploadingFavicon(true);
     try {
       toast.info('جاري رفع الأيقونة...');
-      const { file_url } = await uploadToR2(file);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       if (!file_url) throw new Error('لم يُرجع الخادم رابطاً');
       setSettings(s => ({ ...s, favicon_url: file_url }));
       toast.success('تم رفع الأيقونة! لا تنسَ الحفظ.');

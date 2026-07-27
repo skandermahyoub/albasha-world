@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import BarcodeScannerModal from '@/components/admin/BarcodeScannerModal';
 import { logAction } from '@/lib/auditLog';
 import AIImageField from '@/components/admin/AIImageField';
-import { uploadToR2 } from '@/lib/uploadToR2';
+
 import { getStores } from '@/lib/navLinks';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 
@@ -60,7 +60,7 @@ export default function AdminProducts() {
     const urls = [];
     for (const file of files) {
       try {
-        const { file_url } = await uploadToR2(file);
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
         urls.push(file_url);
       } catch (err) {}
     }

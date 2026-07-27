@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Loader2, Trash2, Plus, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStoreSettings } from '@/lib/useStoreSettings';
-import { uploadToR2 } from '@/lib/uploadToR2';
+
 import { getStores } from '@/lib/navLinks';
 
 export default function AdminStoreConfigs() {
@@ -58,7 +58,7 @@ export default function AdminStoreConfigs() {
   const handleUploadBg = async (storeKey, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const { file_url } = await uploadToR2(file);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
     const newImages = [...(configs[storeKey]?.bg_images || []), file_url];
     updateField(storeKey, 'bg_images', newImages);
   };

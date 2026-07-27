@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Wand2, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image as ImageIcon, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import AIImageField from '@/components/admin/AIImageField';
@@ -14,7 +14,7 @@ export default function AdminGenericList({ entityName, title, fields = [], aiIma
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
-  const [generating, setGenerating] = useState(false);
+
 
   const entity = base44.entities[entityName];
   const load = () => entity.list('-created_date', 100).then(setItems).catch(() => []);
@@ -45,23 +45,6 @@ export default function AdminGenericList({ entityName, title, fields = [], aiIma
     }
   };
 
-  const generateImage = async (fieldKey) => {
-    setGenerating(true);
-    try {
-      toast.info('جاري توليد الصورة...');
-      const prompt = typeof aiImagePrompt === 'function' ? aiImagePrompt(form) : aiImagePrompt || `Professional image for ${form.title || form.name || entityName}`;
-      const { url } = await base44.integrations.Core.GenerateImage({ prompt });
-      setForm(f => ({ ...f, [fieldKey]: url }));
-      toast.success('تم توليد الصورة');
-    } catch (err) {
-      if (err?.message?.includes('limit')) {
-        toast.error('انتهى رصيد التكاملات لهذا الشهر - يرجى ترقية الخطة');
-      } else {
-        toast.error('فشل توليد الصورة - تأكد من اشتراك Builder+');
-      }
-    }
-    setGenerating(false);
-  };
 
   return (
     <div>

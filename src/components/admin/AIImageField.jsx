@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { uploadToR2 } from '@/lib/uploadToR2';
+import { base44 } from '@/api/base44Client';
 import { Input } from '@/components/ui/input';
 import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
@@ -19,7 +19,7 @@ export default function AIImageField({ value, onChange, context = {}, label = '�
     setUploading(true);
     try {
       toast.info('جاري رفع الصورة...');
-      const { file_url } = await uploadToR2(file);
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
       if (!file_url) throw new Error('لم يُرجع الخادم رابطاً للصورة');
       onChange(file_url);
       toast.success('تم رفع الصورة');
