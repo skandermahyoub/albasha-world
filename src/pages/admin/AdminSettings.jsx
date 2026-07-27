@@ -23,11 +23,11 @@ const NAV_KEYS = [
 ];
 
 const STORE_KEYS = [
-  { key: 'emad_phones', label: 'القسم الأول', defaultName: 'الهواتف الذكية', defaultIcon: 'smartphone' },
-  { key: 'emad_laptops', label: 'القسم الثاني', defaultName: 'لابتوبات وتابلت', defaultIcon: 'monitor' },
-  { key: 'emad_accessories', label: 'القسم الثالث', defaultName: 'إكسسوارات', defaultIcon: 'headphones' },
-  { key: 'emad_home', label: 'القسم الرابع', defaultName: 'أجهزة منزلية', defaultIcon: 'zap' },
-  { key: 'emad_offers', label: 'القسم الخامس', defaultName: 'عروض مميزة', defaultIcon: 'tag' },
+  { key: 'shisha', label: 'القسم الأول', defaultName: 'الباشا شيشة', defaultIcon: 'cigarette' },
+  { key: 'boutique', label: 'القسم الثاني', defaultName: 'الباشا بوتيك', defaultIcon: 'gift' },
+  { key: 'perfume', label: 'القسم الثالث', defaultName: 'الباشا بيرفيوم', defaultIcon: 'droplet' },
+  { key: 'vape', label: 'القسم الرابع', defaultName: 'الباشا فيب', defaultIcon: 'wine' },
+  { key: 'pets', label: 'القسم الخامس', defaultName: 'الباشا بيتس', defaultIcon: 'pawprint' },
 ];
 
 export default function AdminSettings() {

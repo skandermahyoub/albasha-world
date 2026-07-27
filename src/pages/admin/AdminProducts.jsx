@@ -291,7 +291,7 @@ export default function AdminProducts() {
             </div>
 
             {/* حقول خاصة بالشيشة */}
-            {form.store_key === 'emad_phones' && (
+            {form.store_key === 'shisha' && (
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
                 <p className="text-xs font-bold text-primary flex items-center gap-1"><Smartphone className="w-3 h-3" /> خصائص الشيشة</p>
                 <div className="grid grid-cols-2 gap-2">
@@ -304,7 +304,7 @@ export default function AdminProducts() {
             )}
 
             {/* حقول خاصة بالبوتيك */}
-            {form.store_key === 'emad_laptops' && (
+            {form.store_key === 'boutique' && (
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
                 <p className="text-xs font-bold text-primary flex items-center gap-1"><Monitor className="w-3 h-3" /> خصائص البوتيك</p>
                 <div className="grid grid-cols-2 gap-2">
@@ -317,7 +317,7 @@ export default function AdminProducts() {
             )}
 
             {/* حقول خاصة بالعطور */}
-            {form.store_key === 'emad_accessories' && (
+            {form.store_key === 'perfume' && (
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
                 <p className="text-xs font-bold text-primary flex items-center gap-1"><Headphones className="w-3 h-3" /> خصائص العطور</p>
                 <div className="grid grid-cols-2 gap-2">
@@ -330,7 +330,7 @@ export default function AdminProducts() {
             )}
 
             {/* حقول خاصة بالفيب */}
-            {form.store_key === 'emad_home' && (
+            {form.store_key === 'vape' && (
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
                 <p className="text-xs font-bold text-primary flex items-center gap-1"><Zap className="w-3 h-3" /> خصائص الفيب</p>
                 <div className="grid grid-cols-2 gap-2">
@@ -343,7 +343,7 @@ export default function AdminProducts() {
             )}
 
             {/* حقول خاصة بالحيوانات الأليفة */}
-            {form.store_key === 'emad_offers' && (
+            {form.store_key === 'pets' && (
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
                 <p className="text-xs font-bold text-primary flex items-center gap-1"><Tag className="w-3 h-3" /> خصائص الحيوانات الأليفة</p>
                 <div className="grid grid-cols-2 gap-2">
