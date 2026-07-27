@@ -57,7 +57,7 @@ export default async function(req) {
       const days = FREQ_DAYS[freq];
       const nextDelivery = new Date(Date.now() + days * 86400000).toISOString();
 
-      const sub = await base44.entities.Subscription.create({
+      const sub = await base44.asServiceRole.entities.Subscription.create({
         user_email: user.email,
         customer_name: user.full_name || '',
         product_id,
@@ -99,7 +99,7 @@ export default async function(req) {
         return Response.json({ success: true, message: 'الاشتراك ملغى مسبقاً' });
       }
 
-      await base44.entities.Subscription.update(subscription_id, { status: 'cancelled' });
+      await base44.asServiceRole.entities.Subscription.update(subscription_id, { status: 'cancelled' });
 
       return Response.json({ success: true, message: 'تم إلغاء الاشتراك' });
     }
@@ -117,7 +117,7 @@ export default async function(req) {
       if (sub.status !== 'active') {
         return Response.json({ error: 'لا يمكن إيقاف اشتراك غير نشط' }, { status: 400 });
       }
-      await base44.entities.Subscription.update(subscription_id, { status: 'paused' });
+      await base44.asServiceRole.entities.Subscription.update(subscription_id, { status: 'paused' });
       return Response.json({ success: true, message: 'تم إيقاف الاشتراك' });
     }
 
@@ -137,7 +137,7 @@ export default async function(req) {
       // Calculate next delivery from now
       const days = FREQ_DAYS[sub.frequency] || 30;
       const nextDelivery = new Date(Date.now() + days * 86400000).toISOString();
-      await base44.entities.Subscription.update(subscription_id, {
+      await base44.asServiceRole.entities.Subscription.update(subscription_id, {
         status: 'active',
         next_delivery: nextDelivery,
       });

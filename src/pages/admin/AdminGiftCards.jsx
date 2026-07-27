@@ -36,6 +36,11 @@ export default function AdminGiftCards() {
     load();
   };
 
+  const activateCard = async (id) => {
+    await base44.entities.GiftCard.update(id, { status: 'active' });
+    toast.success('تم تفعيل البطاقة'); load();
+  };
+
   const deleteCard = async (id) => {
     if (!confirm('حذف هذه البطاقة؟')) return;
     await base44.entities.GiftCard.delete(id);
@@ -87,6 +92,11 @@ export default function AdminGiftCards() {
               <p className="font-bold text-primary">{card.amount - (card.used_amount || 0)} / {card.amount} {card.currency || 'SAR'}</p>
               <p className="text-[10px] text-muted-foreground">{card.status === 'active' ? 'نشطة' : card.status === 'used' ? 'مستخدمة' : 'منتهية'}</p>
             </div>
+            {card.status === 'pending' && (
+              <Button variant="outline" size="sm" className="text-green-600 border-green-300" onClick={() => activateCard(card.id)}>
+                <CheckCircle className="w-3.5 h-3.5 ml-1" /> تفعيل
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteCard(card.id)}><Trash2 className="w-4 h-4" /></Button>
           </div>
         ))}

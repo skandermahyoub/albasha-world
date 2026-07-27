@@ -238,11 +238,7 @@ export default async function(req) {
     };
 
     let order;
-    if (user) {
-      order = await base44.entities.Order.create(orderData);
-    } else {
-      order = await base44.asServiceRole.entities.Order.create(orderData);
-    }
+    order = await base44.asServiceRole.entities.Order.create(orderData);
 
     // ── 18. Deduct wallet ──
     if (walletUsed > 0 && profileRecord) {

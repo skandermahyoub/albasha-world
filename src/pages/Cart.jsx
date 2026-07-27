@@ -24,17 +24,37 @@ export default function Cart() {
 
   const applyCouponCode = async () => {
     if (!couponInput.trim()) return toast.error('أدخل كود الخصم');
-    const coupons = await base44.entities.Coupon.filter({ code: couponInput.trim().toUpperCase(), is_active: true }).catch(() => []);
-    const coupon = coupons[0];
-    if (!coupon) return toast.error('كود غير صحيح أو غير مفعّل');
-    const now = new Date();
-    if (coupon.valid_from && new Date(coupon.valid_from) > now) return toast.error('هذا الكود لم يبدأ بعد');
-    if (coupon.valid_until && new Date(coupon.valid_until) < now) return toast.error('انتهت صلاحية الكود');
-    if (coupon.max_uses > 0 && (coupon.used_count || 0) >= coupon.max_uses) return toast.error('تم استخدام الكود بالكامل');
-    if (coupon.min_order_value > 0 && total < coupon.min_order_value) return toast.error(`الحد الأدنى للطلب ${coupon.min_order_value}$`);
-    setAppliedCoupon(coupon);
-    toast.success(`تم تطبيق خصم ${coupon.discount_type === 'percentage' ? coupon.discount_value + '%' : '$' + coupon.discount_value}`);
-    setCouponInput('');
+    try {
+      const res = await base44.functions.invoke('validate-discount', {
+        code: couponInput.trim().toUpperCase(),
+        subtotal: total,
+      });
+      const data = res.data;
+      if (!data.valid) {
+        return toast.error(data.message || 'كود غير صحيح');
+      }
+      if (data.type === 'coupon') {
+        setAppliedCoupon({
+          code: data.code,
+          discount_type: data.discount_type,
+          discount_value: data.discount_value,
+          discount_amount: data.discount_amount,
+        });
+        toast.success(`تم تطبيق خصم ${data.discount_type === 'percentage' ? data.discount_value + '%' : '$' + data.discount_value}`);
+      } else if (data.type === 'gift_card') {
+        setAppliedCoupon({
+          code: data.code,
+          discount_type: 'fixed',
+          discount_value: data.usable_amount,
+          discount_amount: data.usable_amount,
+          is_gift_card: true,
+        });
+        toast.success(`بطاقة هدايا — رصيد متاح: $${data.balance}`);
+      }
+      setCouponInput('');
+    } catch (err) {
+      toast.error('حدث خطأ في التحقق من الكود');
+    }
   };
 
   useEffect(() => {

@@ -52,16 +52,16 @@ export default function ClientRating() {
         ? Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.filter(r => r > 0).length)
         : 5;
 
-      await base44.entities.ClientRating.create({
+      const res = await base44.functions.invoke('submit-client-rating', {
         rating: avgRating,
         comment: feedback.slice(0, MAX_COMMENT_LENGTH),
-        user_email: user?.email || '',
-        user_name: user?.full_name || 'زائر',
+        ratings_detail: ratingsDetail,
         page: window.location.pathname,
         context: 'home',
-        ratings_detail: ratingsDetail,
-        status: 'pending',
       });
+      if (!res.data?.success) {
+        throw new Error(res.data?.error || 'فشل الحفظ');
+      }
 
       localStorage.setItem('basha_rating_last', String(Date.now()));
       setSubmitted(true);

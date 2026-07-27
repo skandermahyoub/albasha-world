@@ -3,11 +3,11 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
+import { Plus, Pencil, Trash2, Shield, ShieldCheck, ShieldOff, Key, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Trash2, Shield, ShieldCheck, ShieldOff, Key } from 'lucide-react';
 import { toast } from 'sonner';
+import PermissionGate from '@/components/admin/PermissionGate';
+import { useAdminPermissions } from '@/lib/useAdminPermissions';
 
 const SECTIONS = [
   { key: 'orders', label: 'الطلبات' },
@@ -52,7 +52,9 @@ export default function AdminSystemAdmins() {
   const [permTarget, setPermTarget] = useState(null);
   const [form, setForm] = useState({ name: '', employee_number: '', email: '', password_hash: '', is_active: true });
   const [permissions, setPermissions] = useState({ ...DEFAULT_PERMISSIONS });
-  const [step, setStep] = useState('info'); // 'info' | 'perms'
+  const [step, setStep] = useState('info');
+  const { permissions: myPerms } = useAdminPermissions();
+  const isSuperAdmin = myPerms?._super === true;
 
   const load = () => base44.entities.SystemAdmin.list('-created_date', 200).catch(() => []).then(setAdmins);
   useEffect(() => { load(); }, []);
@@ -82,39 +84,80 @@ export default function AdminSystemAdmins() {
     if (!form.name) return toast.error('أدخل اسم الحساب');
     if (!editing) {
       if (!form.email || !form.password_hash) return toast.error('أدخل البريد الإلكتروني وكلمة المرور');
-      // Move to permissions step for new accounts
       setStep('perms');
     } else {
-      await base44.entities.SystemAdmin.update(editing.id, { name: form.name, password_hash: form.password_hash });
-      toast.success('تم تحديث الحساب');
-      setOpen(false); load();
+      try {
+        const res = await base44.functions.invoke('manage-system-admin', {
+          action: 'update',
+          admin_id: editing.id,
+          data: { name: form.name, password_hash: form.password_hash },
+        });
+        if (!res.data?.success) return toast.error(res.data?.error || 'فشل التحديث');
+        toast.success('تم تحديث الحساب');
+        setOpen(false); load();
+      } catch (err) {
+        toast.error('فشل التحديث');
+      }
     }
   };
 
   const handleSaveNew = async () => {
-    const data = { ...form, permissions, is_active: true };
-    await base44.entities.SystemAdmin.create(data);
-    toast.success('تم إنشاء الحساب');
-    setOpen(false); load();
+    try {
+      const res = await base44.functions.invoke('manage-system-admin', {
+        action: 'create',
+        data: { ...form, permissions, is_active: true },
+      });
+      if (!res.data?.success) return toast.error(res.data?.error || 'فشل إنشاء الحساب');
+      toast.success('تم إنشاء الحساب');
+      setOpen(false); load();
+    } catch (err) {
+      toast.error('فشل إنشاء الحساب');
+    }
   };
 
   const handleSavePerms = async () => {
-    await base44.entities.SystemAdmin.update(permTarget.id, { permissions });
-    toast.success('تم تحديث الصلاحيات');
-    setPermOpen(false); load();
+    try {
+      const res = await base44.functions.invoke('manage-system-admin', {
+        action: 'update',
+        admin_id: permTarget.id,
+        data: { permissions },
+      });
+      if (!res.data?.success) return toast.error(res.data?.error || 'فشل تحديث الصلاحيات');
+      toast.success('تم تحديث الصلاحيات');
+      setPermOpen(false); load();
+    } catch (err) {
+      toast.error('فشل تحديث الصلاحيات');
+    }
   };
 
   const handleToggleActive = async (admin) => {
-    await base44.entities.SystemAdmin.update(admin.id, { is_active: !admin.is_active });
-    toast.success(admin.is_active ? 'تم تعطيل الحساب' : 'تم تفعيل الحساب');
-    load();
+    try {
+      const res = await base44.functions.invoke('manage-system-admin', {
+        action: 'update',
+        admin_id: admin.id,
+        data: { is_active: !admin.is_active },
+      });
+      if (!res.data?.success) return toast.error(res.data?.error || 'فشل التحديث');
+      toast.success(admin.is_active ? 'تم تعطيل الحساب' : 'تم تفعيل الحساب');
+      load();
+    } catch (err) {
+      toast.error('فشل التحديث');
+    }
   };
 
   const handleDelete = async (id) => {
     if (!confirm('حذف هذا الحساب نهائياً؟')) return;
-    await base44.entities.SystemAdmin.delete(id);
-    toast.success('تم الحذف');
-    load();
+    try {
+      const res = await base44.functions.invoke('manage-system-admin', {
+        action: 'delete',
+        admin_id: id,
+      });
+      if (!res.data?.success) return toast.error(res.data?.error || 'فشل الحذف');
+      toast.success('تم الحذف');
+      load();
+    } catch (err) {
+      toast.error('فشل الحذف');
+    }
   };
 
   const setAllPerms = (value) => {
@@ -131,8 +174,16 @@ export default function AdminSystemAdmins() {
           </h1>
           <p className="text-sm text-muted-foreground mt-1">إدارة حسابات الموظفين وصلاحياتهم</p>
         </div>
-        <Button onClick={openAdd}><Plus className="w-4 h-4 ml-2" /> إنشاء حساب</Button>
+        <PermissionGate section="settings" level="full">
+          <Button onClick={openAdd}><Plus className="w-4 h-4 ml-2" /> إنشاء حساب</Button>
+        </PermissionGate>
       </div>
+
+      {!isSuperAdmin && (
+        <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-3 mb-4">
+          <p className="text-xs text-amber-700 dark:text-amber-400">أنت تتصفح كأدمن عادي — إنشاء وتعديل وحذف حسابات النظام متاح فقط لمدير النظام الرئيسي (Super Admin).</p>
+        </div>
+      )}
 
       {admins.length === 0 && (
         <div className="text-center py-20 text-muted-foreground">
@@ -161,19 +212,21 @@ export default function AdminSystemAdmins() {
                 <Badge className={admin.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
                   {admin.is_active ? 'مفعّل' : 'معطّل'}
                 </Badge>
-                <Button size="sm" variant="outline" onClick={() => openPerms(admin)}>
-                  <Key className="w-3.5 h-3.5 ml-1" /> الصلاحيات
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => openEdit(admin)}>
-                  <Pencil className="w-3.5 h-3.5 ml-1" /> تعديل
-                </Button>
-                <Button size="sm" variant="outline" onClick={() => handleToggleActive(admin)}
-                  className={admin.is_active ? 'text-red-600 border-red-300' : 'text-green-600 border-green-300'}>
-                  {admin.is_active ? 'تعطيل' : 'تفعيل'}
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => handleDelete(admin.id)} className="text-destructive">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+                <PermissionGate section="settings" level="full">
+                  <Button size="sm" variant="outline" onClick={() => openPerms(admin)}>
+                    <Key className="w-3.5 h-3.5 ml-1" /> الصلاحيات
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => openEdit(admin)}>
+                    <Pencil className="w-3.5 h-3.5 ml-1" /> تعديل
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handleToggleActive(admin)}
+                    className={admin.is_active ? 'text-red-600 border-red-300' : 'text-green-600 border-green-300'}>
+                    {admin.is_active ? 'تعطيل' : 'تفعيل'}
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => handleDelete(admin.id)} className="text-destructive">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </PermissionGate>
               </div>
             </div>
 

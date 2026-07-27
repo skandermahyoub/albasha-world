@@ -86,6 +86,7 @@ import MyWallet from './pages/MyWallet';
 import AffiliateDashboard from './pages/AffiliateDashboard';
 import Returns from './pages/Returns';
 import Tickets from './pages/Tickets';
+import RecoverCart from './pages/RecoverCart';
 import SurveyPage from './pages/SurveyPage';
 import SurveyPopup from '@/components/SurveyPopup';
 import BottomNav from '@/components/BottomNav';
@@ -135,6 +136,7 @@ const AuthenticatedApp = () => {
         <Route path="/affiliate" element={<AffiliateDashboard />} />
         <Route path="/returns" element={<Returns />} />
         <Route path="/tickets" element={<Tickets />} />
+        <Route path="/recover-cart/:token" element={<RecoverCart />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />}>
