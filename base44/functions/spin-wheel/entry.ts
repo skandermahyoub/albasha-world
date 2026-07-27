@@ -61,7 +61,7 @@ export default async function(req) {
     const couponCode = generateCode();
 
     // Determine store_key for the coupon
-    const targetStore = store_key || 'emad_offers';
+    const targetStore = store_key || 'pets';
 
     // Create a real Coupon record
     const coupon = await base44.asServiceRole.entities.Coupon.create({

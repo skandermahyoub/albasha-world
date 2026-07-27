@@ -96,11 +96,11 @@
       "type": "string",
       "title": "\u0627\u0644\u0642\u0633\u0645 \u0627\u0644\u0645\u0641\u0636\u0644",
       "enum": [
-        "emad_phones",
-        "emad_laptops",
-        "emad_accessories",
-        "emad_home",
-        "emad_offers"
+        "shisha",
+        "boutique",
+        "perfume",
+        "vape",
+        "pets"
       ]
     },
     "last_interaction": {
