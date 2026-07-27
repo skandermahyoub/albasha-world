@@ -6,9 +6,9 @@ const TOOLS = [
   { icon: FileText, title: 'مولد الأوصاف', color: 'from-blue-500 to-cyan-500', desc: 'كتابة أوصاف منتجات جذابة تلقائياً بضغطة زر' },
   { icon: MessageSquare, title: 'المساعد الذكي', color: 'from-green-500 to-emerald-500', desc: 'شات بوت يساعد العملاء في اختيار المنتجات المناسبة' },
   { icon: ScanLine, title: 'ماسح الباركود', color: 'from-orange-500 to-red-500', desc: 'مسح متواصل للباركود للبيع وإدارة المخزون' },
-  { icon: Bot, title: 'مساعد واتساب الذكي', color: 'from-green-600 to-teal-500', desc: 'رفع صورة المنتج والعثور على مطابق في المتجر' },
-  { icon: Gift, title: 'مستشار الهدايا', color: 'from-rose-500 to-pink-500', desc: 'توصية ذكية بالهدايا حسب الميزانية والمناسبة' },
-  { icon: Bell, title: 'نظام الإشعارات', color: 'from-amber-500 to-yellow-500', desc: 'إشعارات فورية للعميل عند تغيير حالة الطلب والعروض' },
+  { icon: Bot, title: 'المساعد الذكي داخل المتجر', color: 'from-green-600 to-teal-500', desc: 'محادثة مساعدة لاكتشاف المنتجات والرد على استفسارات العميل' },
+  { icon: Gift, title: 'محتوى الرئيسية القابل للإدارة', color: 'from-rose-500 to-pink-500', desc: 'إدارة الشرائح والعروض والبنرات والمقالات ومميزات الصفحة الرئيسية' },
+  { icon: Bell, title: 'رسائل وعروض المتجر', color: 'from-amber-500 to-yellow-500', desc: 'رسائل ترويجية وإشعارات تُدار من لوحة التحكم' },
   { icon: Ticket, title: 'الكوبونات وبطاقات الهدايا', color: 'from-indigo-500 to-purple-500', desc: 'نظام كوبونات خصم وبطاقات هدايا قابلة للبيع' },
   { icon: Trophy, title: 'المسابقات والاستطلاعات', color: 'from-violet-500 to-fuchsia-500', desc: 'مسابقات تفاعلية واستطلاعات رأي لزيادة التفاعل' },
   { icon: Star, title: 'التقييمات والمراجعات', color: 'from-yellow-500 to-amber-500', desc: 'تقييم بالنجوم للمنتجات والتوصيل مع تعليقات' },
@@ -24,9 +24,9 @@ export default function ToolsGrid() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <span className="text-xs font-bold text-primary tracking-wider">الأدوات الذكية</span>
-          <h2 className="font-heading font-black text-3xl md:text-5xl mt-2 mb-3">أدوات تعمل بالذكاء الاصطناعي</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">أدوات متقدمة توفّر الوقت وتزيد المبيعات تلقائياً</p>
+          <span className="text-xs font-bold text-primary tracking-wider">أدوات التشغيل والمحتوى</span>
+          <h2 className="font-heading font-black text-3xl md:text-5xl mt-2 mb-3">أدوات جاهزة للاستخدام</h2>
+          <p className="text-muted-foreground max-w-xl mx-auto">أدوات لإدارة المحتوى والمبيعات وخدمة العملاء داخل المنصة</p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">

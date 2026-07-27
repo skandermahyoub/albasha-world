@@ -62,8 +62,8 @@ const SYSTEMS = [
     icon: Cpu,
     gradient: 'from-fuchsia-500 to-purple-600',
     title: 'نظام الذكاء الاصطناعي',
-    desc: 'مولد صور بالـ AI، مولد أوصاف، مساعد شات ذكي، مستشار هدايا، وتوصيات شخصية',
-    features: ['توليد الصور', 'توليد الأوصاف', 'مساعد ذكي', 'توصيات شخصية'],
+    desc: 'توليد صور وأوصاف للمنتجات، ومساعد محادثة داخل المتجر لإرشاد العميل.',
+    features: ['توليد الصور', 'توليد الأوصاف', 'مساعد ذكي', 'محتوى مرئي'],
   },
 ];
 
@@ -79,7 +79,7 @@ export default function SystemsGrid() {
         >
           <span className="text-xs font-bold text-primary tracking-wider">الأنظمة المتكاملة</span>
           <h2 className="font-heading font-black text-3xl md:text-5xl mt-2 mb-3">٩ أنظمة في تطبيق واحد</h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">كل ما تحتاجه لإدارة متجرك من المصنع إلى doorstep العميل</p>
+          <p className="text-muted-foreground max-w-xl mx-auto">وحدات تشغيل تغطي رحلة المتجر من المحتوى إلى خدمة العميل.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

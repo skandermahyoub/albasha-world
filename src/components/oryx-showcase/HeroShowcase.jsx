@@ -51,7 +51,7 @@ export default function HeroShowcase({ stats }) {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6"
         >
           <Sparkles className="w-3.5 h-3.5 text-primary" />
-          <span className="text-xs font-bold text-primary">الإصدار V3.4 — منصة تجارة إلكترونية متكاملة</span>
+          <span className="text-xs font-bold text-primary">الإصدار V4.1 — منصة تشغيل متجر قابلة للإدارة</span>
         </motion.div>
 
         <motion.h1
@@ -60,7 +60,7 @@ export default function HeroShowcase({ stats }) {
           transition={{ delay: 0.1 }}
           className="font-heading font-black text-5xl md:text-7xl mb-4"
         >
-          <span className="text-gradient-luxury">نظام أوريكس V3.4</span>
+          <span className="text-gradient-luxury">نظام أوريكس V4.1</span>
         </motion.h1>
 
         <motion.p
@@ -69,8 +69,8 @@ export default function HeroShowcase({ stats }) {
           transition={{ delay: 0.2 }}
           className="text-lg md:text-xl text-muted-foreground font-body mb-10 max-w-2xl mx-auto"
         >
-          منصة تجارة إلكترونية شاملة تجمع المتجر، نقاط البيع، إدارة المخزون، الذكاء الاصطناعي،
-          وأنظمة الولاء والتسويق في تطبيق واحد متكامل بالكامل
+          منصة تشغيل متجر تجمع المحتوى القابل للإدارة، المنتجات والطلبات والعملاء والمخزون،
+          مع أدوات ذكية وتجربة شراء متجاوبة في تطبيق واحد.
         </motion.p>
 
         <motion.div

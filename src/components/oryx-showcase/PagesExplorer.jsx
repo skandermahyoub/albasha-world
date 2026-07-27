@@ -2,11 +2,11 @@ import { motion } from 'framer-motion';
 import { Smartphone, Laptop, Watch, Home, Tag, ShoppingCart, Package, Heart, GitCompare, Truck, BookOpen, Trophy, Image, Video, ListChecks, Gift, BookMarked, Wallet, UserCog, RotateCcw, TicketCheck, ClipboardList, User } from 'lucide-react';
 
 const STORES = [
-  { icon: Smartphone, name: 'الهواتف الذكية', color: 'text-blue-500 bg-blue-50' },
-  { icon: Laptop, name: 'اللابتوبات', color: 'text-purple-500 bg-purple-50' },
-  { icon: Watch, name: 'الإكسسوارات', color: 'text-green-500 bg-green-50' },
-  { icon: Home, name: 'الأجهزة المنزلية', color: 'text-orange-500 bg-orange-50' },
-  { icon: Tag, name: 'العروض والخصومات', color: 'text-red-500 bg-red-50' },
+  { icon: Smartphone, name: 'الباشا شيشة', color: 'text-blue-500 bg-blue-50' },
+  { icon: Laptop, name: 'الباشا فيب', color: 'text-purple-500 bg-purple-50' },
+  { icon: Watch, name: 'الباشا بوتيك', color: 'text-green-500 bg-green-50' },
+  { icon: Home, name: 'الباشا بيرفيوم', color: 'text-orange-500 bg-orange-50' },
+  { icon: Tag, name: 'الباشا بيتس', color: 'text-red-500 bg-red-50' },
 ];
 
 const PAGES = [
@@ -72,8 +72,8 @@ export default function PagesExplorer() {
           className="text-center mb-8"
         >
           <span className="text-xs font-bold text-primary tracking-wider">صفحات العميل</span>
-          <h2 className="font-heading font-black text-3xl md:text-5xl mt-2 mb-3">١٨ صفحة تفاعلية</h2>
-          <p className="text-muted-foreground">تجربة مستخدم كاملة من التصفّح حتى ما بعد البيع</p>
+          <h2 className="font-heading font-black text-3xl md:text-5xl mt-2 mb-3">تجربة شراء وخدمة متكاملة</h2>
+          <p className="text-muted-foreground">مسارات حية للتصفح والطلب والحساب والمتابعة وما بعد البيع</p>
         </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">

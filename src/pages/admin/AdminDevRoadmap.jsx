@@ -3,29 +3,29 @@ import SystemsGrid from '@/components/oryx-showcase/SystemsGrid';
 import ToolsGrid from '@/components/oryx-showcase/ToolsGrid';
 import PagesExplorer from '@/components/oryx-showcase/PagesExplorer';
 import TechStack from '@/components/oryx-showcase/TechStack';
-import CapabilityCharts from '@/components/oryx-showcase/CapabilityCharts';
 import ClientRating from '@/components/oryx-showcase/ClientRating';
 import ActivationHero from '@/components/oryx-showcase/ActivationHero';
 import OryxFooter from '@/components/oryx-showcase/OryxFooter';
+import ReleaseNotes from '@/components/oryx-showcase/ReleaseNotes';
 import { motion } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 
 const HERO_STATS = [
-  { value: '٣٥+', label: 'كيان قاعدة بيانات' },
-  { value: '٤٠+', label: 'صفحة إدارية' },
-  { value: '٩', label: 'أنظمة متكاملة' },
-  { value: '١٠', label: 'أدوات بالـ AI' },
+  { value: '٥٠+', label: 'كيان بيانات' },
+  { value: '٤٠+', label: 'واجهة إدارة' },
+  { value: '٩', label: 'مجالات تشغيل' },
+  { value: 'V4.1', label: 'الإصدار الحالي' },
 ];
 
 const HIGHLIGHTS = [
-  'متجر إلكتروني متكامل بـ ٥ أقسام وهوية بصرية مستقلة لكل قسم',
-  'نظام نقاط بيع (POS) بمسح باركود متواصل وإدارة ورديات',
-  'ذكاء اصطناعي مدمج: توليد صور، أوصاف، مساعد ذكي، ومستشار هدايا',
-  'نظام CRM كامل بدرجات عضوية ومحافظ رقمية وتقييم العملاء',
-  'نظام ولاء وعجلة حظ ومسابقات لزيادة التفاعل',
-  'برنامج مسوّقين بالعمولة مع تتبع النقرات والمبيعات',
-  'نظام محاسبة وإدارة مخزون وموردين وأوامر شراء',
-  'تطبيق PWA قابل للتثبيت على iOS و Android',
+  'واجهة متجر ديناميكية تعتمد على بيانات الإدارة بدلاً من محتوى تجريبي ثابت',
+  'إدارة مستقلة للشرائح والعروض والبنرات والمقالات والتصنيفات ومميزات الرئيسية',
+  'كتالوج منتجات قابل للفلترة حسب التصنيف مع السلة والمفضلة والمقارنة',
+  'لوحات تشغيل للطلبات والعملاء والمخزون والموردين والمحاسبة والتوصيل',
+  'أدوات ذكاء اصطناعي متاحة للمحتوى والصور والمساعدة داخل المتجر',
+  'نظام ولاء ومسابقات وتسويق بالعمولة ومحافظ وبطاقات هدايا',
+  'إدارة متعددة الأقسام: الشيشة والفيب والبوتيك والعطور واحتياجات الحيوانات',
+  'تطبيق ويب قابل للتثبيت مع دعم الشاشات الصغيرة',
 ];
 
 export default function AdminDevRoadmap() {
@@ -43,7 +43,7 @@ export default function AdminDevRoadmap() {
             className="text-center mb-6"
           >
             <h2 className="font-heading font-black text-2xl md:text-3xl mb-2">أبرز ما أنجزته المنصة</h2>
-            <p className="text-sm text-muted-foreground">نظرة شاملة على الإمكانيات المتوفرة في نظام أوريكس V3.4</p>
+            <p className="text-sm text-muted-foreground">ملخص واقعي للوظائف المتاحة وخارطة الأولويات في نظام أوريكس V4.1</p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {HIGHLIGHTS.map((h, i) => (
@@ -63,10 +63,10 @@ export default function AdminDevRoadmap() {
         </div>
       </section>
 
+      <ReleaseNotes />
       <SystemsGrid />
       <ToolsGrid />
       <PagesExplorer />
-      <CapabilityCharts />
       <TechStack />
 
       <ClientRating />

@@ -16,7 +16,7 @@ const VALUE_PILLARS = [
 const TERMS_SECTIONS = [
   {
     title: 'أولاً: التعريف والمنظومة',
-    body: 'يُعدّ "نظام أوريكس V3.4 (Oryx V3.4)" منظومة رقمية موحدة لإدارة المتاجر الإلكترونية، تجمع في تطبيق واحد أنظمة التجارة، نقاط البيع، المخزون، العملاء، الولاء، التسويق بالعمولة، المحاسبة، التوصيل، والذكاء الاصطناعي. بتقديم طلب التفعيل يُعدّ المتجر (المُرخّص له) مُوافقاً على الاستخدام وفق هذه الاتفاقية.',
+    body: 'يُعدّ "نظام أوريكس V4.1 (Oryx V4.1)" منظومة رقمية موحدة لإدارة المتاجر الإلكترونية، تجمع في تطبيق واحد أنظمة التجارة، نقاط البيع، المخزون، العملاء، الولاء، التسويق بالعمولة، المحاسبة، التوصيل، والذكاء الاصطناعي. بتقديم طلب التفعيل يُعدّ المتجر (المُرخّص له) مُوافقاً على الاستخدام وفق هذه الاتفاقية.',
   },
   {
     title: 'ثانياً: الترخيص والملكية',
@@ -68,7 +68,7 @@ export default function ActivationHero() {
   const [declineSubmitted, setDeclineSubmitted] = useState(false);
 
   const sendActivationRequest = () => {
-    const msg = `مرحباً فريق أوريكس،%0A%0Aأرغب في طلب تفعيل نسخة نظام أوريكس V3.4 (Oryx V3.4) لمتجري.%0A%0Aلقد اطلعت على الشروط والأحكام وأوافق عليها، وأرغب في بدء إجراءات التخصيص والتسليم.%0A%0Aأرجو التواصل معي لإتمام التفعيل.%0A%0Aشكراً.`;
+    const msg = `مرحباً فريق أوريكس،%0A%0Aأرغب في طلب تفعيل نسخة نظام أوريكس V4.1 (Oryx V4.1) لمتجري.%0A%0Aلقد اطلعت على الشروط والأحكام وأوافق عليها، وأرغب في بدء إجراءات التخصيص والتسليم.%0A%0Aأرجو التواصل معي لإتمام التفعيل.%0A%0Aشكراً.`;
     window.open(`https://wa.me/${ACTIVATION_NUMBER}?text=${msg}`, '_blank');
   };
 
@@ -81,7 +81,7 @@ export default function ActivationHero() {
   const handleDeclineSubmit = () => {
     setDeclineSubmitted(true);
     if (declineReason.trim()) {
-      const msg = `مرحباً فريق أوريكس،%0A%0Aبعد الاطلاع على شروط استخدام نظام أوريكس V3.4، لا أوافق حالياً للأسباب التالية:%0A%0A${encodeURIComponent(declineReason)}%0A%0Aأرجو أخذ رؤيتي بعين الاعتبار.`;
+      const msg = `مرحباً فريق أوريكس،%0A%0Aبعد الاطلاع على شروط استخدام نظام أوريكس V4.1، لا أوافق حالياً للأسباب التالية:%0A%0A${encodeURIComponent(declineReason)}%0A%0Aأرجو أخذ رؤيتي بعين الاعتبار.`;
       window.open(`https://wa.me/${ACTIVATION_NUMBER}?text=${msg}`, '_blank');
     }
   };
@@ -104,7 +104,7 @@ export default function ActivationHero() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-bold text-primary">منظومة رقمية موحدة — أوريكس V3.4</span>
+            <span className="text-xs font-bold text-primary">منظومة رقمية موحدة — أوريكس V4.1</span>
           </div>
 
           <h2 className="font-heading font-black text-4xl md:text-6xl mb-5 leading-tight">
@@ -119,7 +119,7 @@ export default function ActivationHero() {
           </p>
 
           <p className="text-sm md:text-base text-foreground/80 font-body max-w-2xl mx-auto leading-relaxed">
-            مع <span className="font-bold text-primary">أوريكس V3.4</span> تجارة بعلم وبصيرة، وبأدوات
+            مع <span className="font-bold text-primary">أوريكس V4.1</span> تجارة بعلم وبصيرة، وبأدوات
             مساعدة ذكية تغنيك عن التأجيل والتأخير في معرفة أحوال تجارتك.
           </p>
         </motion.div>
@@ -282,7 +282,7 @@ export default function ActivationHero() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-heading text-xl">
               <FileText className="w-5 h-5 text-primary" />
-              الشروط والأحكام لتفعيل نظام أوريكس V3.4
+              الشروط والأحكام لتفعيل نظام أوريكس V4.1
             </DialogTitle>
           </DialogHeader>
 
