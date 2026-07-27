@@ -68,7 +68,10 @@ export default function AdminStoreConfigs() {
   return (
     <div>
       <h1 className="font-heading font-bold text-2xl mb-2">إعدادات أقسام {settings?.store_name || 'متجري'}</h1>
-      <p className="text-sm text-muted-foreground mb-6">تخصيص واتساب وخلفيات كل قسم</p>
+      <p className="text-sm text-muted-foreground mb-2">تخصيص واتساب وخلفيات كل قسم</p>
+      <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 mb-6 text-sm">
+        💡 <strong>ملاحظة:</strong> أول صورة في "صور الخلفية المتغيرة" تظهر كصورة بطاقة القسم في الصفحة الرئيسية. ارفع صورة جذابة لكل قسم لتحسين مظهر المتجر.
+      </div>
 
       <div className="space-y-6">
         {STORES.map(store => {

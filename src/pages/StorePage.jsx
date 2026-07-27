@@ -119,7 +119,7 @@ export default function StorePage() {
             />
           </div>
         ) : (
-          <img src={meta.image} alt={meta.name} className="w-full h-48 md:h-64 object-cover" />
+          <div className="w-full h-48 md:h-64" style={{ background: `linear-gradient(135deg, ${effectiveColor}40, ${effectiveColor}10)` }} />
         )}
         <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${effectiveColor}80, ${effectiveColor}20, var(--background))` }} />
         <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-20 md:py-28">

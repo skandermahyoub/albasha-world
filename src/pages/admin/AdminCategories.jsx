@@ -80,6 +80,9 @@ export default function AdminCategories() {
         <div>
           <h1 className="font-heading font-bold text-2xl">التصنيفات</h1>
           <p className="text-sm text-muted-foreground mt-0.5">إدارة تصنيفات {settings?.store_name || 'المتجر'} — كل نشاط له أقسامه الخاصة</p>
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 mt-3 text-sm">
+            💡 <strong>ملاحظة:</strong> التصنيفات التي تحتوي على صورة تظهر تلقائياً في قسم "تصفّح حسب التصنيف" بالصفحة الرئيسية.
+          </div>
         </div>
         <Button onClick={() => openAdd()}><Plus className="w-4 h-4 ml-2" /> تصنيف جديد</Button>
       </div>

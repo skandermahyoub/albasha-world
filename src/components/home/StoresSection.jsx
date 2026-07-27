@@ -13,7 +13,6 @@ const STORE_META = STORE_SECTIONS.map(s => ({
   icon: s.icon,
   desc: s.desc,
   color: s.color,
-  fallbackImage: s.fallbackImage,
 }));
 
 export default function StoresSection() {
@@ -42,8 +41,9 @@ export default function StoresSection() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {STORE_META.map((store, i) => {
           const config = storeConfigs[store.key];
-          const displayImage = config?.bg_images?.[0] || store.fallbackImage;
-          
+          const displayImage = config?.bg_images?.[0];
+          const hasImage = !!displayImage;
+
           return (
             <motion.div
               key={store.key}
@@ -56,15 +56,21 @@ export default function StoresSection() {
                   className="relative rounded-2xl overflow-hidden border hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                   style={{ borderColor: store.color + '4D', background: `linear-gradient(135deg, ${store.color}1A, ${store.color}0A)` }}
                 >
-                  <div className="aspect-[4/3] overflow-hidden">
-                    <img
-                      src={displayImage}
-                      alt={store.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => {
-                        e.target.src = store.fallbackImage;
-                      }}
-                    />
+                  <div className="aspect-[4/3] overflow-hidden relative">
+                    {hasImage ? (
+                      <img
+                        src={displayImage}
+                        alt={store.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div
+                        className="w-full h-full flex items-center justify-center"
+                        style={{ background: `linear-gradient(135deg, ${store.color}22, ${store.color}08)` }}
+                      >
+                        <store.icon className="w-14 h-14" style={{ color: store.color }} />
+                      </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                   </div>
 
@@ -90,10 +96,10 @@ export default function StoresSection() {
                 </div>
               </div>
             </Link>
-          </motion.div>
-        );
-      })}
-      </div>
-    </section>
+            </motion.div>
+            );
+            })}
+            </div>
+            </section>
   );
 }

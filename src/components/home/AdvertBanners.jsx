@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Loader2, Wand2 } from 'lucide-react';
+
 
 // This component displays 4 promotional banners
 export default function AdvertBanners({ banners = [] }) {
@@ -24,11 +24,15 @@ export default function AdvertBanners({ banners = [] }) {
             className="relative rounded-2xl overflow-hidden group cursor-pointer"
           >
             <div className="aspect-[16/7] relative">
-              <img
-                src={banner.image || 'https://images.unsplash.com/photo-1560913210-602903af5079?w=800'}
-                alt={banner.title || ''}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+              {banner.image ? (
+                <img
+                  src={banner.image}
+                  alt={banner.title || ''}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
               <div className="absolute inset-0 flex flex-col justify-center p-6">
                 {banner.title && (

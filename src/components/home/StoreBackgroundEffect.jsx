@@ -1,11 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { STORE_DETAILS } from '@/lib/navLinks';
-
 export default function StoreBackgroundEffect({ storeKey, customImages, isActive = true }) {
   const [currentIdx, setCurrentIdx] = useState(0);
-  const fallbackImages = STORE_DETAILS[storeKey]?.bgImages || [];
-  const images = (customImages && customImages.length > 0) ? customImages : fallbackImages;
+  const images = (customImages && customImages.length > 0) ? customImages : [];
 
   useEffect(() => {
     if (!isActive || images.length <= 1) return;

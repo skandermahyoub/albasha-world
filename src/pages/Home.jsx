@@ -32,6 +32,7 @@ import LiveActivityBar from '@/components/home/LiveActivityBar';
 import TrustBadgesBar from '@/components/home/TrustBadgesBar';
 import DailyDealBanner from '@/components/home/DailyDealBanner';
 import CategoryProductsSection from '@/components/home/CategoryProductsSection';
+import CategoryGrid from '@/components/home/CategoryGrid';
 import FloatingCategories from '@/components/FloatingCategories';
 
 // Lazy-loaded below-the-fold sections for faster initial render
@@ -147,6 +148,9 @@ export default function Home() {
 
       {/* Stores Section */}
       <StoresSection />
+
+      {/* Category Grid (from DB) */}
+      <CategoryGrid />
 
       {/* Daily Deal */}
       <DailyDealBanner products={products} format={currency.format} />
