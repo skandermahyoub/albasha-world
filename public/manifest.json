@@ -1,0 +1,20 @@
+{
+  "name": "عماد ستور - Emad Store",
+  "short_name": "عماد ستور",
+  "description": "وجهتك الأولى للأجهزة الذكية والإلكترونيات بأفضل الأسعار",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#B4D333",
+  "dir": "rtl",
+  "lang": "ar",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

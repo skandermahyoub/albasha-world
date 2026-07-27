@@ -1,0 +1,74 @@
+{
+  "name": "AffiliateCommission",
+  "type": "object",
+  "properties": {
+    "affiliate_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0645\u0633\u0648\u0642"
+    },
+    "affiliate_code": {
+      "type": "string",
+      "title": "\u0643\u0648\u062f \u0627\u0644\u0645\u0633\u0648\u0642"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0637\u0644\u0628"
+    },
+    "order_number": {
+      "type": "string",
+      "title": "\u0631\u0642\u0645 \u0627\u0644\u0637\u0644\u0628"
+    },
+    "sale_amount": {
+      "type": "number",
+      "title": "\u0642\u064a\u0645\u0629 \u0627\u0644\u0628\u064a\u0639"
+    },
+    "commission_rate": {
+      "type": "number",
+      "title": "\u0646\u0633\u0628\u0629 \u0627\u0644\u0639\u0645\u0648\u0644\u0629 %"
+    },
+    "commission_amount": {
+      "type": "number",
+      "title": "\u0645\u0628\u0644\u063a \u0627\u0644\u0639\u0645\u0648\u0644\u0629"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "earned",
+        "reversed"
+      ],
+      "title": "\u0627\u0644\u062d\u0627\u0644\u0629",
+      "default": "pending"
+    },
+    "reference_commission_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0627\u0644\u0645\u0631\u062a\u0628\u0637\u0629 (\u0644\u0627\u0644\u0639\u0643\u0633)"
+    }
+  },
+  "required": [
+    "affiliate_id",
+    "commission_amount"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

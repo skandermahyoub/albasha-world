@@ -1,0 +1,76 @@
+{
+  "name": "ProductReview",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "title": "\u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "\u0627\u0644\u0628\u0631\u064a\u062f"
+    },
+    "user_name": {
+      "type": "string",
+      "title": "\u0627\u0644\u0627\u0633\u0645"
+    },
+    "rating": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0642\u064a\u064a\u0645",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "title": {
+      "type": "string",
+      "title": "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062a\u0642\u064a\u064a\u0645"
+    },
+    "comment": {
+      "type": "string",
+      "title": "\u0627\u0644\u062a\u0639\u0644\u064a\u0642"
+    },
+    "image_url": {
+      "type": "string",
+      "title": "\u0635\u0648\u0631\u0629 \u0645\u0631\u0641\u0642\u0629"
+    },
+    "verified_purchase": {
+      "type": "boolean",
+      "title": "\u0634\u0631\u0627\u0621 \u0645\u0648\u062b\u0642",
+      "default": false
+    },
+    "helpful_count": {
+      "type": "number",
+      "title": "\u0645\u0641\u064a\u062f",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "title": "\u0627\u0644\u062d\u0627\u0644\u0629",
+      "default": "pending"
+    }
+  },
+  "required": [
+    "product_id",
+    "user_name",
+    "rating",
+    "comment"
+  ],
+  "rls": {
+    "read": {},
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

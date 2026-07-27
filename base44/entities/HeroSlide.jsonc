@@ -1,0 +1,84 @@
+{
+  "name": "HeroSlide",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0631\u0626\u064a\u0633\u064a"
+    },
+    "subtitle": {
+      "type": "string",
+      "title": "\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0641\u0631\u0639\u064a"
+    },
+    "image": {
+      "type": "string",
+      "title": "\u0635\u0648\u0631\u0629 \u0627\u0644\u062e\u0644\u0641\u064a\u0629"
+    },
+    "button_text": {
+      "type": "string",
+      "title": "\u0646\u0635 \u0627\u0644\u0632\u0631"
+    },
+    "button_link": {
+      "type": "string",
+      "title": "\u0631\u0627\u0628\u0637 \u0645\u062e\u0635\u0635"
+    },
+    "link_type": {
+      "type": "string",
+      "enum": [
+        "product",
+        "category",
+        "custom"
+      ],
+      "title": "\u0646\u0648\u0639 \u0627\u0644\u0631\u0627\u0628\u0637",
+      "default": "custom"
+    },
+    "linked_product_id": {
+      "type": "string",
+      "title": "\u0627\u0644\u0645\u0646\u062a\u062c \u0627\u0644\u0645\u0631\u062a\u0628\u0637"
+    },
+    "linked_category_id": {
+      "type": "string",
+      "title": "\u0627\u0644\u062a\u0635\u0646\u064a\u0641 \u0627\u0644\u0645\u0631\u062a\u0628\u0637"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "title": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0628\u062f\u0627\u064a\u0629"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "title": "\u062a\u0627\u0631\u064a\u062e \u0627\u0644\u0646\u0647\u0627\u064a\u0629"
+    },
+    "sort_order": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0631\u062a\u064a\u0628"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "\u0645\u0641\u0639\u0644",
+      "default": true
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

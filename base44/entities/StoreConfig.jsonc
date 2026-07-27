@@ -1,0 +1,97 @@
+{
+  "name": "StoreConfig",
+  "type": "object",
+  "properties": {
+    "store_key": {
+      "type": "string",
+      "title": "\u0645\u0641\u062a\u0627\u062d \u0627\u0644\u0642\u0633\u0645",
+      "enum": [
+        "emad_phones",
+        "emad_laptops",
+        "emad_accessories",
+        "emad_home",
+        "emad_offers"
+      ]
+    },
+    "whatsapp_number": {
+      "type": "string",
+      "title": "\u0631\u0642\u0645 \u0648\u0627\u062a\u0633\u0627\u0628 \u0627\u0644\u0642\u0633\u0645",
+      "default": "967776616688"
+    },
+    "bg_images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "\u0635\u0648\u0631 \u0627\u0644\u062e\u0644\u0641\u064a\u0629 \u0627\u0644\u0645\u062a\u063a\u064a\u0631\u0629"
+    },
+    "bg_effect_active": {
+      "type": "boolean",
+      "title": "\u062a\u0641\u0639\u064a\u0644 \u062a\u0623\u062b\u064a\u0631 \u0627\u0644\u062e\u0644\u0641\u064a\u0629",
+      "default": true
+    },
+    "store_slider": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "button_text": {
+            "type": "string"
+          },
+          "button_link": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "\u0634\u0631\u0627\u0626\u062d \u0633\u0644\u0627\u064a\u062f\u0631 \u0627\u0644\u0642\u0633\u0645"
+    },
+    "exclusive_offers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "discount_percent": {
+            "type": "number"
+          },
+          "image": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "\u0627\u0644\u0639\u0631\u0648\u0636 \u0627\u0644\u062d\u0635\u0631\u064a\u0629"
+    }
+  },
+  "required": [
+    "store_key"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

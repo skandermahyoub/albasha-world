@@ -1,0 +1,71 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "\u0627\u0644\u0639\u0646\u0648\u0627\u0646"
+    },
+    "message": {
+      "type": "string",
+      "title": "\u0627\u0644\u0631\u0633\u0627\u0644\u0629"
+    },
+    "icon": {
+      "type": "string",
+      "title": "\u0627\u0644\u0623\u064a\u0642\u0648\u0646\u0629 (\u0625\u064a\u0645\u0648\u062c\u064a)",
+      "default": "\ud83c\udf89"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "promo",
+        "info",
+        "alert",
+        "loyalty"
+      ],
+      "title": "\u0627\u0644\u0646\u0648\u0639",
+      "default": "promo"
+    },
+    "customer_email": {
+      "type": "string",
+      "title": "\u0628\u0631\u064a\u062f \u0639\u0645\u064a\u0644 \u0645\u062d\u062f\u062f (\u0641\u0627\u0631\u063a = \u0644\u0644\u062c\u0645\u064a\u0639)"
+    },
+    "interval_minutes": {
+      "type": "number",
+      "title": "\u0643\u0644 \u0643\u0645 \u062f\u0642\u064a\u0642\u0629 \u064a\u0638\u0647\u0631",
+      "default": 5
+    },
+    "sort_order": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0631\u062a\u064a\u0628",
+      "default": 1
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "\u0645\u0641\u0639\u0651\u0644",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "message"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

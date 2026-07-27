@@ -1,0 +1,92 @@
+{
+  "name": "InventoryMovement",
+  "type": "object",
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "title": "\u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "product_title": {
+      "type": "string",
+      "title": "\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "sku": {
+      "type": "string",
+      "title": "\u0627\u0644\u0628\u0627\u0631\u0643\u0648\u062f / SKU"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "sale",
+        "restock",
+        "return",
+        "adjustment"
+      ],
+      "title": "\u0646\u0648\u0639 \u0627\u0644\u062d\u0631\u0643\u0629"
+    },
+    "quantity": {
+      "type": "number",
+      "title": "\u0627\u0644\u0643\u0645\u064a\u0629"
+    },
+    "stock_before": {
+      "type": "number",
+      "title": "\u0627\u0644\u0645\u062e\u0632\u0648\u0646 \u0642\u0628\u0644"
+    },
+    "stock_after": {
+      "type": "number",
+      "title": "\u0627\u0644\u0645\u062e\u0632\u0648\u0646 \u0628\u0639\u062f"
+    },
+    "unit_price": {
+      "type": "number",
+      "title": "\u0633\u0639\u0631 \u0627\u0644\u0648\u062d\u062f\u0629"
+    },
+    "total": {
+      "type": "number",
+      "title": "\u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0651\u0641 \u0627\u0644\u0637\u0644\u0628"
+    },
+    "order_number": {
+      "type": "string",
+      "title": "\u0631\u0642\u0645 \u0627\u0644\u0641\u0627\u062a\u0648\u0631\u0629"
+    },
+    "shift_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0651\u0641 \u0627\u0644\u0648\u0631\u062f\u064a\u0629"
+    },
+    "note": {
+      "type": "string",
+      "title": "\u0645\u0644\u0627\u062d\u0638\u0629"
+    }
+  },
+  "required": [
+    "product_id",
+    "product_title",
+    "type",
+    "quantity"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

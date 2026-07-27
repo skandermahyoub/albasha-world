@@ -1,0 +1,115 @@
+{
+  "name": "AbandonedCart",
+  "type": "object",
+  "properties": {
+    "customer_email": {
+      "type": "string",
+      "title": "\u0628\u0631\u064a\u062f \u0627\u0644\u0639\u0645\u064a\u0644"
+    },
+    "customer_name": {
+      "type": "string",
+      "title": "\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644"
+    },
+    "customer_phone": {
+      "type": "string",
+      "title": "\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641"
+    },
+    "visitor_key": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0632\u0627\u0626\u0631"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "image": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "\u0627\u0644\u0645\u0646\u062a\u062c\u0627\u062a"
+    },
+    "cart_total": {
+      "type": "number",
+      "title": "\u0625\u062c\u0645\u0627\u0644\u064a \u0627\u0644\u0633\u0644\u0629",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "reminded",
+        "recovered",
+        "expired"
+      ],
+      "title": "\u0627\u0644\u062d\u0627\u0644\u0629",
+      "default": "pending"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "title": "\u062a\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u062a\u0630\u0643\u064a\u0631",
+      "default": false
+    },
+    "reminder_method": {
+      "type": "string",
+      "enum": [
+        "whatsapp",
+        "email",
+        "push",
+        "none"
+      ],
+      "title": "\u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u062a\u0630\u0643\u064a\u0631",
+      "default": "none"
+    },
+    "discount_code": {
+      "type": "string",
+      "title": "\u0643\u0648\u062f \u062e\u0635\u0645 \u0627\u0644\u062a\u062d\u0641\u064a\u0632"
+    },
+    "recovered_order_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0637\u0644\u0628 \u0627\u0644\u0645\u0633\u062a\u0631\u062c\u0639"
+    },
+    "recovery_token": {
+      "type": "string",
+      "title": "\u0631\u0645\u0632 \u0627\u0644\u0627\u0633\u062a\u0639\u0627\u062f\u0629"
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

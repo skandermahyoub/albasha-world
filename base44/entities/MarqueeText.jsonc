@@ -1,0 +1,40 @@
+{
+  "name": "MarqueeText",
+  "type": "object",
+  "properties": {
+    "text": {
+      "type": "string",
+      "title": "\u0627\u0644\u0646\u0635"
+    },
+    "sort_order": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0631\u062a\u064a\u0628"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "\u0645\u0641\u0639\u0644",
+      "default": true
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

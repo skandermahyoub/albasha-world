@@ -1,0 +1,44 @@
+{
+  "name": "Brand",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "\u0627\u0633\u0645 \u0627\u0644\u0639\u0644\u0627\u0645\u0629 \u0627\u0644\u062a\u062c\u0627\u0631\u064a\u0629"
+    },
+    "logo": {
+      "type": "string",
+      "title": "\u0627\u0644\u0634\u0639\u0627\u0631"
+    },
+    "sort_order": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0631\u062a\u064a\u0628"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "\u0645\u0641\u0639\u0644",
+      "default": true
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

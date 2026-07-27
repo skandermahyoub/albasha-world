@@ -1,0 +1,46 @@
+{
+  "name": "ContactMessage",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "\u0627\u0644\u0627\u0633\u0645"
+    },
+    "phone": {
+      "type": "string",
+      "title": "\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641"
+    },
+    "message": {
+      "type": "string",
+      "title": "\u0627\u0644\u0631\u0633\u0627\u0644\u0629"
+    },
+    "is_read": {
+      "type": "boolean",
+      "title": "\u0645\u0642\u0631\u0648\u0621\u0629",
+      "default": false
+    }
+  },
+  "required": [
+    "name",
+    "phone",
+    "message"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

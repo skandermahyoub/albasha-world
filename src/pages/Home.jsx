@@ -1,0 +1,243 @@
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { base44 } from '@/api/base44Client';
+import useTheme from '@/lib/useTheme';
+import { useStoreSettings } from '@/lib/useStoreSettings';
+import { useCart, useFavorites, useCompare } from '@/lib/useCart';
+import useCurrency from '@/lib/useCurrency';
+import BigHeader from '@/components/layout/BigHeader';
+import StickyHeader from '@/components/layout/StickyHeader';
+import Footer from '@/components/layout/Footer';
+import HeroSlider from '@/components/home/HeroSlider';
+import MarqueeBar from '@/components/home/MarqueeBar';
+import OffersCarousel from '@/components/home/OffersCarousel';
+import ProductsShowcase from '@/components/home/ProductsShowcase';
+import ReviewsSection from '@/components/home/ReviewsSection';
+import BrandsSection from '@/components/home/BrandsSection';
+import ContactSection from '@/components/home/ContactSection';
+import BundlesSection from '@/components/home/BundlesSection';
+import StoresSection from '@/components/home/StoresSection';
+import BottomNav from '@/components/BottomNav';
+import NotificationSystem from '@/components/NotificationSystem';
+import SEOHead from '@/components/SEOHead';
+import FeaturesSection from '@/components/home/FeaturesSection';
+import AdvertBanners from '@/components/home/AdvertBanners';
+// WhatsAppButton removed - contact via BottomNav chat
+import SmartPersonalization from '@/components/home/SmartPersonalization';
+import AdaptiveNightMode from '@/components/home/AdaptiveNightMode';
+import CartFlyAnimation from '@/components/CartFlyAnimation';
+import HomeSkeleton from '@/components/home/HomeSkeleton';
+
+import FacebookFeedSection from '@/components/home/FacebookFeedSection';
+import LiveActivityBar from '@/components/home/LiveActivityBar';
+import TrustBadgesBar from '@/components/home/TrustBadgesBar';
+import DailyDealBanner from '@/components/home/DailyDealBanner';
+import CategoryProductsSection from '@/components/home/CategoryProductsSection';
+import FloatingCategories from '@/components/FloatingCategories';
+
+// Lazy-loaded below-the-fold sections for faster initial render
+const ShortVideosSection = lazy(() => import('@/components/home/ShortVideosSection'));
+const SocialFeedSection = lazy(() => import('@/components/home/SocialFeedSection'));
+const SpinWheelSection = lazy(() => import('@/components/home/SpinWheelSection'));
+const ReferFriendBanner = lazy(() => import('@/components/home/ReferFriendBanner'));
+const CreatorEngagementSection = lazy(() => import('@/components/home/CreatorEngagementSection'));
+const VIPCorner = lazy(() => import('@/components/home/VIPCorner'));
+const MagazineSection = lazy(() => import('@/components/home/MagazineSection'));
+
+const SectionFallback = () => null;
+
+export default function Home() {
+  const { isDark, toggle } = useTheme();
+  const { items: cartItems, addItem, count: cartCount } = useCart();
+  const { toggleFav, isFav } = useFavorites();
+  const { toggleCompare, isComparing } = useCompare();
+  const { settings, loading: settingsLoading } = useStoreSettings();
+  const currency = useCurrency(settings);
+  const [showSticky, setShowSticky] = useState(false);
+  const bigHeaderRef = useRef(null);
+
+  const [slides, setSlides] = useState([]);
+  const [marqueeItems, setMarqueeItems] = useState([]);
+  const [offers, setOffers] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [bundles, setBundles] = useState([]);
+  const [banners, setBanners] = useState([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const [slidesData, marqueeData, offersData, productsData, reviewsData, brandsData, postsData, bundlesData, bannersData] = await Promise.all([
+        base44.entities.HeroSlide.list('sort_order').catch(() => []),
+        base44.entities.MarqueeText.list('sort_order').catch(() => []),
+        base44.entities.SpecialOffer.list('sort_order').catch(() => []),
+        base44.entities.Product.list('-created_date', 50).catch(() => []),
+        base44.entities.Review.list('-created_date', 50).catch(() => []),
+        base44.entities.Brand.list('sort_order').catch(() => []),
+        base44.entities.BlogPost.list('-created_date', 10).catch(() => []),
+        base44.entities.Bundle.list('-created_date', 10).catch(() => []),
+        base44.entities.AdvertBanner.list('sort_order').catch(() => []),
+      ]);
+      setSlides(slidesData);
+      setMarqueeItems(marqueeData);
+      setOffers(offersData);
+      setProducts(productsData);
+      setReviews(reviewsData);
+      setBrands(brandsData);
+      setPosts(postsData);
+      setBundles(bundlesData);
+      setBanners(bannersData);
+    };
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowSticky(window.scrollY > 280);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // التقاط كود الإحالة (Affiliate) من الرابط
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      localStorage.setItem('affiliate_ref', refCode);
+      // تسجيل نقرة على رابط المسوق عبر الخادم (منع التكرar)
+      base44.functions.invoke('track-affiliate-click', { affiliate_code: refCode }).catch(() => {});
+    }
+  }, []);
+
+  if (!settings) return <HomeSkeleton />;
+
+  return (
+    <div className="min-h-screen bg-background relative">
+      <SEOHead
+        title={settings?.store_name}
+        description={settings?.slogan}
+        image={settings?.logo_url}
+      />
+      <AdaptiveNightMode isDark={isDark} />
+      <CartFlyAnimation />
+      
+      {/* Big Header */}
+      <div ref={bigHeaderRef}>
+        <BigHeader settings={settings} />
+      </div>
+
+      {/* Sticky Header */}
+      <StickyHeader visible={showSticky} cartCount={cartCount} isDark={isDark} toggleTheme={toggle} settings={settings} />
+
+      {/* Hero Slider */}
+      <HeroSlider slides={slides} />
+
+      {/* Marquee */}
+      <MarqueeBar items={marqueeItems} />
+
+      {/* Live Activity */}
+      <LiveActivityBar />
+
+      {/* Creator Community */}
+      <Suspense fallback={<SectionFallback />}><CreatorEngagementSection settings={settings} /></Suspense>
+
+      {/* Trust Badges */}
+      <TrustBadgesBar />
+
+      {/* Stores Section */}
+      <StoresSection />
+
+      {/* Daily Deal */}
+      <DailyDealBanner products={products} format={currency.format} />
+
+      {/* Offers */}
+      <OffersCarousel offers={offers} />
+
+      {/* Category Products */}
+      <CategoryProductsSection
+        products={products}
+        onAddCart={addItem}
+        onToggleFav={toggleFav}
+        onToggleCompare={toggleCompare}
+        isFav={isFav}
+        isComparing={isComparing}
+        format={currency.format}
+        settings={settings}
+      />
+
+      {/* Spin & Win */}
+      <Suspense fallback={<SectionFallback />}><SpinWheelSection /></Suspense>
+
+      {/* Bundles */}
+      <BundlesSection bundles={bundles} format={currency.format} />
+
+      {/* Refer a Friend */}
+      <Suspense fallback={<SectionFallback />}><ReferFriendBanner settings={settings} /></Suspense>
+
+      {/* Smart Personalization */}
+      <SmartPersonalization
+        products={products}
+        onAddCart={addItem}
+        onToggleFav={toggleFav}
+        onToggleCompare={toggleCompare}
+        isFav={isFav}
+        isComparing={isComparing}
+        format={currency.format}
+        settings={settings}
+      />
+
+      {/* Products Showcase */}
+      <ProductsShowcase
+        products={products}
+        onAddCart={addItem}
+        onToggleFav={toggleFav}
+        onToggleCompare={toggleCompare}
+        isFav={isFav}
+        isComparing={isComparing}
+        format={currency.format}
+        settings={settings}
+      />
+
+      {/* Short Videos */}
+      <Suspense fallback={<SectionFallback />}><ShortVideosSection /></Suspense>
+
+      {/* Social Feed */}
+      <Suspense fallback={<SectionFallback />}><SocialFeedSection /></Suspense>
+
+      {/* Reviews */}
+      <ReviewsSection reviews={reviews} />
+
+      {/* Brands */}
+      <BrandsSection brands={brands} />
+
+      {/* Advert Banners */}
+      <AdvertBanners banners={banners} />
+
+      {/* Features */}
+      <FeaturesSection />
+
+      {/* VIP Corner */}
+      <Suspense fallback={<SectionFallback />}><VIPCorner products={products} format={currency.format} /></Suspense>
+
+      {/* Facebook Feed */}
+      <FacebookFeedSection />
+
+      {/* Magazine Section */}
+      <Suspense fallback={<SectionFallback />}><MagazineSection posts={posts} /></Suspense>
+
+      {/* Contact */}
+      <ContactSection settings={settings} />
+
+      {/* Footer */}
+      <Footer settings={settings} />
+
+      {/* Bottom Navigation */}
+      <div className="h-20" />
+      <BottomNav settings={settings} />
+
+      <NotificationSystem />
+      <FloatingCategories />
+    </div>
+  );
+}

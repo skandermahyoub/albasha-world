@@ -1,0 +1,246 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "subtitle": {
+      "type": "string",
+      "title": "\u0648\u0635\u0641 \u0645\u062e\u062a\u0635\u0631"
+    },
+    "description": {
+      "type": "string",
+      "title": "\u0627\u0644\u0648\u0635\u0641 \u0627\u0644\u062a\u0641\u0635\u064a\u0644\u064a"
+    },
+    "image": {
+      "type": "string",
+      "title": "\u0635\u0648\u0631\u0629 \u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "\u0645\u0639\u0631\u0636 \u0627\u0644\u0635\u0648\u0631"
+    },
+    "price": {
+      "type": "number",
+      "title": "\u0627\u0644\u0633\u0639\u0631 (\u062f\u0648\u0644\u0627\u0631 \u0623\u0645\u0631\u064a\u0643\u064a)"
+    },
+    "old_price": {
+      "type": "number",
+      "title": "\u0627\u0644\u0633\u0639\u0631 \u0627\u0644\u0642\u062f\u064a\u0645 (\u062f\u0648\u0644\u0627\u0631 \u0623\u0645\u0631\u064a\u0643\u064a)"
+    },
+    "discount_end_date": {
+      "type": "string",
+      "format": "date",
+      "title": "\u062a\u0627\u0631\u064a\u062e \u0627\u0646\u062a\u0647\u0627\u0621 \u0627\u0644\u062e\u0635\u0645"
+    },
+    "category_id": {
+      "type": "string",
+      "title": "\u0627\u0644\u062a\u0635\u0646\u064a\u0641 \u0627\u0644\u0641\u0631\u0639\u064a"
+    },
+    "store_key": {
+      "type": "string",
+      "title": "\u0627\u0644\u0642\u0633\u0645",
+      "enum": [
+        "shisha",
+        "vape",
+        "boutique",
+        "perfume",
+        "pets"
+      ]
+    },
+    "brand": {
+      "type": "string",
+      "title": "\u0627\u0644\u0645\u0627\u0631\u0643\u0629"
+    },
+    "flavor": {
+      "type": "string",
+      "title": "\u0627\u0644\u0646\u0643\u0647\u0629 / \u0627\u0644\u0646\u0648\u0639"
+    },
+    "nicotine_level": {
+      "type": "string",
+      "title": "\u0627\u0644\u062a\u0631\u0643\u064a\u0632 / \u0627\u0644\u0645\u0633\u0643\u0648\u062a"
+    },
+    "device_condition": {
+      "type": "string",
+      "title": "\u062d\u0627\u0644\u0629 \u0627\u0644\u0645\u0646\u062a\u062c",
+      "enum": [
+        "new",
+        "used_like_new",
+        "used_very_good",
+        "used_good",
+        "open_box"
+      ]
+    },
+    "condition_notes": {
+      "type": "string",
+      "title": "\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u062d\u0627\u0644\u0629"
+    },
+    "warranty": {
+      "type": "string",
+      "title": "\u0627\u0644\u0636\u0645\u0627\u0646"
+    },
+    "storage": {
+      "type": "string",
+      "title": "\u0633\u0639\u0629 \u0627\u0644\u062a\u062e\u0632\u064a\u0646"
+    },
+    "ram": {
+      "type": "string",
+      "title": "\u0627\u0644\u0631\u0627\u0645"
+    },
+    "processor": {
+      "type": "string",
+      "title": "\u0627\u0644\u0645\u0639\u0627\u0644\u062c"
+    },
+    "camera": {
+      "type": "string",
+      "title": "\u0627\u0644\u0643\u0627\u0645\u064a\u0631\u0627"
+    },
+    "battery": {
+      "type": "string",
+      "title": "\u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629"
+    },
+    "battery_health": {
+      "type": "string",
+      "title": "\u0635\u062d\u0629 \u0627\u0644\u0628\u0637\u0627\u0631\u064a\u0629"
+    },
+    "screen_size": {
+      "type": "string",
+      "title": "\u062d\u062c\u0645 \u0627\u0644\u0634\u0627\u0634\u0629"
+    },
+    "sim_type": {
+      "type": "string",
+      "title": "\u0646\u0648\u0639 \u0627\u0644\u0634\u0631\u064a\u062d\u0629 / \u0627\u0644\u0634\u0628\u0643\u0629"
+    },
+    "color_name": {
+      "type": "string",
+      "title": "\u0627\u0644\u0644\u0648\u0646"
+    },
+    "os": {
+      "type": "string",
+      "title": "\u0646\u0638\u0627\u0645 \u0627\u0644\u062a\u0634\u063a\u064a\u0644"
+    },
+    "accessory_type": {
+      "type": "string",
+      "title": "\u0646\u0648\u0639 \u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "compatibility": {
+      "type": "string",
+      "title": "\u0627\u0644\u062a\u0648\u0627\u0641\u0642 / \u0627\u0644\u0645\u062a\u0648\u0627\u0641\u0642\u0629"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "\u0627\u0644\u0648\u0633\u0648\u0645"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "title": "\u0645\u0646\u062a\u062c \u0645\u0645\u064a\u0632"
+    },
+    "is_bestseller": {
+      "type": "boolean",
+      "title": "\u0627\u0644\u0623\u0643\u062b\u0631 \u0645\u0628\u064a\u0639\u0627\u064b"
+    },
+    "is_new": {
+      "type": "boolean",
+      "title": "\u0645\u0646\u062a\u062c \u062c\u062f\u064a\u062f"
+    },
+    "is_coming_soon": {
+      "type": "boolean",
+      "title": "\u0642\u0627\u062f\u0645 \u0642\u0631\u064a\u0628\u0627\u064b"
+    },
+    "is_subscribable": {
+      "type": "boolean",
+      "title": "\u0645\u062a\u0627\u062d \u0644\u0644\u0627\u0634\u062a\u0631\u0627\u0643 \u0627\u0644\u062f\u0648\u0631\u064a",
+      "default": false
+    },
+    "subscription_discount": {
+      "type": "number",
+      "title": "\u062e\u0635\u0645 \u0627\u0644\u0627\u0634\u062a\u0631\u0627\u0643 (%)",
+      "default": 10
+    },
+    "stock": {
+      "type": "number",
+      "title": "\u0627\u0644\u0645\u062e\u0632\u0648\u0646"
+    },
+    "stock_alert_threshold": {
+      "type": "number",
+      "title": "\u062d\u062f \u062a\u0646\u0628\u064a\u0647 \u0627\u0644\u0645\u062e\u0632\u0648\u0646",
+      "default": 5
+    },
+    "sku": {
+      "type": "string",
+      "title": "\u0631\u0645\u0632 \u0627\u0644\u0645\u0646\u062a\u062c / \u0627\u0644\u0628\u0627\u0631\u0643\u0648\u062f"
+    },
+    "power_wattage": {
+      "type": "string",
+      "title": "\u0627\u0644\u0627\u0633\u062a\u0637\u0627\u0639\u0629 (\u0648\u0627\u0637)"
+    },
+    "volume": {
+      "type": "string",
+      "title": "\u0627\u0644\u062d\u062c\u0645 / \u0627\u0644\u0623\u0648\u0646 / \u0627\u0644\u0645\u0644\u0644"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "draft",
+        "archived"
+      ],
+      "title": "\u0627\u0644\u062d\u0627\u0644\u0629"
+    },
+    "show_price": {
+      "type": "boolean",
+      "title": "\u0625\u0638\u0647\u0627\u0631 \u0627\u0644\u0633\u0639\u0631",
+      "default": true
+    },
+    "show_cart_btn": {
+      "type": "boolean",
+      "title": "\u0625\u0638\u0647\u0627\u0631 \u0632\u0631 \u0627\u0644\u0633\u0644\u0629",
+      "default": true
+    },
+    "show_fav_btn": {
+      "type": "boolean",
+      "title": "\u0625\u0638\u0647\u0627\u0631 \u0632\u0631 \u0627\u0644\u0645\u0641\u0636\u0644\u0629",
+      "default": true
+    },
+    "show_compare_btn": {
+      "type": "boolean",
+      "title": "\u0625\u0638\u0647\u0627\u0631 \u0632\u0631 \u0627\u0644\u0645\u0642\u0627\u0631\u0646\u0629",
+      "default": true
+    },
+    "sales_count": {
+      "type": "number",
+      "title": "\u0639\u062f\u062f \u0627\u0644\u0645\u0628\u064a\u0639\u0627\u062a",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "category_id"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

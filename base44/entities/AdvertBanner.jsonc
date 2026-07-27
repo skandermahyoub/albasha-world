@@ -1,0 +1,58 @@
+{
+  "name": "AdvertBanner",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "\u0627\u0644\u0639\u0646\u0648\u0627\u0646"
+    },
+    "subtitle": {
+      "type": "string",
+      "title": "\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0641\u0631\u0639\u064a"
+    },
+    "image": {
+      "type": "string",
+      "title": "\u0627\u0644\u0635\u0648\u0631\u0629"
+    },
+    "button_text": {
+      "type": "string",
+      "title": "\u0646\u0635 \u0627\u0644\u0632\u0631"
+    },
+    "button_link": {
+      "type": "string",
+      "title": "\u0631\u0627\u0628\u0637 \u0627\u0644\u0632\u0631"
+    },
+    "sort_order": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0631\u062a\u064a\u0628",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "\u0645\u0641\u0639\u0651\u0644",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "image"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

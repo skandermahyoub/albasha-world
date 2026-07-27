@@ -1,0 +1,73 @@
+{
+  "name": "SocialPost",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "\u0627\u0644\u0639\u0646\u0648\u0627\u0646"
+    },
+    "content": {
+      "type": "string",
+      "title": "\u0646\u0635 \u0627\u0644\u0645\u0646\u0634\u0648\u0631"
+    },
+    "image": {
+      "type": "string",
+      "title": "\u0627\u0644\u0635\u0648\u0631\u0629"
+    },
+    "link": {
+      "type": "string",
+      "title": "\u0631\u0627\u0628\u0637 \u0627\u0644\u0645\u0646\u0634\u0648\u0631"
+    },
+    "platform": {
+      "type": "string",
+      "enum": [
+        "facebook",
+        "instagram"
+      ],
+      "title": "\u0627\u0644\u0645\u0646\u0635\u0629",
+      "default": "facebook"
+    },
+    "likes_count": {
+      "type": "number",
+      "title": "\u0627\u0644\u0625\u0639\u062c\u0627\u0628\u0627\u062a",
+      "default": 0
+    },
+    "comments_count": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0639\u0644\u064a\u0642\u0627\u062a",
+      "default": 0
+    },
+    "sort_order": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0631\u062a\u064a\u0628",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "\u0645\u0641\u0639\u0644",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "image"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

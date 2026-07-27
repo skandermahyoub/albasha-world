@@ -1,0 +1,58 @@
+{
+  "name": "VideoGallery",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0641\u064a\u062f\u064a\u0648"
+    },
+    "description": {
+      "type": "string",
+      "title": "\u0627\u0644\u0648\u0635\u0641"
+    },
+    "video_url": {
+      "type": "string",
+      "title": "\u0631\u0627\u0628\u0637 \u0627\u0644\u0641\u064a\u062f\u064a\u0648"
+    },
+    "cover_image": {
+      "type": "string",
+      "title": "\u0635\u0648\u0631\u0629 \u0627\u0644\u063a\u0644\u0627\u0641"
+    },
+    "category": {
+      "type": "string",
+      "title": "\u0627\u0644\u062a\u0635\u0646\u064a\u0641"
+    },
+    "sort_order": {
+      "type": "number",
+      "title": "\u0627\u0644\u062a\u0631\u062a\u064a\u0628",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "\u0645\u0641\u0639\u0651\u0644",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "video_url"
+  ],
+  "rls": {
+    "read": {},
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

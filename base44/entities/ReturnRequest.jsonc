@@ -1,0 +1,136 @@
+{
+  "name": "ReturnRequest",
+  "type": "object",
+  "properties": {
+    "request_number": {
+      "type": "string",
+      "title": "\u0631\u0642\u0645 \u0627\u0644\u0637\u0644\u0628"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0637\u0644\u0628 \u0627\u0644\u0623\u0635\u0644\u064a"
+    },
+    "customer_name": {
+      "type": "string",
+      "title": "\u0627\u0633\u0645 \u0627\u0644\u0639\u0645\u064a\u0644"
+    },
+    "customer_email": {
+      "type": "string",
+      "title": "\u0628\u0631\u064a\u062f \u0627\u0644\u0639\u0645\u064a\u0644"
+    },
+    "customer_phone": {
+      "type": "string",
+      "title": "\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062a\u0641"
+    },
+    "product_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "product_title": {
+      "type": "string",
+      "title": "\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "defective",
+        "wrong_item",
+        "not_as_described",
+        "changed_mind",
+        "damaged_shipping",
+        "other"
+      ],
+      "title": "\u0633\u0628\u0628 \u0627\u0644\u0625\u0631\u062c\u0627\u0639"
+    },
+    "description": {
+      "type": "string",
+      "title": "\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0625\u0631\u062c\u0627\u0639"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "\u0635\u0648\u0631 \u0627\u0644\u0645\u0646\u062a\u062c"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "return",
+        "exchange"
+      ],
+      "title": "\u0646\u0648\u0639 \u0627\u0644\u0637\u0644\u0628",
+      "default": "return"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "pickup_scheduled",
+        "received",
+        "refunded",
+        "completed"
+      ],
+      "title": "\u0627\u0644\u062d\u0627\u0644\u0629",
+      "default": "pending"
+    },
+    "refund_amount": {
+      "type": "number",
+      "title": "\u0645\u0628\u0644\u063a \u0627\u0644\u0627\u0633\u062a\u0631\u062f\u0627\u062f"
+    },
+    "refund_method": {
+      "type": "string",
+      "enum": [
+        "wallet",
+        "bank_transfer",
+        "cash",
+        "store_credit"
+      ],
+      "title": "\u0637\u0631\u064a\u0642\u0629 \u0627\u0644\u0627\u0633\u062a\u0631\u062f\u0627\u062f"
+    },
+    "admin_notes": {
+      "type": "string",
+      "title": "\u0645\u0644\u0627\u062d\u0638\u0627\u062a \u0627\u0644\u0625\u062f\u0627\u0631\u0629"
+    }
+  },
+  "required": [
+    "customer_name",
+    "customer_phone",
+    "product_title",
+    "reason"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {},
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

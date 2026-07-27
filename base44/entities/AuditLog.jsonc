@@ -1,0 +1,85 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "action": {
+      "type": "string",
+      "enum": [
+        "create",
+        "update",
+        "delete",
+        "login",
+        "logout",
+        "export",
+        "import",
+        "settings_change",
+        "price_change",
+        "other"
+      ],
+      "title": "\u0646\u0648\u0639 \u0627\u0644\u0625\u062c\u0631\u0627\u0621"
+    },
+    "entity_type": {
+      "type": "string",
+      "title": "\u0646\u0648\u0639 \u0627\u0644\u0643\u064a\u0627\u0646 \u0627\u0644\u0645\u062a\u0623\u062b\u0631"
+    },
+    "entity_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0651\u0641 \u0627\u0644\u0643\u064a\u0627\u0646"
+    },
+    "entity_name": {
+      "type": "string",
+      "title": "\u0627\u0633\u0645/\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0643\u064a\u0627\u0646"
+    },
+    "performed_by": {
+      "type": "string",
+      "title": "\u062a\u0645 \u0628\u0648\u0627\u0633\u0637\u0629 (\u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645)"
+    },
+    "performed_by_email": {
+      "type": "string",
+      "title": "\u0628\u0631\u064a\u062f \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645"
+    },
+    "description": {
+      "type": "string",
+      "title": "\u0648\u0635\u0641 \u0627\u0644\u0625\u062c\u0631\u0627\u0621"
+    },
+    "old_value": {
+      "type": "string",
+      "title": "\u0627\u0644\u0642\u064a\u0645\u0629 \u0627\u0644\u0642\u062f\u064a\u0645\u0629 (JSON)"
+    },
+    "new_value": {
+      "type": "string",
+      "title": "\u0627\u0644\u0642\u064a\u0645\u0629 \u0627\u0644\u062c\u062f\u064a\u062f\u0629 (JSON)"
+    },
+    "ip_address": {
+      "type": "string",
+      "title": "\u0639\u0646\u0648\u0627\u0646 IP"
+    }
+  },
+  "required": [
+    "action",
+    "description",
+    "performed_by"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
