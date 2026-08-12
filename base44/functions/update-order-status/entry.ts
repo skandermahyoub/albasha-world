@@ -37,6 +37,36 @@ export default async function(req) {
       }
       updateData.stock_deducted = false;
     }
+    if (new_status === 'delivered' && !order.sales_updated) {
+      for (const item of order.items || []) {
+        const product = await base44.asServiceRole.entities.Product.get(item.product_id).catch(() => null);
+        if (product) await base44.asServiceRole.entities.Product.update(product.id, { sales_count: (Number(product.sales_count) || 0) + item.quantity });
+      }
+      await base44.asServiceRole.entities.SystemTransaction.create({ type: 'order_profit', amount: order.total || 0, order_number: order.order_number, order_subtotal: order.subtotal || 0, order_discount: order.discount || 0, performed_by: performed_by || user.full_name || user.email, reason: `تسليم طلب ${order.order_number}`, date: new Date().toISOString() });
+      const commissions = await base44.asServiceRole.entities.AffiliateCommission.filter({ order_id: order.id, status: 'pending' });
+      for (const commission of commissions) {
+        await base44.asServiceRole.entities.AffiliateCommission.update(commission.id, { status: 'earned' });
+        const affiliate = await base44.asServiceRole.entities.Affiliate.get(commission.affiliate_id).catch(() => null);
+        if (affiliate) await base44.asServiceRole.entities.Affiliate.update(affiliate.id, { total_commission: (affiliate.total_commission || 0) + commission.commission_amount });
+      }
+      updateData.sales_updated = true;
+      updateData.commission_calculated = true;
+    }
+    if (new_status === 'returned') {
+      for (const item of order.items || []) {
+        const product = await base44.asServiceRole.entities.Product.get(item.product_id).catch(() => null);
+        if (product) await base44.asServiceRole.entities.Product.update(product.id, { stock: (Number(product.stock) || 0) + item.quantity, sales_count: Math.max(0, (Number(product.sales_count) || 0) - item.quantity) });
+      }
+      await base44.asServiceRole.entities.SystemTransaction.create({ type: 'order_return', amount: -(order.total || 0), order_number: order.order_number, order_subtotal: order.subtotal || 0, order_discount: order.discount || 0, performed_by: performed_by || user.full_name || user.email, reason: `استرجاع طلب ${order.order_number}`, date: new Date().toISOString() });
+      const commissions = await base44.asServiceRole.entities.AffiliateCommission.filter({ order_id: order.id, status: 'earned' });
+      for (const commission of commissions) {
+        await base44.asServiceRole.entities.AffiliateCommission.update(commission.id, { status: 'reversed' });
+        const affiliate = await base44.asServiceRole.entities.Affiliate.get(commission.affiliate_id).catch(() => null);
+        if (affiliate) await base44.asServiceRole.entities.Affiliate.update(affiliate.id, { total_commission: Math.max(0, (affiliate.total_commission || 0) - commission.commission_amount) });
+      }
+      updateData.stock_deducted = false;
+      updateData.return_processed = true;
+    }
     await base44.asServiceRole.entities.Order.update(order.id, updateData);
     const eventKey = `order:${order.id}:${new_status}`;
     const existing = await base44.asServiceRole.entities.Notification.filter({ event_key: eventKey, customer_email: order.customer_email });
