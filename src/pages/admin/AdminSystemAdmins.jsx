@@ -22,6 +22,7 @@ const SECTIONS = [
   { key: 'crm', label: 'نظام CRM' },
   { key: 'delivery', label: 'التوصيل' },
   { key: 'blog', label: 'المدونة' },
+  { key: 'notifications', label: 'الإشعارات' },
 ];
 
 const PERM_LABELS = {
@@ -50,7 +51,7 @@ export default function AdminSystemAdmins() {
   const [permOpen, setPermOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [permTarget, setPermTarget] = useState(null);
-  const [form, setForm] = useState({ name: '', employee_number: '', email: '', password_hash: '', is_active: true });
+  const [form, setForm] = useState({ name: '', employee_number: '', email: '', is_active: true });
   const [permissions, setPermissions] = useState({ ...DEFAULT_PERMISSIONS });
   const [step, setStep] = useState('info');
   const { permissions: myPerms } = useAdminPermissions();
@@ -61,7 +62,7 @@ export default function AdminSystemAdmins() {
 
   const openAdd = () => {
     setEditing(null);
-    setForm({ name: '', employee_number: '', email: '', password_hash: '', is_active: true });
+    setForm({ name: '', employee_number: '', email: '', is_active: true });
     setPermissions({ ...DEFAULT_PERMISSIONS });
     setStep('info');
     setOpen(true);
@@ -69,7 +70,7 @@ export default function AdminSystemAdmins() {
 
   const openEdit = (admin) => {
     setEditing(admin);
-    setForm({ name: admin.name, password_hash: admin.password_hash || '' });
+    setForm({ name: admin.name, employee_number: admin.employee_number || '' });
     setOpen(true);
     setStep('info');
   };
@@ -83,14 +84,14 @@ export default function AdminSystemAdmins() {
   const handleSaveInfo = async () => {
     if (!form.name) return toast.error('أدخل اسم الحساب');
     if (!editing) {
-      if (!form.email || !form.password_hash) return toast.error('أدخل البريد الإلكتروني وكلمة المرور');
+      if (!form.email) return toast.error('أدخل البريد الإلكتروني');
       setStep('perms');
     } else {
       try {
         const res = await base44.functions.invoke('manage-system-admin', {
           action: 'update',
           admin_id: editing.id,
-          data: { name: form.name, password_hash: form.password_hash },
+          data: { name: form.name, employee_number: form.employee_number },
         });
         if (!res.data?.success) return toast.error(res.data?.error || 'فشل التحديث');
         toast.success('تم تحديث الحساب');
@@ -103,6 +104,7 @@ export default function AdminSystemAdmins() {
 
   const handleSaveNew = async () => {
     try {
+      await base44.users.inviteUser(form.email, 'user');
       const res = await base44.functions.invoke('manage-system-admin', {
         action: 'create',
         data: { ...form, permissions, is_active: true },
@@ -274,10 +276,7 @@ export default function AdminSystemAdmins() {
                   </div>
                 </>
               )}
-              <div>
-                <label className="text-xs text-muted-foreground block mb-1">كلمة المرور {editing ? '(اترك فارغاً للإبقاء)' : '*'}</label>
-                <Input type="password" placeholder="كلمة المرور" value={form.password_hash || ''} onChange={e => setForm(f => ({ ...f, password_hash: e.target.value }))} />
-              </div>
+              {!editing && <p className="text-xs text-muted-foreground bg-secondary rounded-lg p-3">سيتم إرسال دعوة دخول آمنة إلى بريد الموظف. لا تُخزّن كلمات مرور في النظام.</p>}
               <Button onClick={handleSaveInfo} className="w-full">
                 {editing ? 'حفظ التعديلات' : 'التالي: تحديد الصلاحيات ←'}
               </Button>

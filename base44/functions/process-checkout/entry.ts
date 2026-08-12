@@ -273,7 +273,7 @@ export default async function(req) {
     }
 
     const staffAccounts = await base44.asServiceRole.entities.SystemAdmin.filter({ is_active: true });
-    const staffRecipients = staffAccounts.filter(account => account.permissions?.orders && account.permissions.orders !== 'none').map(account => account.email).filter(Boolean);
+    const staffRecipients = staffAccounts.filter(account => ['view', 'edit', 'delete', 'full'].includes(account.permissions?.orders)).map(account => account.email).filter(Boolean);
     if (staffRecipients.length) {
       await base44.asServiceRole.entities.Notification.bulkCreate(staffRecipients.map(email => ({
         title: `طلب جديد ${orderNumber}`, message: `تم استلام طلب جديد بقيمة ${finalTotal} ${currency}.`, icon: '📦', type: 'info', customer_email: email,

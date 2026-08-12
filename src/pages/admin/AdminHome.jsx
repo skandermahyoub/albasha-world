@@ -10,6 +10,7 @@ import StoreInventoryDashboard from '@/components/admin/StoreInventoryDashboard'
 import StockAlertMonitor from '@/components/admin/StockAlertMonitor';
 import SalesChartDashboard from '@/components/admin/SalesChartDashboard';
 import useCurrency from '@/lib/useCurrency';
+import { useAdminPermissions } from '@/lib/useAdminPermissions';
 import {
   calculateActiveOrdersValue,
   calculateNetRevenue,
@@ -25,6 +26,7 @@ const STORE_LABELS = Object.fromEntries(
 );
 
 export default function AdminHome() {
+  const { canView } = useAdminPermissions();
   const [stats, setStats] = useState({ products: 0, activeProducts: 0, orders: 0, reviews: 0, messages: 0, activeOrdersValue: 0, netRevenue: 0, refunds: 0, customers: 0, giftCards: 0, pendingReviews: 0, orderCounts: {} });
   const [storeStats, setStoreStats] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
@@ -90,7 +92,7 @@ export default function AdminHome() {
     { label: 'رسائل جديدة', value: stats.messages, icon: MessageSquare, color: 'bg-red-500', sub: 'رسائل التواصل', to: '/admin/messages' },
     { label: 'بطاقات هدايا', value: stats.giftCards, icon: Gift, color: 'bg-pink-500', sub: 'بطاقات نشطة', to: '/admin/gift-cards' },
     { label: 'تقييمات معلقة', value: stats.pendingReviews, icon: Star, color: 'bg-amber-500', sub: 'بانتظار الموافقة', to: '/admin/reviews' },
-  ];
+  ].filter(card => !card.to || canView(card.to.includes('orders') ? 'orders' : card.to.includes('products') ? 'products' : card.to.includes('crm') || card.to.includes('reviews') || card.to.includes('messages') ? 'customers' : card.to.includes('accounting') ? 'accounting' : card.to.includes('gift-cards') ? 'coupons' : 'settings'));
 
   const quickLinks = [
     { to: '/admin/products', label: 'إضافة منتج', icon: Package, color: 'bg-purple-500/10 text-purple-600' },

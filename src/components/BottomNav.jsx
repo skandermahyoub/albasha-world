@@ -7,10 +7,12 @@ import SmartChatOverlay from '@/components/chat/SmartChatOverlay';
 import { getNavLinks, getStores } from '@/lib/navLinks';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 import { useAuth } from '@/lib/AuthContext';
+import useStaffAccess from '@/lib/useStaffAccess';
 
 export default function BottomNav({ settings: propSettings }) {
   const { settings: ctxSettings } = useStoreSettings();
   const { user } = useAuth();
+  const { isStaff } = useStaffAccess();
   const settings = { ...ctxSettings, ...propSettings };
   const location = useLocation();
   const { count } = useCart();
@@ -104,8 +106,8 @@ export default function BottomNav({ settings: propSettings }) {
                 })}
               </div>
 
-              {/* Admin Link - admin only */}
-              {user?.role === 'admin' && (
+              {/* Dashboard link for active employees and super admins */}
+              {isStaff && (
               <div className="p-3 border-t border-border/50 shrink-0">
                 <Link
                   to="/admin"

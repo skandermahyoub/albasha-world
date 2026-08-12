@@ -6,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { getNavLinks, getStores } from '@/lib/navLinks';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 import { useAuth } from '@/lib/AuthContext';
+import useStaffAccess from '@/lib/useStaffAccess';
 import NotificationBell from '@/components/NotificationBell';
 export default function StickyHeader({ visible, cartCount, isDark, toggleTheme, settings: propSettings }) {
   const { settings: ctxSettings } = useStoreSettings();
   const { user } = useAuth();
+  const { isStaff } = useStaffAccess();
   const settings = { ...ctxSettings, ...propSettings };
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
@@ -142,8 +144,8 @@ export default function StickyHeader({ visible, cartCount, isDark, toggleTheme, 
                 })}
               </div>
 
-              {/* Admin Link - admin only */}
-              {user?.role === 'admin' && (
+              {/* Dashboard link for active employees and super admins */}
+              {isStaff && (
               <div className="p-3 border-t border-border/50 shrink-0">
                 <Link
                   to="/admin"
