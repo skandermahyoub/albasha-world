@@ -56,7 +56,8 @@ export default function AdminOrders() {
   const [tab, setTab] = useState('active'); // 'active' | 'past'
   const [confirmDialog, setConfirmDialog] = useState(null); // { order, newStatus }
   const [deleteDialog, setDeleteDialog] = useState(null); // order
-  const [expandedOrder, setExpandedOrder] = useState(null);
+  const urlParams = new URLSearchParams(window.location.search);
+  const [expandedOrder, setExpandedOrder] = useState(urlParams.get('order'));
   const [products, setProducts] = useState([]);
   const [storeFilter, setStoreFilter] = useState('all');
   const [profiles, setProfiles] = useState({});

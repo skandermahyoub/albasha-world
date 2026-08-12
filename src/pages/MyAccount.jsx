@@ -34,7 +34,7 @@ export default function MyAccount() {
       setUser(me);
       if (me) {
         const [o, lp, profs] = await Promise.all([
-              base44.entities.Order.filter({ customer_email: me.email }, '-created_date', 100).catch(() => []),
+              base44.functions.invoke('get-my-orders', {}).then(res => res.data?.orders || []).catch(() => []),
           base44.entities.LoyaltyPoints.filter({ user_email: me.email }).catch(() => []),
           base44.entities.CustomerProfile.filter({ user_email: me.email }).catch(() => []),
         ]);
@@ -257,6 +257,7 @@ export default function MyAccount() {
                 )}
                 <div className="flex items-center justify-between pt-2 border-t border-border/30">
                   <span className="text-xs text-muted-foreground">{order.created_date ? new Date(order.created_date).toLocaleDateString('ar-SA') : ''}</span>
+                  <Link to={`/orders/${order.order_number}`} className="text-xs font-bold text-primary">عرض التفاصيل</Link>
                   <span className="font-bold text-sm text-primary">{order.total} {order.currency || 'USD'}</span>
                 </div>
               </div>

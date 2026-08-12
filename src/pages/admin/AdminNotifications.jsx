@@ -1,8 +1,11 @@
 import AdminGenericList from './AdminGenericList';
+import ManualNotificationForm from '@/components/admin/ManualNotificationForm';
 
 export default function AdminNotifications() {
   return (
-    <AdminGenericList
+    <>
+      <ManualNotificationForm />
+      <AdminGenericList
       entityName="Notification"
       title="نظام الإشعارات الذكي"
       fields={[
@@ -20,5 +23,6 @@ export default function AdminNotifications() {
         { key: 'sort_order', label: 'الترتيب في الدوران', type: 'number' },
       ]}
     />
+    </>
   );
 }

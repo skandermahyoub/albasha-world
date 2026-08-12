@@ -19,6 +19,7 @@ import Checkout from './pages/Checkout';
 import Favorites from './pages/Favorites';
 import Compare from './pages/Compare';
 import OrderTracking from './pages/OrderTracking';
+import OrderDetail from './pages/OrderDetail';
 import Blog from './pages/Blog';
 import BlogPostPage from './pages/BlogPost';
 import Loyalty from './pages/Loyalty';
@@ -120,6 +121,7 @@ const AuthenticatedApp = () => {
         <Route path="/favorites" element={<Favorites />} />
         <Route path="/compare" element={<Compare />} />
         <Route path="/order-tracking" element={<OrderTracking />} />
+        <Route path="/orders/:orderNumber" element={<OrderDetail />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPostPage />} />
         <Route path="/loyalty" element={<Loyalty />} />

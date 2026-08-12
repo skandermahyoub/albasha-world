@@ -16,9 +16,6 @@ export default async function(req) {
     if (!idempotency_key) {
       return Response.json({ error: 'مفتاح منع التكرار مفقود' }, { status: 400 });
     }
-    if (!customer_name || !customer_phone) {
-      return Response.json({ error: 'اسم العميل ورقم الهاتف مطلوبان' }, { status: 400 });
-    }
     if (!items || !Array.isArray(items) || items.length === 0) {
       return Response.json({ error: 'السلة فارغة' }, { status: 400 });
     }
@@ -48,6 +45,17 @@ export default async function(req) {
     let user = null;
     try { user = await base44.auth.me(); } catch {}
     const userEmail = user?.email || customer_email || '';
+    let profileRecord = null;
+    if (user?.email) {
+      const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email });
+      profileRecord = profiles[0] || null;
+    }
+    const effectiveCustomerName = customer_name || profileRecord?.full_name || profileRecord?.name || user?.full_name || '';
+    const effectiveCustomerPhone = customer_phone || profileRecord?.phone || '';
+    const effectiveAddress = address || profileRecord?.address || '';
+    if (!effectiveCustomerName || !effectiveCustomerPhone) {
+      return Response.json({ error: 'الاسم الكامل ورقم الهاتف مطلوبان لإتمام الطلب' }, { status: 400 });
+    }
 
     // ── 4. Read products from DB (do NOT trust frontend prices) ──
     const productIds = [...new Set(items.map(i => i.product_id).filter(Boolean))];
@@ -184,10 +192,7 @@ export default async function(req) {
 
     // ── 13. Wallet payment ──
     let walletUsed = 0;
-    let profileRecord = null;
     if (use_wallet && userEmail) {
-      const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: userEmail });
-      profileRecord = profiles[0];
       if (profileRecord && (profileRecord.wallet_balance || 0) > 0) {
         const finalBeforeWallet = subtotal - discount + shippingFee;
         walletUsed = Math.min(profileRecord.wallet_balance, finalBeforeWallet);
@@ -215,8 +220,8 @@ export default async function(req) {
     // ── 17. Create order ──
     const orderData = {
       order_number: orderNumber,
-      customer_name,
-      customer_phone,
+      customer_name: effectiveCustomerName,
+      customer_phone: effectiveCustomerPhone,
       customer_email: userEmail,
       items: orderItems,
       subtotal,
@@ -226,7 +231,7 @@ export default async function(req) {
       status: 'pending',
       status_history: [{ status: 'pending', date: new Date().toISOString() }],
       payment_method: payment_method || '',
-      address: address || '',
+      address: effectiveAddress,
       notes: notes || '',
       shipping_zone: shippingZoneName,
       shipping_fee: shippingFee,
@@ -240,11 +245,25 @@ export default async function(req) {
     let order;
     order = await base44.asServiceRole.entities.Order.create(orderData);
 
+    if (user?.email) {
+      const profileData = { full_name: effectiveCustomerName, name: effectiveCustomerName, phone: effectiveCustomerPhone, address: effectiveAddress };
+      if (profileRecord) {
+        await base44.asServiceRole.entities.CustomerProfile.update(profileRecord.id, profileData);
+      } else {
+        profileRecord = await base44.asServiceRole.entities.CustomerProfile.create({ user_email: user.email, ...profileData });
+      }
+    }
+
     if (userEmail) {
       await base44.asServiceRole.entities.Notification.create({
         title: 'تم استلام طلبك',
         message: `تم استلام الطلب ${orderNumber} وهو الآن قيد المراجعة.`,
         icon: '📦',
+        target_type: 'order',
+        target_id: order.id,
+        target_route: `/orders/${orderNumber}`,
+        event_key: `order:${order.id}:pending`,
+        is_read: false,
         type: 'info',
         customer_email: userEmail,
         interval_minutes: 5,
@@ -253,7 +272,16 @@ export default async function(req) {
       });
     }
 
-    // ── 18. Deduct wallet ──
+    const staffAccounts = await base44.asServiceRole.entities.SystemAdmin.filter({ is_active: true });
+    const staffRecipients = staffAccounts.filter(account => account.permissions?.orders && account.permissions.orders !== 'none').map(account => account.email).filter(Boolean);
+    if (staffRecipients.length) {
+      await base44.asServiceRole.entities.Notification.bulkCreate(staffRecipients.map(email => ({
+        title: `طلب جديد ${orderNumber}`, message: `تم استلام طلب جديد بقيمة ${finalTotal} ${currency}.`, icon: '📦', type: 'info', customer_email: email,
+        target_type: 'order', target_id: order.id, target_route: `/admin/orders?order=${order.id}`, event_key: `staff-order:${order.id}:${email}`, is_read: false, is_active: true, interval_minutes: 5, sort_order: 0,
+      })));
+    }
+
+    // ── 18. Deduct wallet
     if (walletUsed > 0 && profileRecord) {
       const newBalance = (profileRecord.wallet_balance || 0) - walletUsed;
       await base44.asServiceRole.entities.CustomerProfile.update(profileRecord.id, {

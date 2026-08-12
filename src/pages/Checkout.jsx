@@ -44,7 +44,9 @@ export default function Checkout() {
     base44.auth.me().then(me => {
       if (me?.email) {
         base44.entities.CustomerProfile.filter({ user_email: me.email }).then(profiles => {
-          setWalletBalance(profiles[0]?.wallet_balance || 0);
+          const profile = profiles[0];
+          setWalletBalance(profile?.wallet_balance || 0);
+          setForm(current => ({ ...current, name: profile?.full_name || profile?.name || me.full_name || '', phone: profile?.phone || '', address: profile?.address || '' }));
         }).catch(() => {});
         base44.entities.LoyaltyPoints.filter({ user_email: me.email }).then(lps => {
           setLoyaltyPoints(lps[0]?.points || 0);
