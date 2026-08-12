@@ -11,6 +11,11 @@ export default async function(req) {
     if (!user || user.role !== 'admin') {
       return Response.json({ error: 'صلاحية غير كافية' }, { status: 403 });
     }
+    const employeeAccounts = await base44.asServiceRole.entities.SystemAdmin.filter({ email: user.email });
+    const employeeAccount = employeeAccounts[0];
+    if (employeeAccount && (employeeAccount.is_active === false || !['edit', 'delete', 'full'].includes(employeeAccount.permissions?.orders))) {
+      return Response.json({ error: 'لا تملك صلاحية تعديل الطلبات' }, { status: 403 });
+    }
 
     if (!order_id || !new_status) {
       return Response.json({ error: 'معرف الطلب والحالة الجديدة مطلوبان' }, { status: 400 });

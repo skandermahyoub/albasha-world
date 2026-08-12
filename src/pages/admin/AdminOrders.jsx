@@ -7,6 +7,7 @@ import { MessageCircle, Clock, CheckCircle2, Package, Truck, XCircle, ChevronDow
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useAuth } from '@/lib/AuthContext';
+import { useAdminPermissions } from '@/lib/useAdminPermissions';
 import { getStores } from '@/lib/navLinks';
 
 const STATUS_OPTIONS = [
@@ -62,6 +63,7 @@ export default function AdminOrders() {
   const [storeFilter, setStoreFilter] = useState('all');
   const [profiles, setProfiles] = useState({});
   const { user } = useAuth();
+  const { canEdit } = useAdminPermissions();
   const STORES = getStores(settings?.theme_config || {});
 
   const load = async () => {
@@ -284,7 +286,7 @@ export default function AdminOrders() {
                   )}
 
                   {/* Status change */}
-                  {!isLocked ? (
+                  {!isLocked && canEdit('orders') ? (
                     assignedToOther ? (
                       <p className="text-xs text-amber-700 bg-amber-50 rounded-lg p-2 inline-flex items-center justify-center gap-1 w-full">
                         <Lock className="w-3 h-3" /> محجوز لموظف آخر: {order.assigned_employee}
@@ -301,7 +303,7 @@ export default function AdminOrders() {
                     )
                   ) : (
                     <p className="text-xs text-muted-foreground text-center py-1 bg-secondary rounded-lg inline-flex items-center justify-center gap-1 w-full">
-                      <Lock className="w-3 h-3" /> هذا الطلب مغلق ولا يمكن تغيير حالته
+                      <Lock className="w-3 h-3" /> {isLocked ? 'هذا الطلب مغلق ولا يمكن تغيير حالته' : 'ليس لديك صلاحية تعديل حالة الطلب'}
                     </p>
                   )}
 
