@@ -1,0 +1,40 @@
+{
+  "name": "BlogView",
+  "type": "object",
+  "properties": {
+    "post_id": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0645\u0642\u0627\u0644"
+    },
+    "visitor_key": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0632\u0627\u0626\u0631"
+    }
+  },
+  "required": [
+    "post_id",
+    "visitor_key"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
