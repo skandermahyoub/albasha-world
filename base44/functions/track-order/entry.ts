@@ -36,7 +36,7 @@ export default async function(req) {
       order: {
         order_number: order.order_number,
         status: order.status,
-        items: order.items,
+        items: (order.items || []).map((item: any) => ({ product_id: item.product_id, title: item.title, price: item.price, quantity: item.quantity, image: item.image, store_key: item.store_key || '' })),
         total: order.total,
         subtotal: order.subtotal,
         discount: order.discount,
