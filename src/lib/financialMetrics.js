@@ -20,7 +20,9 @@
  * Gross Sales          = sum(order_profit) — all-or-nothing: falls back to order status if incomplete
  * Refunds              = abs(sum(order_return)) — all-or-nothing
  * Net Revenue          = sum(order_profit + order_return) — all-or-nothing
- * Estimated Profit     = Net Revenue − Expenses  (COGS not available → "estimated")
+ * COGS                 = historical item cost × fulfilled quantity, net of full returns
+ * Gross Profit         = Net Revenue − COGS
+ * Net Profit           = Gross Profit − Expenses
  */
 
 // ═══════════════════════════════════════════════════════════════
@@ -322,14 +324,43 @@ export function calculateTotalExpenses(expenses = []) {
   return expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
 }
 
+/** Historical cost of one order using the cost captured in Order.items at checkout/POS time. */
+export function calculateOrderCOGS(order) {
+  return (order?.items || []).reduce((sum, item) => sum + (Math.max(0, Number(item.cost_price) || 0) * (Number(item.quantity) || 0)), 0);
+}
+
 /**
- * Calculate estimated profit = net revenue − expenses.
- *
- * NOTE: This is "estimated" because cost of goods (COGS) is NOT stored
- * in order items or products. The Product schema has no `cost` field,
- * and order items do not store historical cost.
- * True gross/net profit requires historical cost data.
+ * Calculate COGS net of full returns. When financial transactions are complete,
+ * delivery adds COGS and a full return reverses it. Fallback uses currently-delivered orders.
  */
+export function calculateCOGS(orders = [], transactions = []) {
+  const validation = validateTransactionCompleteness(orders, transactions);
+  if (transactions?.length && validation.isComplete) {
+    const orderByNumber = Object.fromEntries(orders.filter(o => o.order_number).map(o => [o.order_number, o]));
+    return transactions
+      .filter(t => t.type === 'order_profit' || t.type === 'order_return')
+      .reduce((sum, t) => {
+        const cost = calculateOrderCOGS(orderByNumber[t.order_number]);
+        return sum + (t.type === 'order_return' ? -cost : cost);
+      }, 0);
+  }
+  return orders.filter(o => o.status === 'delivered').reduce((sum, o) => sum + calculateOrderCOGS(o), 0);
+}
+
+export function isCostDataComplete(orders = []) {
+  const fulfilled = orders.filter(o => o.status === 'delivered' || o.status === 'returned');
+  return fulfilled.every(o => (o.items || []).every(item => Object.prototype.hasOwnProperty.call(item, 'cost_price')));
+}
+
+export function calculateGrossProfit(netRevenue, cogs = 0) {
+  return netRevenue - cogs;
+}
+
+export function calculateNetProfit(netRevenue, cogs = 0, expenses = 0) {
+  return netRevenue - cogs - expenses;
+}
+
+/** Backward-compatible helper retained for older components. */
 export function calculateEstimatedProfit(netRevenue, expenses = 0) {
   return netRevenue - expenses;
 }
@@ -365,6 +396,10 @@ export function calculateAllMetrics(orders = [], transactions = [], expenses = [
   const netRevenue = calculateNetRevenue(orders, transactions);
   const totalExpenses = calculateTotalExpenses(expenses);
   const transactionValidation = validateTransactionCompleteness(orders, transactions);
+  const cogs = calculateCOGS(orders, transactions);
+  const grossProfit = calculateGrossProfit(netRevenue, cogs);
+  const netProfit = calculateNetProfit(netRevenue, cogs, totalExpenses);
+  const costDataComplete = isCostDataComplete(orders);
 
   return {
     // Revenue indicators
@@ -379,9 +414,12 @@ export function calculateAllMetrics(orders = [], transactions = [], expenses = [
 
     // Expenses & Profit
     totalExpenses,
-    estimatedProfit: calculateEstimatedProfit(netRevenue, totalExpenses),
-    // NOTE: COGS not available — grossProfit and netProfit cannot be calculated.
-    // Product cost field does not exist in schema; order items do not store historical cost.
+    cogs,
+    grossProfit,
+    netProfit,
+    // Compatibility for legacy consumers; new UI should use netProfit.
+    estimatedProfit: netProfit,
+    costDataComplete,
 
     // Products
     activeProducts: countActiveProducts(products),
