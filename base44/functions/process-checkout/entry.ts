@@ -84,7 +84,9 @@ export default async function(req) {
     // ── 6. Read settings ──
     const settingsList = await base44.asServiceRole.entities.StoreSettings.list();
     const settings = settingsList[0] || {};
-    const currency = settings?.currency || 'USD';
+    // All monetary values are stored in the accounting base currency (USD).
+    // The UI may display another currency using exchange_rates, but persisted order totals remain unambiguous.
+    const currency = 'USD';
     const rates = settings?.exchange_rates || { USD: 1, SAR: 3.75, YER_OLD: 530, YER_NEW: 1630, AED: 3.67 };
 
     // ── 7. Calculate subtotal (server-side) ──
