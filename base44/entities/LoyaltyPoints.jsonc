@@ -50,7 +50,7 @@
     "read": {
       "$or": [
         {
-          "created_by_id": "{{user.id}}"
+          "data.user_email": "{{user.email}}"
         },
         {
           "user_condition": {
@@ -60,19 +60,14 @@
       ]
     },
     "create": {
-      "created_by_id": "{{user.id}}"
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "update": {
-      "$or": [
-        {
-          "created_by_id": "{{user.id}}"
-        },
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
       "user_condition": {
