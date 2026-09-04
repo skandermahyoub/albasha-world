@@ -115,7 +115,7 @@ export default function SmartChatOverlay({ onClose, settings }) {
       } else {
         setMessages([{
           role: 'assistant',
-          content: `مرحباً بك في ${settings?.store_name || 'عالم الباشا للتسوق'}!\n\nأنا مساعدك الشخصي، هنا لأساعدك في:\n- **اختيار** المنتج الأنسب لاحتياجك\n- **اقتراح** أفضل العروض والمنتجات\n- **الإجابة** على كل أسئلتك عن منتجاتنا\n\nكيف أقدر أساعدك؟`,
+          content: `مرحباً بك في ${settings?.store_name || 'عالم الباشا للتسوق'}!\n\nيمكنك تصفح المتجر بحرية. لاستخدام **المساعد الذكي الشخصي** وحفظ سياقك ونقاطك، سجّل الدخول أولاً.`,
           products: []
         }]);
       }
@@ -155,6 +155,10 @@ export default function SmartChatOverlay({ onClose, settings }) {
   };
 
   const send = async (overrideText) => {
+    if (!user) {
+      base44.auth.redirectToLogin();
+      return;
+    }
     const userMsg = (overrideText || input).trim();
     if (!userMsg || loading) return;
     setInput('');
@@ -317,6 +321,7 @@ ${history}
         <div ref={bottomRef} />
       </div>
 
+      {user && (
       <div className="px-3 pb-2 flex gap-2 overflow-x-auto shrink-0" style={{ scrollbarWidth: 'none' }}>
         {QUICK_SUGGESTIONS.map(({ text, icon: SuggIcon }) => (
           <button
@@ -329,6 +334,7 @@ ${history}
           </button>
         ))}
       </div>
+      )}
 
       <div className="p-3 border-t border-border bg-background shrink-0">
         <form onSubmit={e => { e.preventDefault(); send(); }} className="flex gap-2 items-center">
@@ -339,21 +345,27 @@ ${history}
           >
             {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
-          <Input
-            placeholder={isListening ? 'يستمع...' : `اسأل مساعد ${settings?.store_name || 'عالم الباشا للتسوق'}...`}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            className="flex-1 bg-secondary border-0 rounded-xl"
-            disabled={loading || isListening}
-          />
-          <Button
-            size="icon"
-            type="submit"
-            disabled={loading || (!input.trim() && !isListening)}
-            className="rounded-xl w-10 h-10 shrink-0 bg-gradient-to-br from-primary to-lime-600"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
+          {user ? (
+            <>
+              <Input
+                placeholder={isListening ? 'يستمع...' : `اسأل مساعد ${settings?.store_name || 'عالم الباشا للتسوق'}...`}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                className="flex-1 bg-secondary border-0 rounded-xl"
+                disabled={loading || isListening}
+              />
+              <Button
+                size="icon"
+                type="submit"
+                disabled={loading || (!input.trim() && !isListening)}
+                className="rounded-xl w-10 h-10 shrink-0 bg-gradient-to-br from-primary to-lime-600"
+              >
+                <Send className="w-4 h-4" />
+              </Button>
+            </>
+          ) : (
+            <Button type="button" className="w-full" onClick={() => base44.auth.redirectToLogin()}>تسجيل الدخول لاستخدام المساعد الذكي</Button>
+          )}
         </form>
       </div>
       </motion.div>
