@@ -62,7 +62,7 @@ export default function StorePage() {
       setLoading(true);
       const [s, p, c, cfgList] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.entities.Product.filter({ store_key: resolvedKey }, '-created_date', 500).catch(() => []),
+        base44.entities.Product.filter({ store_key: resolvedKey }, '-created_date', 1000).catch(() => []),
         base44.entities.Category.filter({ store_key: resolvedKey }, 'sort_order').catch(() => []),
         base44.entities.StoreConfig.filter({ store_key: resolvedKey }).catch(() => []),
       ]);
