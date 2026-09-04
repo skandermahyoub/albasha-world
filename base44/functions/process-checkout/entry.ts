@@ -381,6 +381,7 @@ export default async function(req) {
           commission_rate: aff.commission_rate || 5,
           commission_amount: commissionAmount,
           status: 'pending',
+          sale_recorded: false,
         });
         // Sale totals and earned commission are recorded only after delivery.
       }
