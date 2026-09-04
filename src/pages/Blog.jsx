@@ -15,10 +15,10 @@ export default function Blog() {
   useEffect(() => {
     Promise.all([
       base44.entities.StoreSettings.list().catch(() => []),
-      base44.entities.BlogPost.list('-created_date', 50).catch(() => []),
+      base44.functions.invoke('get-public-blog-posts', { limit: 50 }).then(res => res.data?.posts || []).catch(() => []),
     ]).then(([s, p]) => {
       setSettings(s[0] || {});
-      setPosts(p.filter(post => post.status === 'published'));
+      setPosts(p);
     });
   }, []);
 
