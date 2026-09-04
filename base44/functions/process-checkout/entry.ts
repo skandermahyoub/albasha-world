@@ -223,6 +223,8 @@ export default async function(req) {
         product_id: item.product_id,
         title: product.title,
         price: effectiveProductPrice(product),
+        cost_price: Math.max(0, Number(product.cost_price) || 0),
+        store_key: product.store_key || '',
         quantity: item.quantity,
         image: product.image || '',
       };
