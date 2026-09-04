@@ -16,23 +16,25 @@ const STATUS_OPTIONS = [
   { value: 'preparing', label: 'قيد التجهيز' },
   { value: 'shipped', label: 'تم الشحن' },
   { value: 'delivered', label: 'تم التسليم' },
+  { value: 'returned', label: 'مرتجع' },
   { value: 'cancelled', label: 'ملغي' },
 ];
 
 // الحالات التي لا يمكن الرجوع منها
-const LOCKED_STATUSES = ['delivered', 'cancelled'];
+const LOCKED_STATUSES = ['returned', 'cancelled'];
 
 // الحالات الحالية (غير مكتملة)
 const ACTIVE_STATUSES = ['pending', 'confirmed', 'preparing', 'shipped'];
 // الحالات السابقة (مكتملة أو ملغاة)
-const PAST_STATUSES = ['delivered', 'cancelled'];
+const PAST_STATUSES = ['delivered', 'returned', 'cancelled'];
 
 const STATUS_COLORS = {
   pending: 'bg-yellow-100 text-yellow-700',
   confirmed: 'bg-blue-100 text-blue-700',
   preparing: 'bg-purple-100 text-purple-700',
   shipped: 'bg-cyan-100 text-cyan-700',
-  delivered: 'bg-orange-100 text-orange-700',
+  delivered: 'bg-green-100 text-green-700',
+  returned: 'bg-pink-100 text-pink-700',
   cancelled: 'bg-red-100 text-red-700',
 };
 
@@ -42,6 +44,7 @@ const STATUS_ICONS = {
   preparing: Package,
   shipped: Truck,
   delivered: CheckCircle2,
+  returned: Package,
   cancelled: XCircle,
 };
 
@@ -63,7 +66,7 @@ export default function AdminOrders() {
   const [storeFilter, setStoreFilter] = useState('all');
   const [profiles, setProfiles] = useState({});
   const { user } = useAuth();
-  const { canEdit } = useAdminPermissions();
+  const { canEdit, canDelete } = useAdminPermissions();
   const STORES = getStores(settings?.theme_config || {});
 
   const load = async () => {
@@ -320,14 +323,16 @@ export default function AdminOrders() {
                   )}
 
                   {/* حذف الطلب (للطلبات الوهمية أو الملغاة) */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setDeleteDialog(order)}
-                    className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 gap-2"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" /> حذف الطلب
-                  </Button>
+                  {canDelete('orders') && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDeleteDialog(order)}
+                      className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 gap-2"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> حذف الطلب
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
