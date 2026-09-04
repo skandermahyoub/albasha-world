@@ -37,7 +37,7 @@ export default function ProductDetail() {
     const load = async () => {
       const [s, products, allProds] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.entities.Product.filter({ id }).catch(() => []),
+        base44.entities.Product.filter({ id, status: 'active' }).catch(() => []),
         base44.entities.Product.list('-sales_count', 50).catch(() => []),
       ]);
       setSettings(s[0] || {});
@@ -63,7 +63,10 @@ export default function ProductDetail() {
   const discountActive = product.old_price && product.old_price > product.price && (!product.discount_end_date || new Date(product.discount_end_date) >= new Date());
 
   const handleAddToCart = () => {
-    addItem(product, qty);
+    if (product.stock != null && product.stock <= 0) return toast.error('هذا المنتج غير متوفر حالياً');
+    const safeQty = product.stock != null ? Math.min(qty, product.stock) : qty;
+    if (safeQty <= 0) return toast.error('الكمية غير متوفرة');
+    addItem(product, safeQty);
     toast.success(`تمت إضافة ${product.title} إلى السلة`);
   };
 
@@ -136,7 +139,7 @@ export default function ProductDetail() {
                   <Minus className="w-4 h-4" />
                 </button>
                 <span className="w-10 text-center font-bold">{qty}</span>
-                <button onClick={() => setQty(q => q + 1)} className="w-10 h-10 flex items-center justify-center hover:bg-secondary transition-colors">
+                <button onClick={() => setQty(q => product.stock != null ? Math.min(product.stock, q + 1) : q + 1)} disabled={product.stock != null && qty >= product.stock} className="w-10 h-10 flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
@@ -149,7 +152,7 @@ export default function ProductDetail() {
 
             {/* Actions */}
             <div className="flex gap-3 pt-2">
-              <Button onClick={handleAddToCart} className="flex-1 h-12 text-base">
+              <Button onClick={handleAddToCart} disabled={product.stock != null && product.stock <= 0} className="flex-1 h-12 text-base">
                 <ShoppingCart className="w-5 h-5 ml-2" /> أضف للسلة
               </Button>
               <Button variant="outline" size="icon" className="h-12 w-12" onClick={() => toggleFav(product.id)}>
