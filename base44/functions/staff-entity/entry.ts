@@ -5,7 +5,7 @@ const ENTITY_SECTIONS: Record<string, string> = {
   Product: 'products', Category: 'products', SpecialOffer: 'products', Bundle: 'products', Brand: 'products',
   Order: 'orders', InventoryMovement: 'orders', CashierShift: 'orders', AbandonedCart: 'orders', ReturnRequest: 'orders', Subscription: 'orders',
   CustomerProfile: 'customers', ContactMessage: 'customers', Review: 'customers', ProductReview: 'customers', ClientRating: 'customers', Subscriber: 'customers', Ticket: 'customers',
-  StoreSettings: 'settings', HeroSlide: 'settings', AdvertBanner: 'settings', HomeHighlight: 'settings', MarqueeText: 'settings', Gallery: 'settings', VideoGallery: 'settings', GeneratedImage: 'settings', PaymentMethod: 'settings', AuditLog: 'settings',
+  StoreSettings: 'settings', HeroSlide: 'settings', AdvertBanner: 'settings', HomeHighlight: 'settings', MarqueeText: 'settings', Gallery: 'settings', VideoGallery: 'settings', GeneratedImage: 'settings', PaymentMethod: 'settings', AuditLog: 'settings', SystemAdmin: 'settings',
   StoreConfig: 'stores', Supplier: 'stores', PurchaseOrder: 'stores',
   Employee: 'employees',
   Expense: 'accounting', SystemTransaction: 'accounting', WalletTransaction: 'accounting',
