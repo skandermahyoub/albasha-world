@@ -1,5 +1,7 @@
-const viewLevels = ['view', 'edit', 'delete', 'full'];
-const editLevels = ['edit', 'delete', 'full'];
+const VIEW_LEVELS = ['view', 'add', 'edit', 'delete', 'full'];
+const ADD_LEVELS = ['add', 'edit', 'delete', 'full'];
+const EDIT_LEVELS = ['edit', 'delete', 'full'];
+const DELETE_LEVELS = ['delete', 'full'];
 
 export async function getStaffAccess(base44, user) {
   if (user.role === 'admin') return { superAdmin: true, isStaff: true, permissions: {} };
@@ -14,9 +16,18 @@ export async function getStaffAccess(base44, user) {
 export function canStaff(access, section, operation = 'view') {
   if (access.superAdmin) return true;
   const permission = access.permissions?.[section];
-  if (operation === 'view') return viewLevels.includes(permission);
-  if (operation === 'send') return ['send', 'full'].includes(permission);
-  return editLevels.includes(permission);
+  if (section === 'notifications') {
+    if (operation === 'view') return ['view', 'send', 'full'].includes(permission);
+    if (operation === 'send' || operation === 'add' || operation === 'edit') return ['send', 'full'].includes(permission);
+    if (operation === 'delete') return permission === 'full';
+    return false;
+  }
+  if (operation === 'view') return VIEW_LEVELS.includes(permission);
+  if (operation === 'add') return ADD_LEVELS.includes(permission);
+  if (operation === 'edit') return EDIT_LEVELS.includes(permission);
+  if (operation === 'delete') return DELETE_LEVELS.includes(permission);
+  if (operation === 'full') return permission === 'full';
+  return false;
 }
 
 export async function requireStaffPermission(base44, user, section, operation = 'view') {
