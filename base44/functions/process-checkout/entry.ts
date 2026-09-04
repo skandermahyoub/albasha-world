@@ -1,5 +1,12 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
 
+function effectiveProductPrice(product) {
+  const basePrice = Number(product?.price) || 0;
+  const oldPrice = Number(product?.old_price) || 0;
+  if (product?.discount_end_date && oldPrice > 0 && new Date(product.discount_end_date) < new Date()) return oldPrice;
+  return basePrice;
+}
+
 export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
@@ -92,7 +99,7 @@ export default async function(req) {
     // ── 7. Calculate subtotal (server-side) ──
     const subtotal = items.reduce((sum, item) => {
       const product = productMap[item.product_id];
-      return sum + (Number(product.price) || 0) * item.quantity;
+      return sum + effectiveProductPrice(product) * item.quantity;
     }, 0);
 
     // ── 8. Read shipping zone ──
@@ -215,7 +222,7 @@ export default async function(req) {
       return {
         product_id: item.product_id,
         title: product.title,
-        price: Number(product.price) || 0,
+        price: effectiveProductPrice(product),
         quantity: item.quantity,
         image: product.image || '',
       };
