@@ -338,13 +338,15 @@ ${history}
 
       <div className="p-3 border-t border-border bg-background shrink-0">
         <form onSubmit={e => { e.preventDefault(); send(); }} className="flex gap-2 items-center">
-          <button
-            type="button"
-            onClick={isListening ? stopVoice : startVoice}
-            className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-secondary text-muted-foreground hover:bg-accent'}`}
-          >
-            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-          </button>
+          {user && (
+            <button
+              type="button"
+              onClick={isListening ? stopVoice : startVoice}
+              className={`shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-secondary text-muted-foreground hover:bg-accent'}`}
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </button>
+          )}
           {user ? (
             <>
               <Input
