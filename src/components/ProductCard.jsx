@@ -101,8 +101,9 @@ export default function ProductCard({ product, onAddCart, onToggleFav, onToggleC
           {showCart && (
             <motion.button
               whileTap={{ scale: 0.9 }}
-              onClick={() => onAddCart?.(product)}
-              className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-md shadow-primary/20"
+              onClick={() => { if (product.stock == null || product.stock > 0) onAddCart?.(product); }}
+              disabled={product.stock != null && product.stock <= 0}
+              className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
             >
               <ShoppingCart className="w-4 h-4" />
             </motion.button>
