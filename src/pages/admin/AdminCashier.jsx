@@ -222,32 +222,22 @@ export default function AdminCashier() {
     if (overStock) return toast.error(`كمية ${overStock.title} أكبر من المخزون`);
     setSaving(true);
     try {
-      const orderNumber = `POS-${Date.now().toString().slice(-8)}`;
-      const order = await base44.entities.Order.create({
-        order_number: orderNumber,
-        customer_name: customerName.trim() || 'عميل نقدي',
-        customer_phone: customerPhone.trim() || '-',
-        items: cart.map(i => ({ product_id: i.product_id, title: i.title, price: i.price, quantity: i.quantity, image: i.image })),
-        subtotal: cartTotal,
-        discount: discountAmount,
-        total: cartFinal,
-        currency: 'USD',
-        status: 'delivered',
+      const res = await base44.functions.invoke('process-pos-sale', {
+        items: cart.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+        customer_name: customerName.trim(),
+        customer_phone: customerPhone.trim(),
         payment_method: paymentMethod,
+        discount: discountAmount,
         shift_id: shift.id,
-        source: 'cashier',
+        idempotency_key: `pos_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       });
-
-      for (const item of cart) {
-        const product = products.find(p => p.id === item.product_id);
-        if (!product) continue;
-        const before = product.stock || 0;
-        const after = Math.max(0, before - item.quantity);
-        await base44.entities.Product.update(product.id, { stock: after, sales_count: (product.sales_count || 0) + item.quantity });
-        await createMovement({ product, type: 'sale', quantity: item.quantity, before, after, order });
+      if (!res.data?.success) {
+        toast.error(res.data?.error || 'فشل إتمام البيع');
+        setSaving(false);
+        return;
       }
-
-      toast.success('تم البيع وخصم المخزون وتسجيل الحركة');
+      const order = res.data.order;
+      toast.success('تم البيع وتسجيل المخزون والحسابات بنجاح');
       printInvoice(order);
       setCart([]);
       setCustomerName('');
@@ -255,7 +245,7 @@ export default function AdminCashier() {
       setDiscount('');
       await loadData();
     } catch (err) {
-      toast.error('فشل إتمام البيع');
+      toast.error(err?.message || 'فشل إتمام البيع');
     }
     setSaving(false);
   };
@@ -315,26 +305,21 @@ export default function AdminCashier() {
   };
 
   const processReturn = async () => {
-    const order = orders.find(o => o.order_number?.toLowerCase() === returnOrderNumber.trim().toLowerCase());
-    if (!order) return toast.error('لم يتم العثور على الفاتورة');
-    if (order.status === 'returned') return toast.error('هذه الفاتورة مرتجعة مسبقاً');
+    if (!returnOrderNumber.trim()) return toast.error('أدخل رقم الفاتورة');
     setSaving(true);
     try {
-      await base44.entities.Order.update(order.id, { status: 'returned', notes: returnNote || 'مرتجع من الكاشير' });
-      for (const item of order.items || []) {
-        const product = products.find(p => p.id === item.product_id);
-        if (!product) continue;
-        const before = product.stock || 0;
-        const after = before + (item.quantity || 0);
-        await base44.entities.Product.update(product.id, { stock: after, sales_count: Math.max(0, (product.sales_count || 0) - (item.quantity || 0)) });
-        await createMovement({ product, type: 'return', quantity: item.quantity || 0, before, after, order });
+      const res = await base44.functions.invoke('process-pos-return', { order_number: returnOrderNumber.trim(), note: returnNote.trim() });
+      if (!res.data?.success) {
+        toast.error(res.data?.error || 'فشل تسجيل المرتجع');
+        setSaving(false);
+        return;
       }
-      toast.success('تم تسجيل المرتجع وإرجاع الكميات للمخزون');
+      toast.success('تم تسجيل المرتجع وعكس المخزون والحسابات');
       setReturnOrderNumber('');
       setReturnNote('');
       await loadData();
     } catch (err) {
-      toast.error('فشل تسجيل المرتجع');
+      toast.error(err?.message || 'فشل تسجيل المرتجع');
     }
     setSaving(false);
   };
