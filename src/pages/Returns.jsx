@@ -23,7 +23,7 @@ export default function Returns() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ order_id: '', product_title: '', reason: 'defective', type: 'return', description: '' });
+  const [form, setForm] = useState({ order_id: '', product_id: '', reason: 'defective', type: 'return', description: '' });
 
   useEffect(() => {
     const load = async () => {
@@ -35,10 +35,10 @@ export default function Returns() {
       setUser(me);
       if (me) {
         const [o, r] = await Promise.all([
-          base44.entities.Order.filter({ customer_email: me.email }, '-created_date', 50).catch(() => []),
-          base44.entities.ReturnRequest.filter({ customer_email: me.email }, '-created_date', 50).catch(() => []),
+          base44.functions.invoke('get-my-orders', {}).then(res => res.data?.orders || []).catch(() => []),
+          base44.functions.invoke('get-my-returns', {}).then(res => res.data?.returns || []).catch(() => []),
         ]);
-        setOrders(o);
+        setOrders(o.filter(order => order.status === 'delivered'));
         setReturns(r);
       }
       setLoading(false);
@@ -48,25 +48,22 @@ export default function Returns() {
 
   const handleSubmit = async () => {
     if (!user) return;
-    if (!form.product_title || !form.reason) {
-      toast.error('يرجى تعبئة الحقول المطلوبة');
+    if (!form.order_id || !form.product_id || !form.reason) {
+      toast.error('اختر الطلب والمنتج وسبب الإرجاع');
       return;
     }
     setSubmitting(true);
     try {
-      const reqNum = `RET-${Date.now().toString().slice(-6)}`;
-      await base44.entities.ReturnRequest.create({
-        ...form,
-        request_number: reqNum,
-        customer_name: user.full_name || '',
-        customer_email: user.email,
-        customer_phone: '',
-        status: 'pending',
-      });
-      toast.success('تم إرسال طلب الإرجاع بنجاح');
+      const res = await base44.functions.invoke('submit-return-request', form);
+      if (!res.data?.success) {
+        toast.error(res.data?.error || 'فشل إرسال الطلب');
+        setSubmitting(false);
+        return;
+      }
+      toast.success(`تم إرسال طلب الإرجاع #${res.data.request?.request_number || ''}`);
       setShowForm(false);
-      setForm({ order_id: '', product_title: '', reason: 'defective', type: 'return', description: '' });
-      const r = await base44.entities.ReturnRequest.filter({ customer_email: user.email }, '-created_date', 50).catch(() => []);
+      setForm({ order_id: '', product_id: '', reason: 'defective', type: 'return', description: '' });
+      const r = await base44.functions.invoke('get-my-returns', {}).then(response => response.data?.returns || []).catch(() => []);
       setReturns(r);
     } catch (err) {
       toast.error('فشل إرسال الطلب');
@@ -125,8 +122,8 @@ export default function Returns() {
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">الطلب الأصلي (اختياري)</label>
               <select className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-                value={form.order_id} onChange={e => setForm(f => ({ ...f, order_id: e.target.value, product_title: '' }))}>
-                <option value="">اختر طلباً</option>
+                value={form.order_id} onChange={e => setForm(f => ({ ...f, order_id: e.target.value, product_id: '' }))}>
+                <option value="">اختر طلباً تم تسليمه</option>
                 {orders.map(o => <option key={o.id} value={o.id}>#{o.order_number || o.id?.slice(-6)}</option>)}
               </select>
             </div>
@@ -134,20 +131,15 @@ export default function Returns() {
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">المنتج</label>
                 <select className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-                  value={form.product_title} onChange={e => setForm(f => ({ ...f, product_title: e.target.value }))}>
+                  value={form.product_id} onChange={e => setForm(f => ({ ...f, product_id: e.target.value }))}>
                   <option value="">اختر منتجاً</option>
                   {orders.find(o => o.id === form.order_id)?.items?.map((it, i) => (
-                    <option key={i} value={it.title}>{it.title}</option>
+                    <option key={`${it.product_id}-${i}`} value={it.product_id}>{it.title}</option>
                   ))}
                 </select>
               </div>
             )}
-            {!form.order_id && (
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">اسم المنتج</label>
-                <Input value={form.product_title} onChange={e => setForm(f => ({ ...f, product_title: e.target.value }))} />
-              </div>
-            )}
+            {!form.order_id && <p className="text-xs text-muted-foreground bg-secondary/50 rounded-lg p-3">طلبات الإرجاع مرتبطة بطلبات تم تسليمها فعلياً لحماية العميل والمتجر.</p>}
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">نوع الطلب</label>
               <select className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
