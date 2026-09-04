@@ -32,7 +32,7 @@ export default function Tickets() {
       setSettings(s[0] || {});
       setUser(me);
       if (me) {
-        const t = await base44.entities.Ticket.filter({ customer_email: me.email }, '-created_date', 50).catch(() => []);
+        const t = await base44.functions.invoke('get-my-tickets', {}).then(res => res.data?.tickets || []).catch(() => []);
         setTickets(t);
       }
       setLoading(false);
@@ -48,25 +48,16 @@ export default function Tickets() {
     }
     setSubmitting(true);
     try {
-      const ticketNum = `TKT-${Date.now().toString().slice(-6)}`;
-      await base44.entities.Ticket.create({
-        ...form,
-        ticket_number: ticketNum,
-        customer_name: user.full_name || '',
-        customer_email: user.email,
-        customer_phone: '',
-        status: 'open',
-        messages: [{
-          sender: user.full_name || 'العميل',
-          sender_role: 'customer',
-          message: form.description,
-          timestamp: new Date().toISOString(),
-        }],
-      });
-      toast.success('تم إنشاء التذكرة بنجاح');
+      const res = await base44.functions.invoke('submit-ticket', form);
+      if (!res.data?.success) {
+        toast.error(res.data?.error || 'فشل إنشاء التذكرة');
+        setSubmitting(false);
+        return;
+      }
+      toast.success(`تم إنشاء التذكرة #${res.data.ticket?.ticket_number || ''}`);
       setShowForm(false);
       setForm({ subject: '', category: 'general', priority: 'medium', description: '' });
-      const t = await base44.entities.Ticket.filter({ customer_email: user.email }, '-created_date', 50).catch(() => []);
+      const t = await base44.functions.invoke('get-my-tickets', {}).then(response => response.data?.tickets || []).catch(() => []);
       setTickets(t);
     } catch (err) {
       toast.error('فشل إنشاء التذكرة');
