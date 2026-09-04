@@ -1,0 +1,56 @@
+{
+  "name": "AIUsage",
+  "type": "object",
+  "properties": {
+    "user_email": {
+      "type": "string",
+      "title": "\u0628\u0631\u064a\u062f \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645"
+    },
+    "feature": {
+      "type": "string",
+      "title": "\u0627\u0644\u0645\u064a\u0632\u0629"
+    },
+    "prompt_chars": {
+      "type": "number",
+      "title": "\u0637\u0648\u0644 \u0627\u0644\u0637\u0644\u0628"
+    },
+    "response_chars": {
+      "type": "number",
+      "title": "\u0637\u0648\u0644 \u0627\u0644\u0631\u062f"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "failed"
+      ],
+      "default": "success"
+    }
+  },
+  "required": [
+    "user_email",
+    "feature"
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
