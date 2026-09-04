@@ -94,6 +94,7 @@ import SurveyPopup from '@/components/SurveyPopup';
 import BottomNav from '@/components/BottomNav';
 import InstallPrompt from '@/components/InstallPrompt';
 import NotificationSystem from '@/components/NotificationSystem';
+import AgeGate from '@/components/AgeGate';
 
 
 const AuthenticatedApp = () => {
@@ -111,6 +112,7 @@ const AuthenticatedApp = () => {
 
   return (
     <>
+      <AgeGate />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
