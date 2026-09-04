@@ -20,6 +20,37 @@
       "type": "string",
       "title": "\u0627\u0644\u062a\u0639\u0644\u064a\u0642"
     },
+    "context": {
+      "type": "string",
+      "enum": [
+        "store",
+        "blog"
+      ],
+      "title": "\u0633\u064a\u0627\u0642 \u0627\u0644\u0631\u0623\u064a",
+      "default": "store"
+    },
+    "user_email": {
+      "type": "string",
+      "title": "\u0628\u0631\u064a\u062f \u0627\u0644\u0645\u0633\u062a\u062e\u062f\u0645",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
+    "visitor_key": {
+      "type": "string",
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0632\u0627\u0626\u0631",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
+    },
     "status": {
       "type": "string",
       "enum": [
@@ -27,7 +58,8 @@
         "approved",
         "rejected"
       ],
-      "title": "\u0627\u0644\u062d\u0627\u0644\u0629"
+      "title": "\u0627\u0644\u062d\u0627\u0644\u0629",
+      "default": "pending"
     }
   },
   "required": [
@@ -36,8 +68,16 @@
     "comment"
   ],
   "rls": {
-    "read": {},
-    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
     "update": {
       "user_condition": {
         "role": "admin"
