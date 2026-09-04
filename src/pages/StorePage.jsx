@@ -62,13 +62,13 @@ export default function StorePage() {
       setLoading(true);
       const [s, p, c, cfgList] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.entities.Product.filter({ store_key: storeKey }, '-created_date', 100).catch(() => []),
-        base44.entities.Category.filter({ store_key: storeKey }, 'sort_order').catch(() => []),
-        base44.entities.StoreConfig.filter({ store_key: storeKey }).catch(() => []),
+        base44.entities.Product.filter({ store_key: resolvedKey }, '-created_date', 500).catch(() => []),
+        base44.entities.Category.filter({ store_key: resolvedKey }, 'sort_order').catch(() => []),
+        base44.entities.StoreConfig.filter({ store_key: resolvedKey }).catch(() => []),
       ]);
       setSettings(s[0] || {});
       setStoreConfig(cfgList[0] || null);
-      setProducts(p.filter(pr => pr.status !== 'draft' && pr.status !== 'archived'));
+      setProducts(p.filter(pr => pr.status === 'active'));
       const parents = c.filter(cat => !cat.parent_id);
       const subs = c.filter(cat => !!cat.parent_id);
       setCategories(parents);
