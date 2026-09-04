@@ -35,8 +35,8 @@ export default function ProductReviews({ productId }) {
   const [uploading, setUploading] = useState(false);
 
   const load = () =>
-    base44.entities.ProductReview.filter({ product_id: productId, status: 'approved' })
-      .then(setReviews).catch(() => []);
+    base44.functions.invoke('get-public-product-reviews', { product_id: productId })
+      .then(res => setReviews(res.data?.reviews || [])).catch(() => setReviews([]));
 
   useEffect(() => { if (productId) load(); }, [productId]);
 
@@ -51,8 +51,13 @@ export default function ProductReviews({ productId }) {
     e.preventDefault();
     if (!form.user_name || !form.comment) return toast.error('يرجى ملء الاسم والتعليق');
     setLoading(true);
-    await base44.entities.ProductReview.create({ ...form, product_id: productId, status: 'pending' });
-    toast.success('تم إرسال تقييمك وسيظهر بعد المراجعة');
+    const res = await base44.functions.invoke('submit-product-review', { ...form, product_id: productId });
+    if (!res.data?.success) {
+      toast.error(res.data?.error || 'تعذر إرسال التقييم');
+      setLoading(false);
+      return;
+    }
+    toast.success(res.data?.verified_purchase ? 'تم إرسال تقييمك كشراء موثق وسيظهر بعد المراجعة' : 'تم إرسال تقييمك وسيظهر بعد المراجعة');
     setForm({ user_name: '', title: '', comment: '', rating: 5, image_url: '' });
     setShowForm(false);
     setLoading(false);
@@ -72,8 +77,14 @@ export default function ProductReviews({ productId }) {
   };
 
   const markHelpful = async (review) => {
-    await base44.entities.ProductReview.update(review.id, { helpful_count: (review.helpful_count || 0) + 1 });
-    load();
+    try {
+      const res = await base44.functions.invoke('mark-product-review-helpful', { review_id: review.id });
+      if (!res.data?.success) return toast.error(res.data?.error || 'تعذر تسجيل التصويت');
+      if (res.data?.already_voted) toast.info('سبق أن سجّلت هذا التقييم كمفيد');
+      setReviews(prev => prev.map(r => r.id === review.id ? { ...r, helpful_count: res.data.helpful_count } : r));
+    } catch {
+      toast.error('سجّل الدخول أولاً لتسجيل التقييم كمفيد');
+    }
   };
 
   return (
