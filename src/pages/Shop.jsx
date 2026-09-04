@@ -35,11 +35,11 @@ export default function Shop() {
     const load = async () => {
       const [s, p, c] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.entities.Product.list('-created_date', 100).catch(() => []),
+        base44.entities.Product.list('-created_date', 500).catch(() => []),
         base44.entities.Category.list('sort_order').catch(() => []),
       ]);
       setSettings(s[0] || {});
-      const active = p.filter(pr => pr.status !== 'draft' && pr.status !== 'archived');
+      const active = p.filter(pr => pr.status === 'active');
       const reverted = await revertExpiredDiscounts(active);
       setProducts(reverted);
       setCategories(c);
