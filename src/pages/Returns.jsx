@@ -8,7 +8,6 @@ import { useCart } from '@/lib/useCart';
 import { motion } from 'framer-motion';
 import { Undo2, Package, ArrowLeft, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
@@ -120,7 +119,7 @@ export default function Returns() {
             className="bg-card border border-border/50 rounded-2xl p-4 mb-4 space-y-3">
             <h3 className="font-bold text-sm">طلب إرجاع / استبدال</h3>
             <div>
-              <label className="text-xs text-muted-foreground mb-1 block">الطلب الأصلي (اختياري)</label>
+              <label className="text-xs text-muted-foreground mb-1 block">الطلب الأصلي *</label>
               <select className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
                 value={form.order_id} onChange={e => setForm(f => ({ ...f, order_id: e.target.value, product_id: '' }))}>
                 <option value="">اختر طلباً تم تسليمه</option>
