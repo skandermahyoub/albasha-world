@@ -24,7 +24,7 @@ export default function Contests() {
   useEffect(() => {
     Promise.all([
       base44.entities.Contest.list('-created_date').catch(() => []),
-      base44.entities.ContestEntry.filter({ status: 'approved' }, '-votes', 50).catch(() => []),
+      base44.functions.invoke('get-public-contest-entries', {}).then(res => res.data?.entries || []).catch(() => []),
     ]).then(([c, e]) => {
       setContests(c);
       setEntries(e);
@@ -46,7 +46,13 @@ export default function Contests() {
       caption,
       status: 'pending',
     });
-    toast.success('تم رفع صورتك! سيتم مراجعتها');
+    if (user) {
+      const reward = await base44.functions.invoke('claim-loyalty-reward', { action: 'contest_upload', reference_id: selectedContest.id }).catch(() => null);
+      if (reward?.data?.awarded > 0) toast.success(`تم رفع صورتك! ربحت ${reward.data.awarded} نقطة وسيتم مراجعة المشاركة`);
+      else toast.success('تم رفع صورتك! سيتم مراجعتها');
+    } else {
+      toast.success('تم رفع صورتك! سيتم مراجعتها');
+    }
     setCaption('');
     setUploading(false);
   };
@@ -60,16 +66,11 @@ export default function Contests() {
       } else {
         await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
       }
-      // مكافأة نقاط عند المشاركة
       const user = await base44.auth.me().catch(() => null);
       if (user) {
-        const lp = await base44.entities.LoyaltyPoints.filter({ user_email: user.email }).catch(() => []);
-        if (lp[0]) {
-          await base44.entities.LoyaltyPoints.update(lp[0].id, { points: (lp[0].points || 0) + 25 });
-        } else {
-          await base44.entities.LoyaltyPoints.create({ user_email: user.email, points: 25 });
-        }
-        toast.success('🎉 ربحت 25 نقطة ولاء على المشاركة!');
+        const reward = await base44.functions.invoke('claim-loyalty-reward', { action: 'contest_share', reference_id: entry.id });
+        if (reward.data?.awarded > 0) toast.success(`ربحت ${reward.data.awarded} نقطة ولاء على المشاركة!`);
+        else toast.success('تمت المشاركة — سبق احتساب مكافأة هذه المشاركة');
       } else {
         toast.success('تمت المشاركة! سجل دخولك لربح نقاط الولاء');
       }
