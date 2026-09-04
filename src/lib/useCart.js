@@ -27,17 +27,25 @@ export function useCart() {
   }, [appliedCoupon]);
 
   const addItem = (product, qty = 1) => {
+    if (!product?.id || qty <= 0) return;
+    if (product.stock != null && product.stock <= 0) return;
     setItems(prev => {
       const existing = prev.find(i => i.product_id === product.id);
-      if (existing) return prev.map(i => i.product_id === product.id ? { ...i, quantity: i.quantity + qty } : i);
-      return [...prev, { product_id: product.id, title: product.title, price: product.price, image: product.image, quantity: qty }];
+      const requestedQty = existing ? existing.quantity + qty : qty;
+      const safeQty = product.stock != null ? Math.min(requestedQty, product.stock) : requestedQty;
+      if (existing) return prev.map(i => i.product_id === product.id ? { ...i, quantity: safeQty, stock: product.stock } : i);
+      return [...prev, { product_id: product.id, title: product.title, price: product.price, image: product.image, quantity: safeQty, stock: product.stock }];
     });
   };
 
   const removeItem = (productId) => setItems(prev => prev.filter(i => i.product_id !== productId));
   const updateQty = (productId, qty) => {
     if (qty <= 0) return removeItem(productId);
-    setItems(prev => prev.map(i => i.product_id === productId ? { ...i, quantity: qty } : i));
+    setItems(prev => prev.map(i => {
+      if (i.product_id !== productId) return i;
+      const safeQty = i.stock != null ? Math.min(qty, i.stock) : qty;
+      return { ...i, quantity: Math.max(1, safeQty) };
+    }));
   };
   const clearCart = () => { setItems([]); setAppliedCoupon(null); };
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
