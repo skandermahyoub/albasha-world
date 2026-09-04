@@ -47,9 +47,18 @@ export default function ReviewsSection({ reviews = [] }) {
     e.preventDefault();
     if (!form.name || !form.comment) return toast.error('يرجى ملء جميع الحقول');
     setSubmitting(true);
-    await base44.entities.Review.create({ ...form, status: 'pending' });
-    toast.success('شكراً! تم إرسال رأيك وسيتم مراجعته');
-    setForm({ name: '', phone: '', rating: 5, comment: '' });
+    try {
+      const res = await base44.functions.invoke('submit-review', { name: form.name, rating: form.rating, comment: form.comment, context: 'store' });
+      if (!res.data?.success) {
+        toast.error(res.data?.error || 'تعذر إرسال رأيك');
+        setSubmitting(false);
+        return;
+      }
+      toast.success('شكراً! تم إرسال رأيك وسيتم مراجعته');
+      setForm({ name: '', phone: '', rating: 5, comment: '' });
+    } catch {
+      toast.error('تعذر إرسال رأيك');
+    }
     setSubmitting(false);
   };
 
