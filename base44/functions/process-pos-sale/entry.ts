@@ -36,7 +36,7 @@ export default async function(req: Request) {
     const discountAmount = Math.min(Math.max(0, Number(discount) || 0), subtotal);
     const total = Math.max(0, subtotal - discountAmount);
     const orderNumber = `POS-${Date.now().toString().slice(-8)}`;
-    const orderItems = rows.map(({ product, qty }) => ({ product_id: product.id, title: product.title, price: Number(product.price) || 0, quantity: qty, image: product.image || '' }));
+    const orderItems = rows.map(({ product, qty }) => ({ product_id: product.id, title: product.title, price: Number(product.price) || 0, cost_price: Math.max(0, Number(product.cost_price) || 0), store_key: product.store_key || '', quantity: qty, image: product.image || '' }));
 
     const order = await base44.asServiceRole.entities.Order.create({
       order_number: orderNumber,
