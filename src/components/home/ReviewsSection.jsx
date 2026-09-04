@@ -39,7 +39,7 @@ function ReviewCard({ review }) {
 
 export default function ReviewsSection({ reviews = [] }) {
   const scrollRef = useRef(null);
-  const [form, setForm] = useState({ name: '', phone: '', rating: 5, comment: '' });
+  const [form, setForm] = useState({ name: '', rating: 5, comment: '' });
   const [submitting, setSubmitting] = useState(false);
   const approvedReviews = reviews.filter(r => r.status === 'approved');
 
@@ -55,7 +55,7 @@ export default function ReviewsSection({ reviews = [] }) {
         return;
       }
       toast.success('شكراً! تم إرسال رأيك وسيتم مراجعته');
-      setForm({ name: '', phone: '', rating: 5, comment: '' });
+      setForm({ name: '', rating: 5, comment: '' });
     } catch {
       toast.error('تعذر إرسال رأيك');
     }
@@ -84,7 +84,6 @@ export default function ReviewsSection({ reviews = [] }) {
         <h3 className="font-heading font-bold text-lg mb-4 text-center">شاركنا رأيك</h3>
         <form onSubmit={handleSubmit} className="space-y-3">
           <Input placeholder="الاسم" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
-          <Input placeholder="رقم الهاتف (اختياري)" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">التقييم:</span>
             <StarRating value={form.rating} onChange={r => setForm(f => ({ ...f, rating: r }))} />
