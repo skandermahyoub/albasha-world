@@ -24,22 +24,20 @@ export default function SocialEngagement({ contentType, contentId, title, shareT
   const visitorKey = useMemo(getVisitorKey, []);
 
   const load = async () => {
-    const [reactionRows, commentRows] = await Promise.all([
-      base44.entities.ContentReaction.filter({ content_type: contentType, content_id: contentId }).catch(() => []),
-      allowComments ? base44.entities.ContentComment.filter({ content_type: contentType, content_id: contentId, status: 'approved' }, '-created_date', 20).catch(() => []) : Promise.resolve([]),
-    ]);
-    setLikes(reactionRows.length);
-    setLiked(reactionRows.some(r => r.visitor_key === visitorKey));
-    setComments(commentRows);
+    const res = await base44.functions.invoke('get-public-engagement', { content_type: contentType, content_id: contentId, visitor_key: visitorKey }).catch(() => null);
+    setLikes(res?.data?.likes || 0);
+    setLiked(!!res?.data?.liked);
+    setComments(allowComments ? (res?.data?.comments || []) : []);
   };
 
   useEffect(() => { load(); }, [contentType, contentId]);
 
   const toggleLike = async () => {
     if (liked) return toast.message('أعجبك هذا المحتوى بالفعل');
-    await base44.entities.ContentReaction.create({ content_type: contentType, content_id: contentId, visitor_key: visitorKey, reaction: 'like' });
+    const res = await base44.functions.invoke('like-content', { content_type: contentType, content_id: contentId, visitor_key: visitorKey }).catch(() => null);
+    if (!res?.data?.success) return toast.error(res?.data?.error || 'تعذر تسجيل الإعجاب');
     setLiked(true);
-    setLikes(v => v + 1);
+    setLikes(res.data.likes || 0);
   };
 
   const share = async () => {
@@ -55,11 +53,14 @@ export default function SocialEngagement({ contentType, contentId, title, shareT
     e.preventDefault();
     if (!form.name.trim() || !form.comment.trim()) return toast.error('اكتب اسمك وتعليقك أولاً');
     setSaving(true);
-    const row = await base44.entities.ContentComment.create({ content_type: contentType, content_id: contentId, name: form.name.trim(), comment: form.comment.trim(), status: 'approved' });
-    setComments([row, ...comments]);
+    const res = await base44.functions.invoke('submit-content-comment', { content_type: contentType, content_id: contentId, name: form.name.trim(), comment: form.comment.trim(), visitor_key: visitorKey }).catch(() => null);
+    if (!res?.data?.success) {
+      setSaving(false);
+      return toast.error(res?.data?.error || 'تعذر إرسال التعليق');
+    }
     setForm({ name: '', comment: '' });
     setSaving(false);
-    toast.success('تم نشر تعليقك');
+    toast.success('تم إرسال تعليقك للمراجعة');
   };
 
   return (
