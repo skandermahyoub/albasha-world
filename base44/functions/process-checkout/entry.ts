@@ -200,7 +200,8 @@ export default async function(req) {
     }
 
     // ── 14. Final total ──
-    const finalTotal = Math.max(0, subtotal - discount + shippingFee - walletUsed);
+    const orderTotal = Math.max(0, subtotal - discount + shippingFee);
+    const amountDue = Math.max(0, orderTotal - walletUsed);
     const loyaltyPointsSpent = loyaltyDiscount > 0 ? Math.floor(loyaltyDiscount * 100) : 0;
 
     // ── 15. Generate order number ──
@@ -227,7 +228,8 @@ export default async function(req) {
       items: orderItems,
       subtotal,
       discount,
-      total: finalTotal,
+      total: orderTotal,
+      amount_due: amountDue,
       currency,
       status: 'pending',
       status_history: [{ status: 'pending', date: new Date().toISOString() }],
@@ -283,7 +285,7 @@ export default async function(req) {
     const staffRecipients = staffAccounts.filter(account => ['view', 'edit', 'delete', 'full'].includes(account.permissions?.orders)).map(account => account.email).filter(Boolean);
     if (staffRecipients.length) {
       await base44.asServiceRole.entities.Notification.bulkCreate(staffRecipients.map(email => ({
-        title: `طلب جديد ${orderNumber}`, message: `تم استلام طلب جديد بقيمة ${finalTotal} ${currency}.`, icon: '📦', type: 'info', customer_email: email,
+        title: `طلب جديد ${orderNumber}`, message: `تم استلام طلب جديد بقيمة ${orderTotal} ${currency}.`, icon: '📦', type: 'info', customer_email: email,
         target_type: 'order', target_id: order.id, target_route: `/admin/orders?order=${order.id}`, event_key: `staff-order:${order.id}:${email}`, is_read: false, is_active: true, interval_minutes: 5, sort_order: 0,
       })));
     }
@@ -405,7 +407,8 @@ export default async function(req) {
       order: {
         id: order.id,
         order_number: orderNumber,
-        total: finalTotal,
+        total: orderTotal,
+        amount_due: amountDue,
         subtotal,
         discount,
         shipping_fee: shippingFee,
