@@ -35,10 +35,10 @@ export default function WishLists() {
       const [s, me, p] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
         base44.auth.me().catch(() => null),
-        base44.entities.Product.list('-created_date', 200).catch(() => []),
+        base44.entities.Product.list('-created_date', 1000).catch(() => []),
       ]);
       setSettings(s[0] || {});
-      setAllProducts(p);
+      setAllProducts(p.filter(product => product.status === 'active'));
       setUser(me);
       if (me) {
         const wl = await base44.entities.WishList.filter({ user_email: me.email }).catch(() => []);
