@@ -32,6 +32,19 @@
           "price": {
             "type": "number"
           },
+          "cost_price": {
+            "type": "number",
+            "rls": {
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            }
+          },
+          "store_key": {
+            "type": "string"
+          },
           "quantity": {
             "type": "number"
           },
