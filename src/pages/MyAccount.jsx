@@ -48,21 +48,28 @@ export default function MyAccount() {
   }, []);
 
   const submitDeliveryRating = async (orderId, rating) => {
-    await base44.entities.Order.update(orderId, { delivery_rating: rating });
-    toast.success('شكراً لتقييمك!');
-    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, delivery_rating: rating } : o));
+    try {
+      const res = await base44.functions.invoke('submit-delivery-rating', { order_id: orderId, rating });
+      if (!res.data?.success) return toast.error(res.data?.error || 'تعذر حفظ التقييم');
+      toast.success('شكراً لتقييمك!');
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, delivery_rating: rating } : o));
+    } catch {
+      toast.error('تعذر حفظ التقييم');
+    }
   };
 
   const saveProfile = async () => {
     const me = await base44.auth.me().catch(() => null);
     if (!me?.email) return;
-    const data = { full_name: profile.full_name, id_number: profile.id_number, address: profile.address, profile_photo: profile.profile_photo };
-    if (profile.id) {
-      await base44.entities.CustomerProfile.update(profile.id, data);
-    } else {
-      await base44.entities.CustomerProfile.create({ user_email: me.email, name: me.full_name || '', ...data });
+    try {
+      const data = { full_name: profile?.full_name || '', id_number: profile?.id_number || '', address: profile?.address || '', profile_photo: profile?.profile_photo || '' };
+      const res = await base44.functions.invoke('update-my-profile', data);
+      if (!res.data?.success) return toast.error(res.data?.error || 'تعذر حفظ بياناتك');
+      setProfile(res.data.profile || { ...profile, ...data });
+      toast.success('تم حفظ بياناتك');
+    } catch {
+      toast.error('تعذر حفظ بياناتك');
     }
-    toast.success('تم حفظ بياناتك');
   };
 
   const STATUS_MAP = {
