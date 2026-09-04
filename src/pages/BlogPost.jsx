@@ -35,11 +35,20 @@ function ReviewForm({ postId, onAdded }) {
     e.preventDefault();
     if (!form.name || !form.comment) return toast.error('يرجى ملء جميع الحقول');
     setLoading(true);
-    await base44.entities.Review.create({ ...form, status: 'pending' });
-    toast.success('تم إرسال تعليقك وسيظهر بعد المراجعة');
-    setForm({ name: '', comment: '', rating: 5 });
+    try {
+      const res = await base44.functions.invoke('submit-review', { ...form, context: 'blog', content_id: postId });
+      if (!res.data?.success) {
+        toast.error(res.data?.error || 'تعذر إرسال تعليقك');
+        setLoading(false);
+        return;
+      }
+      toast.success('تم إرسال تعليقك وسيظهر بعد المراجعة');
+      setForm({ name: '', comment: '', rating: 5 });
+      onAdded?.();
+    } catch {
+      toast.error('تعذر إرسال تعليقك');
+    }
     setLoading(false);
-    onAdded?.();
   };
 
   return (
@@ -102,22 +111,29 @@ export default function BlogPostPage() {
   const [shoppableProducts, setShoppableProducts] = useState([]);
   const currency = useCurrency(settings);
 
-  const loadReviews = () => base44.entities.Review.filter({ status: 'approved' }).then(setReviews).catch(() => []);
+  const loadReviews = () => base44.functions.invoke('get-public-reviews', { context: 'blog', content_id: id }).then(res => setReviews(res.data?.reviews || [])).catch(() => setReviews([]));
 
   useEffect(() => {
     setLoading(true);
     Promise.all([
       base44.entities.StoreSettings.list().catch(() => []),
-      base44.entities.BlogPost.filter({ id }).catch(() => []),
-      base44.entities.BlogPost.list('-created_date', 20).catch(() => []),
-      base44.entities.Review.filter({ status: 'approved' }).catch(() => []),
+      base44.functions.invoke('get-public-blog-posts', { id, limit: 1 }).then(res => res.data?.posts || []).catch(() => []),
+      base44.functions.invoke('get-public-blog-posts', { limit: 20 }).then(res => res.data?.posts || []).catch(() => []),
+      base44.functions.invoke('get-public-reviews', { context: 'blog', content_id: id }).then(res => res.data?.reviews || []).catch(() => []),
     ]).then(([s, p, allPosts, r]) => {
       const currentPost = p[0] || null;
       setSettings(s[0] || {});
       setPost(currentPost);
       setReviews(r);
       if (currentPost) {
-        base44.entities.BlogPost.update(currentPost.id, { views: (currentPost.views || 0) + 1 }).catch(() => {});
+        let visitorKey = localStorage.getItem('basha_visitor_key');
+        if (!visitorKey) {
+          visitorKey = `visitor_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+          localStorage.setItem('basha_visitor_key', visitorKey);
+        }
+        base44.functions.invoke('record-blog-view', { post_id: currentPost.id, visitor_key: visitorKey }).then(res => {
+          if (res.data?.success) setPost(prev => prev ? { ...prev, views: res.data.views } : prev);
+        }).catch(() => {});
         setRelatedPosts(allPosts.filter(pp => pp.id !== currentPost.id && pp.status === 'published' && pp.category === currentPost.category).slice(0, 3));
         // جلب منتجات مرتبطة بتصنيف المقال للعرض كـ Shoppable
         if (currentPost.category) {
