@@ -67,7 +67,7 @@ export default function Home() {
         base44.entities.MarqueeText.list('sort_order').catch(() => []),
         base44.entities.SpecialOffer.list('sort_order').catch(() => []),
         base44.entities.Product.list('-created_date', 500).catch(() => []),
-        base44.entities.Review.list('-created_date', 50).catch(() => []),
+        base44.functions.invoke('get-public-reviews', { context: 'store' }).then(res => res.data?.reviews || []).catch(() => []),
         base44.entities.Brand.list('sort_order').catch(() => []),
         base44.entities.BlogPost.list('-created_date', 10).catch(() => []),
         base44.entities.Bundle.list('-created_date', 10).catch(() => []),
