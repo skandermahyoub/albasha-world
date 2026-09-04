@@ -24,10 +24,10 @@ export default function Favorites() {
     const load = async () => {
       const [s, p] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.entities.Product.list('-created_date', 200).catch(() => []),
+        base44.entities.Product.list('-created_date', 1000).catch(() => []),
       ]);
       setSettings(s[0] || {});
-      setProducts(p.filter(pr => favs.includes(pr.id)));
+      setProducts(p.filter(pr => pr.status === 'active' && favs.includes(pr.id)));
     };
     load();
   }, [favs]);
