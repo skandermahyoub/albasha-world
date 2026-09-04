@@ -65,7 +65,14 @@
       "type": "number",
       "title": "\u062a\u0643\u0644\u0641\u0629 \u0627\u0644\u0648\u062d\u062f\u0629 \u0628\u0627\u0644\u062f\u0648\u0644\u0627\u0631",
       "minimum": 0,
-      "default": 0
+      "default": 0,
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     },
     "slug": {
       "type": "string",
@@ -77,15 +84,36 @@
     },
     "source_url": {
       "type": "string",
-      "title": "\u0631\u0627\u0628\u0637 \u0645\u0635\u062f\u0631 \u0627\u0644\u0645\u0646\u062a\u062c"
+      "title": "\u0631\u0627\u0628\u0637 \u0645\u0635\u062f\u0631 \u0627\u0644\u0645\u0646\u062a\u062c",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     },
     "source_id": {
       "type": "string",
-      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0645\u0646\u062a\u062c \u0641\u064a \u0627\u0644\u0645\u0635\u062f\u0631"
+      "title": "\u0645\u0639\u0631\u0641 \u0627\u0644\u0645\u0646\u062a\u062c \u0641\u064a \u0627\u0644\u0645\u0635\u062f\u0631",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     },
     "import_source": {
       "type": "string",
-      "title": "\u0645\u0635\u062f\u0631 \u0627\u0644\u0627\u0633\u062a\u064a\u0631\u0627\u062f"
+      "title": "\u0645\u0635\u062f\u0631 \u0627\u0644\u0627\u0633\u062a\u064a\u0631\u0627\u062f",
+      "rls": {
+        "read": {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      }
     },
     "attributes": {
       "type": "object",
@@ -107,7 +135,14 @@
             "type": "number"
           },
           "cost_price": {
-            "type": "number"
+            "type": "number",
+            "rls": {
+              "read": {
+                "user_condition": {
+                  "role": "admin"
+                }
+              }
+            }
           },
           "stock": {
             "type": "number"
