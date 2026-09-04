@@ -201,6 +201,7 @@ export default async function(req) {
 
     // ── 14. Final total ──
     const finalTotal = Math.max(0, subtotal - discount + shippingFee - walletUsed);
+    const loyaltyPointsSpent = loyaltyDiscount > 0 ? Math.floor(loyaltyDiscount * 100) : 0;
 
     // ── 15. Generate order number ──
     const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
@@ -237,9 +238,15 @@ export default async function(req) {
       shipping_fee: shippingFee,
       source: 'online',
       idempotency_key,
+      wallet_used: walletUsed,
+      loyalty_points_spent: loyaltyPointsSpent,
+      coupon_code: couponRecord?.code || '',
+      gift_card_code: giftCardRecord?.code || '',
       stock_deducted: false,
       sales_updated: false,
       commission_calculated: false,
+      customer_metrics_updated: false,
+      financial_reversed: false,
     };
 
     let order;
@@ -339,56 +346,20 @@ export default async function(req) {
       });
     }
 
-    // ── 21. Update loyalty points ──
-    if (userEmail) {
-      let pointsBalance = loyaltyRecord?.points || 0;
-      let totalEarned = loyaltyRecord?.total_earned || 0;
-      let totalSpent = loyaltyRecord?.total_spent || 0;
+    // ── 21. Redeem loyalty points now; earning happens only after delivery ──
+    if (userEmail && loyaltyPointsSpent > 0) {
+      const pointsBalance = Math.max(0, (loyaltyRecord?.points || 0) - loyaltyPointsSpent);
+      const totalSpent = (loyaltyRecord?.total_spent || 0) + loyaltyPointsSpent;
       const history = loyaltyRecord?.history ? [...loyaltyRecord.history] : [];
-
-      if (loyaltyDiscount > 0) {
-        const pointsToDeduct = Math.floor(loyaltyDiscount * 100);
-        pointsBalance = Math.max(0, pointsBalance - pointsToDeduct);
-        totalSpent += pointsToDeduct;
-        history.push({
-          action: 'spend', points: -pointsToDeduct,
-          date: new Date().toISOString(), description: `خصم على طلب #${orderNumber}`
-        });
-      }
-
-      const earnedPoints = Math.floor(finalTotal);
-      if (earnedPoints > 0) {
-        pointsBalance += earnedPoints;
-        totalEarned += earnedPoints;
-        history.push({
-          action: 'earn', points: earnedPoints,
-          date: new Date().toISOString(), description: `طلب #${orderNumber}`
-        });
-      }
-
+      history.push({
+        action: 'spend', points: -loyaltyPointsSpent,
+        date: new Date().toISOString(), description: `خصم على طلب #${orderNumber}`
+      });
       if (loyaltyRecord) {
         await base44.asServiceRole.entities.LoyaltyPoints.update(loyaltyRecord.id, {
-          points: pointsBalance, total_earned: totalEarned,
-          total_spent: totalSpent, history
-        });
-      } else if (earnedPoints > 0 || loyaltyDiscount > 0) {
-        await base44.asServiceRole.entities.LoyaltyPoints.create({
-          user_email: userEmail,
-          points: pointsBalance, total_earned: totalEarned,
-          total_spent: totalSpent, history
-        });
-      }
-
-      if (earnedPoints > 0) {
-        await base44.asServiceRole.entities.Order.update(order.id, {
-          loyalty_points_earned: earnedPoints
-        });
-      }
-
-      if (profileRecord) {
-        await base44.asServiceRole.entities.CustomerProfile.update(profileRecord.id, {
-          total_spent: (profileRecord.total_spent || 0) + finalTotal,
-          orders_count: (profileRecord.orders_count || 0) + 1,
+          points: pointsBalance,
+          total_spent: totalSpent,
+          history,
         });
       }
     }
@@ -409,10 +380,7 @@ export default async function(req) {
           commission_amount: commissionAmount,
           status: 'pending',
         });
-        // Update total_sales immediately (clicks + sales tracking), commission on delivery
-        await base44.asServiceRole.entities.Affiliate.update(aff.id, {
-          total_sales: (aff.total_sales || 0) + subtotal,
-        });
+        // Sale totals and earned commission are recorded only after delivery.
       }
     }
 
