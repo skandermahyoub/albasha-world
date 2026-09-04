@@ -12,6 +12,8 @@ export default async function(req: Request) {
     const comment = String(body?.comment || '').trim().slice(0, MAX_COMMENT);
     const rating = Number(body?.rating);
     const context = ALLOWED_CONTEXTS.includes(body?.context) ? body.context : 'store';
+    const contentId = String(body?.content_id || '').trim().slice(0, 120);
+    if (context === 'blog' && !contentId) return Response.json({ error: 'معرف المقال مطلوب' }, { status: 400 });
     if (!name || !comment) return Response.json({ error: 'الاسم والتعليق مطلوبان' }, { status: 400 });
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) return Response.json({ error: 'التقييم يجب أن يكون بين 1 و5' }, { status: 400 });
 
@@ -32,6 +34,7 @@ export default async function(req: Request) {
       rating,
       comment,
       context,
+      content_id: contentId,
       user_email: user?.email || '',
       visitor_key: user?.email ? '' : userKey,
       status: 'pending',
