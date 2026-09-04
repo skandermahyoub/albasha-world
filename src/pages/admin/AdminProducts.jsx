@@ -74,7 +74,7 @@ export default function AdminProducts() {
 
   const loadData = async () => {
     const [p, c] = await Promise.all([
-      base44.entities.Product.list('-created_date', 200).catch(() => []),
+      base44.entities.Product.list('-created_date', 500).catch(() => []),
       base44.entities.Category.list('sort_order').catch(() => []),
     ]);
     setProducts(p);
@@ -293,12 +293,12 @@ export default function AdminProducts() {
             {/* حقول خاصة بالشيشة */}
             {form.store_key === 'shisha' && (
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
-                <p className="text-xs font-bold text-primary flex items-center gap-1"><Smartphone className="w-3 h-3" /> خصائص الشيشة</p>
+                <p className="text-xs font-bold text-primary flex items-center gap-1"><Cigarette className="w-3 h-3" /> خصائص الشيشة</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="نوع المنتج (تحفة، زهور، إكسسوار)" value={form.accessory_type || ''} onChange={e => setForm(f => ({ ...f, accessory_type: e.target.value }))} />
-                  <Input placeholder="المناسبة (عرس، عيد، ميلاد)" value={form.compatibility || ''} onChange={e => setForm(f => ({ ...f, compatibility: e.target.value }))} />
-                  <Input placeholder="اللون" value={form.color_name || ''} onChange={e => setForm(f => ({ ...f, color_name: e.target.value }))} />
-                  <Input placeholder="المقاس / الحجم" value={form.volume || ''} onChange={e => setForm(f => ({ ...f, volume: e.target.value }))} />
+                  <Input placeholder="نوع المنتج (معسل، شيشة، فحم، قصدير، إكسسوار)" value={form.accessory_type || ''} onChange={e => setForm(f => ({ ...f, accessory_type: e.target.value }))} />
+                  <Input placeholder="النكهة / النوع" value={form.flavor || ''} onChange={e => setForm(f => ({ ...f, flavor: e.target.value }))} />
+                  <Input placeholder="الوزن / الحجم" value={form.volume || ''} onChange={e => setForm(f => ({ ...f, volume: e.target.value }))} />
+                  <Input placeholder="ملاحظات التوافق أو الاستخدام" value={form.compatibility || ''} onChange={e => setForm(f => ({ ...f, compatibility: e.target.value }))} />
                 </div>
               </div>
             )}
@@ -306,12 +306,12 @@ export default function AdminProducts() {
             {/* حقول خاصة بالبوتيك */}
             {form.store_key === 'boutique' && (
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
-                <p className="text-xs font-bold text-primary flex items-center gap-1"><Monitor className="w-3 h-3" /> خصائص البوتيك</p>
+                <p className="text-xs font-bold text-primary flex items-center gap-1"><Gift className="w-3 h-3" /> خصائص البوتيك</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="النكهة" value={form.flavor || ''} onChange={e => setForm(f => ({ ...f, flavor: e.target.value }))} />
-                  <Input placeholder="مستوى النيكوتين" value={form.nicotine_level || ''} onChange={e => setForm(f => ({ ...f, nicotine_level: e.target.value }))} />
-                  <Input placeholder="الحجم (مل)" value={form.volume || ''} onChange={e => setForm(f => ({ ...f, volume: e.target.value }))} />
-                  <Input placeholder="نوع الجهاز" value={form.accessory_type || ''} onChange={e => setForm(f => ({ ...f, accessory_type: e.target.value }))} />
+                  <Input placeholder="نوع المنتج (هدية، تحفة، زهور، إكسسوار)" value={form.accessory_type || ''} onChange={e => setForm(f => ({ ...f, accessory_type: e.target.value }))} />
+                  <Input placeholder="المناسبة (عرس، عيد، ميلاد...)" value={form.compatibility || ''} onChange={e => setForm(f => ({ ...f, compatibility: e.target.value }))} />
+                  <Input placeholder="اللون" value={form.color_name || ''} onChange={e => setForm(f => ({ ...f, color_name: e.target.value }))} />
+                  <Input placeholder="المقاس / الحجم" value={form.volume || ''} onChange={e => setForm(f => ({ ...f, volume: e.target.value }))} />
                 </div>
               </div>
             )}
@@ -319,12 +319,12 @@ export default function AdminProducts() {
             {/* حقول خاصة بالعطور */}
             {form.store_key === 'perfume' && (
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
-                <p className="text-xs font-bold text-primary flex items-center gap-1"><Headphones className="w-3 h-3" /> خصائص العطور</p>
+                <p className="text-xs font-bold text-primary flex items-center gap-1"><Droplet className="w-3 h-3" /> خصائص العطور</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="النوع (معسل، شيشة، فحم)" value={form.accessory_type || ''} onChange={e => setForm(f => ({ ...f, accessory_type: e.target.value }))} />
-                  <Input placeholder="النكهة" value={form.flavor || ''} onChange={e => setForm(f => ({ ...f, flavor: e.target.value }))} />
-                  <Input placeholder="الوزن / الحجم" value={form.volume || ''} onChange={e => setForm(f => ({ ...f, volume: e.target.value }))} />
-                  <Input placeholder="الماركة" value={form.brand || ''} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))} />
+                  <Input placeholder="الفئة (رجالي، نسائي، للجنسين)" value={form.accessory_type || ''} onChange={e => setForm(f => ({ ...f, accessory_type: e.target.value }))} />
+                  <Input placeholder="العائلة العطرية / الرائحة" value={form.flavor || ''} onChange={e => setForm(f => ({ ...f, flavor: e.target.value }))} />
+                  <Input placeholder="الحجم (مل)" value={form.volume || ''} onChange={e => setForm(f => ({ ...f, volume: e.target.value }))} />
+                  <Input placeholder="التركيز (EDP / EDT / Parfum)" value={form.nicotine_level || ''} onChange={e => setForm(f => ({ ...f, nicotine_level: e.target.value }))} />
                 </div>
               </div>
             )}
@@ -334,10 +334,10 @@ export default function AdminProducts() {
               <div className="space-y-2 bg-primary/5 p-3 rounded-lg border border-primary/20">
                 <p className="text-xs font-bold text-primary flex items-center gap-1"><Zap className="w-3 h-3" /> خصائص الفيب</p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="الحجم (مل)" value={form.volume || ''} onChange={e => setForm(f => ({ ...f, volume: e.target.value }))} />
-                  <Input placeholder="نوع العطر (رجالي/نسائي)" value={form.flavor || ''} onChange={e => setForm(f => ({ ...f, flavor: e.target.value }))} />
-                  <Input placeholder="العلامة التجارية" value={form.brand || ''} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))} />
-                  <Input placeholder="التركيز (EDP/EDT)" value={form.nicotine_level || ''} onChange={e => setForm(f => ({ ...f, nicotine_level: e.target.value }))} />
+                  <Input placeholder="نوع المنتج / الجهاز" value={form.accessory_type || ''} onChange={e => setForm(f => ({ ...f, accessory_type: e.target.value }))} />
+                  <Input placeholder="النكهة" value={form.flavor || ''} onChange={e => setForm(f => ({ ...f, flavor: e.target.value }))} />
+                  <Input placeholder="مستوى النيكوتين" value={form.nicotine_level || ''} onChange={e => setForm(f => ({ ...f, nicotine_level: e.target.value }))} />
+                  <Input placeholder="الحجم (مل) / عدد السحبات" value={form.volume || ''} onChange={e => setForm(f => ({ ...f, volume: e.target.value }))} />
                 </div>
               </div>
             )}
