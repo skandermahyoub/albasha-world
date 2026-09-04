@@ -38,14 +38,15 @@ export default function Contests() {
     setUploading(true);
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
     const user = await base44.auth.me().catch(() => null);
-    await base44.entities.ContestEntry.create({
+    const submitted = await base44.functions.invoke('submit-contest-entry', {
       contest_id: selectedContest.id,
-      user_email: user?.email || '',
-      user_name: user?.full_name || 'مجهول',
       image: file_url,
       caption,
-      status: 'pending',
     });
+    if (!submitted.data?.success) {
+      setUploading(false);
+      return toast.error(submitted.data?.error || 'تعذر إرسال المشاركة');
+    }
     if (user) {
       const reward = await base44.functions.invoke('claim-loyalty-reward', { action: 'contest_upload', reference_id: selectedContest.id }).catch(() => null);
       if (reward?.data?.awarded > 0) toast.success(`تم رفع صورتك! ربحت ${reward.data.awarded} نقطة وسيتم مراجعة المشاركة`);
