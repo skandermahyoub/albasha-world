@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Trash2, Plus } from 'lucide-react';
+import { Loader2, Trash2, Plus, Image as ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 
@@ -53,6 +53,21 @@ export default function AdminStoreConfigs() {
     const imgs = [...(configs[storeKey]?.bg_images || [])];
     imgs.splice(idx, 1);
     updateField(storeKey, 'bg_images', imgs);
+  };
+
+  const handleUploadBg = async (storeKey, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error('no file url');
+      updateField(storeKey, 'bg_images', [...(configs[storeKey]?.bg_images || []), file_url]);
+      toast.success('تم رفع صورة الخلفية');
+    } catch {
+      toast.error('فشل رفع صورة الخلفية');
+    } finally {
+      e.target.value = '';
+    }
   };
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
@@ -117,6 +132,10 @@ export default function AdminStoreConfigs() {
                     </div>
                   ))}
                 </div>
+                <label className="block w-full inline-flex items-center justify-center gap-1 h-8 px-3 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent cursor-pointer transition-colors">
+                  <input type="file" accept="image/*" onChange={e => handleUploadBg(store.key, e)} className="hidden" />
+                  <ImageIcon className="w-3.5 h-3.5" /> رفع صورة خلفية
+                </label>
                 <div className="flex gap-2 mt-2">
                   <Input
                     placeholder="أو الصق رابط صورة"
