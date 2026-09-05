@@ -15,7 +15,7 @@ export default async function(req) {
       { order_number }, '-created_date', 1
     );
     const order = orders[0];
-    if (!order || order.source === 'test') {
+    if (!order || order.source === 'test' || order.admin_archived === true) {
       return Response.json({ error: 'لم يتم العثور على الطلب' }, { status: 404 });
     }
 
