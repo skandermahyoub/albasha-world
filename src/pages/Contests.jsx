@@ -7,7 +7,7 @@ import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Trophy, ThumbsUp, Share2, Sparkles } from 'lucide-react';
+import { Trophy, ThumbsUp, Share2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useStoreSettings } from '@/lib/useStoreSettings';
@@ -18,8 +18,9 @@ export default function Contests() {
   const [contests, setContests] = useState([]);
   const [entries, setEntries] = useState([]);
   const [selectedContest, setSelectedContest] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [caption, setCaption] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -32,30 +33,29 @@ export default function Contests() {
     });
   }, []);
 
-  const handleUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file || !selectedContest) return;
-    setUploading(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+  const submitEntry = async () => {
+    if (!selectedContest || !imageUrl.trim()) return toast.error('أدخل رابط الصورة');
+    setSubmitting(true);
     const user = await base44.auth.me().catch(() => null);
     const submitted = await base44.functions.invoke('submit-contest-entry', {
       contest_id: selectedContest.id,
-      image: file_url,
+      image: imageUrl.trim(),
       caption,
     });
     if (!submitted.data?.success) {
-      setUploading(false);
+      setSubmitting(false);
       return toast.error(submitted.data?.error || 'تعذر إرسال المشاركة');
     }
     if (user) {
       const reward = await base44.functions.invoke('claim-loyalty-reward', { action: 'contest_upload', reference_id: selectedContest.id }).catch(() => null);
-      if (reward?.data?.awarded > 0) toast.success(`تم رفع صورتك! ربحت ${reward.data.awarded} نقطة وسيتم مراجعة المشاركة`);
-      else toast.success('تم رفع صورتك! سيتم مراجعتها');
+      if (reward?.data?.awarded > 0) toast.success(`تم إرسال مشاركتك! ربحت ${reward.data.awarded} نقطة وسيتم مراجعتها`);
+      else toast.success('تم إرسال مشاركتك وسيتم مراجعتها');
     } else {
-      toast.success('تم رفع صورتك! سيتم مراجعتها');
+      toast.success('تم إرسال مشاركتك وسيتم مراجعتها');
     }
     setCaption('');
-    setUploading(false);
+    setImageUrl('');
+    setSubmitting(false);
   };
 
   const handleShare = async (entry) => {
