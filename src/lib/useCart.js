@@ -1,7 +1,4 @@
 import { useState, useEffect } from 'react';
-import { migrateLocalStorage } from '@/lib/localStorageMigration';
-
-migrateLocalStorage();
 
 const CART_KEY = 'basha_cart';
 const FAV_KEY = 'basha_favorites';
