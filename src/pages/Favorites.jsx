@@ -24,7 +24,7 @@ export default function Favorites() {
     const load = async () => {
       const [s, p] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.entities.Product.list('-created_date', 1000).catch(() => []),
+        base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 1000 }).then(res => res.data?.products || []).catch(() => []),
       ]);
       setSettings(s[0] || {});
       setProducts(p.filter(pr => pr.status === 'active' && favs.includes(pr.id)));
