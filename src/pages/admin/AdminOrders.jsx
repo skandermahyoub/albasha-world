@@ -125,15 +125,6 @@ export default function AdminOrders() {
 
     const statusLabel = STATUS_OPTIONS.find(s => s.value === newStatus)?.label;
 
-    // إشعار تلقائي للعميل بالبريد الإلكتروني
-    if (order.customer_email) {
-      base44.integrations.Core.SendEmail({
-        to: order.customer_email,
-        subject: `تحديث حالة طلبك #${order.order_number || order.id.slice(-6)}`,
-        body: `مرحباً ${order.customer_name}،\n\nتم تحديث حالة طلبك رقم #${order.order_number || order.id.slice(-6)} إلى: ${statusLabel}\n\nشكراً لتسوقك من عالم الباشا للتسوق.`,
-      }).catch(() => {});
-    }
-
     // إشعار العميل عبر واتساب
     if (order.customer_phone) {
       const msg = `تحديث طلبك رقم #${order.order_number || order.id.slice(-6)}\n\nالحالة الجديدة: ${statusLabel}\n\nشكراً لتسوقك منا.`;
