@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Star, ThumbsUp, CheckCircle, Loader2, Send, Image as ImageIcon, X } from 'lucide-react';
+import { Star, ThumbsUp, CheckCircle, Loader2, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,7 +32,6 @@ export default function ProductReviews({ productId }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ user_name: '', title: '', comment: '', rating: 5, image_url: '' });
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
 
   const load = () =>
     base44.functions.invoke('get-public-product-reviews', { product_id: productId })
@@ -61,19 +60,6 @@ export default function ProductReviews({ productId }) {
     setForm({ user_name: '', title: '', comment: '', rating: 5, image_url: '' });
     setShowForm(false);
     setLoading(false);
-  };
-
-  const handleImageUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setForm(f => ({ ...f, image_url: file_url }));
-    } catch (err) {
-      toast.error('فشل رفع الصورة');
-    }
-    setUploading(false);
   };
 
   const markHelpful = async (review) => {
