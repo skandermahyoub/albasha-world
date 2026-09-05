@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Image as ImageIcon, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import AIImageField from '@/components/admin/AIImageField';
@@ -15,6 +15,7 @@ export default function AdminGenericList({ entityName, title, fields = [], aiIma
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
+  const [imageUrlInputs, setImageUrlInputs] = useState({});
   const { can } = useAdminPermissions();
   const permissionSection = typeof window !== 'undefined' ? pathToPermissionKey(window.location.pathname) : null;
   const canAdd = !readOnly && (!permissionSection || can(permissionSection, 'add'));
@@ -37,19 +38,6 @@ export default function AdminGenericList({ entityName, title, fields = [], aiIma
     await entity.delete(id);
     toast.success('تم الحذف'); load();
   };
-
-  const handleUpload = async (e, fieldKey) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    try {
-      toast.info('جاري رفع الصورة...');
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setForm(f => ({ ...f, [fieldKey]: file_url }));
-      toast.success('تم رفع الصورة');
-    } catch (err) {
-      toast.error('فشل رفع الصورة - تأكد من اشتراك Builder+');
-    }
-  };
-
 
   return (
     <div>
@@ -108,19 +96,26 @@ export default function AdminGenericList({ entityName, title, fields = [], aiIma
                         ))}
                       </div>
                     )}
-                    <label className="block w-full inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent cursor-pointer transition-colors">
-                      <input type="file" accept="image/*" multiple onChange={async (e) => {
-                        const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/') && f.size < 5 * 1024 * 1024);
-                        if (!files.length) return toast.error('صور غير صالحة (أقل من 5 ميجابايت)');
-                        const urls = [];
-                        for (const file of files) {
-                          try { const { file_url } = await base44.integrations.Core.UploadFile({ file }); urls.push(file_url); } catch {}
-                        }
-                        setForm(f => ({ ...f, [field.key]: [...(f[field.key] || []), ...urls] }));
-                        toast.success(`تم رفع ${urls.length} صورة`);
-                      }} className="hidden" />
-                      <ImageIcon className="w-4 h-4 ml-2" /> رفع صور متعددة
-                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="رابط صورة إضافية"
+                        value={imageUrlInputs[field.key] || ''}
+                        onChange={e => setImageUrlInputs(prev => ({ ...prev, [field.key]: e.target.value }))}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          const url = (imageUrlInputs[field.key] || '').trim();
+                          if (!url) return;
+                          setForm(f => ({ ...f, [field.key]: [...(f[field.key] || []), url] }));
+                          setImageUrlInputs(prev => ({ ...prev, [field.key]: '' }));
+                        }}
+                      >
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 );
               }
