@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Save, Link2, Palette, Store as StoreIcon, Phone, Share2, FileText, Navigation, Tags } from 'lucide-react';
+import { Save, Image as ImageIcon, Link2, Palette, Store as StoreIcon, Phone, Share2, FileText, Navigation, Tags } from 'lucide-react';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 
 import { logAction } from '@/lib/auditLog';
@@ -35,6 +35,8 @@ export default function AdminSettings() {
   const [settings, setSettings] = useState(null);
   const [settingsId, setSettingsId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingFavicon, setUploadingFavicon] = useState(false);
 
   useEffect(() => {
     if (ctxSettings) {
@@ -72,6 +74,40 @@ export default function AdminSettings() {
     });
     await reloadSettings();
     toast.success('تم حفظ الإعدادات وتطبيقها على كامل المتجر');
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogo(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error('no file url');
+      setSettings(s => ({ ...s, logo_url: file_url }));
+      toast.success('تم رفع الشعار الرئيسي؛ لا تنسَ الحفظ');
+    } catch {
+      toast.error('فشل رفع الشعار');
+    } finally {
+      setUploadingLogo(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleFaviconUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingFavicon(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error('no file url');
+      setSettings(s => ({ ...s, favicon_url: file_url }));
+      toast.success('تم رفع أيقونة المتصفح؛ لا تنسَ الحفظ');
+    } catch {
+      toast.error('فشل رفع الأيقونة');
+    } finally {
+      setUploadingFavicon(false);
+      e.target.value = '';
+    }
   };
 
   const u = (key, val) => setSettings(s => ({ ...s, [key]: val }));
@@ -122,9 +158,15 @@ export default function AdminSettings() {
 
           {/* Logo */}
           <div>
-            <label className="text-sm text-muted-foreground block mb-1">شعار المتجر (يظهر في كل مكان)</label>
+            <label className="text-sm text-muted-foreground block mb-1">الشعار الرئيسي للمتجر (هوية التطبيق العامة)</label>
             {settings.logo_url && <img src={settings.logo_url} alt="logo" className="w-20 h-20 rounded-full object-cover mb-2 border-2 border-primary/30" />}
-            <Input placeholder="رابط الشعار" value={settings.logo_url || ''} onChange={e => u('logo_url', e.target.value)} />
+            <div className="flex gap-2">
+              <label className="flex-1 inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent cursor-pointer">
+                <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                <ImageIcon className="w-4 h-4" /> {uploadingLogo ? 'جاري الرفع...' : 'رفع الشعار الرئيسي'}
+              </label>
+              <Input placeholder="أو رابط الشعار" value={settings.logo_url || ''} onChange={e => u('logo_url', e.target.value)} className="flex-1" />
+            </div>
           </div>
 
           {/* Favicon */}
@@ -132,7 +174,11 @@ export default function AdminSettings() {
             <label className="text-sm text-muted-foreground block mb-1">أيقونة المتصفح (Favicon)</label>
             <div className="flex gap-2 items-center">
               {settings.favicon_url && <img src={settings.favicon_url} alt="favicon" className="w-8 h-8 rounded object-cover" />}
-              <Input placeholder="رابط الأيقونة" value={settings.favicon_url || ''} onChange={e => u('favicon_url', e.target.value)} className="flex-1" />
+              <label className="inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent cursor-pointer">
+                <input type="file" accept="image/*" onChange={handleFaviconUpload} className="hidden" />
+                <ImageIcon className="w-4 h-4" /> {uploadingFavicon ? 'جاري...' : 'رفع أيقونة'}
+              </label>
+              <Input placeholder="أو رابط الأيقونة" value={settings.favicon_url || ''} onChange={e => u('favicon_url', e.target.value)} className="flex-1" />
             </div>
           </div>
 
