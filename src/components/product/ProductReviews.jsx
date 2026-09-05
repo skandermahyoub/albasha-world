@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Star, ThumbsUp, CheckCircle, Loader2, Send, X } from 'lucide-react';
+import { Star, ThumbsUp, CheckCircle, Loader2, Send, Image as ImageIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,6 +32,7 @@ export default function ProductReviews({ productId }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ user_name: '', title: '', comment: '', rating: 5, image_url: '' });
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const load = () =>
     base44.functions.invoke('get-public-product-reviews', { product_id: productId })
@@ -60,6 +61,23 @@ export default function ProductReviews({ productId }) {
     setForm({ user_name: '', title: '', comment: '', rating: 5, image_url: '' });
     setShowForm(false);
     setLoading(false);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error('no file url');
+      setForm(f => ({ ...f, image_url: file_url }));
+      toast.success('تم رفع الصورة');
+    } catch {
+      toast.error('فشل رفع الصورة');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
   };
 
   const markHelpful = async (review) => {
@@ -143,11 +161,18 @@ export default function ProductReviews({ productId }) {
                 </button>
               </div>
             ) : (
-              <Input
-                placeholder="رابط صورة (اختياري)"
-                value={form.image_url || ''}
-                onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))}
-              />
+              <div className="space-y-2">
+                <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground border border-dashed border-border rounded-lg px-3 py-2 cursor-pointer hover:border-primary hover:text-primary transition-colors">
+                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImageIcon className="w-3.5 h-3.5" />}
+                  {uploading ? 'جاري الرفع...' : 'رفع صورة (اختياري)'}
+                </label>
+                <Input
+                  placeholder="أو رابط صورة (اختياري)"
+                  value={form.image_url || ''}
+                  onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))}
+                />
+              </div>
             )}
             <Button type="submit" disabled={loading} className="gap-2 w-full">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
