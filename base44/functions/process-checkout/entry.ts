@@ -213,6 +213,17 @@ export default async function(req) {
     const amountDue = Math.max(0, orderTotal - walletUsed);
     const loyaltyPointsSpent = loyaltyDiscount > 0 ? Math.floor(loyaltyDiscount * 100) : 0;
 
+    // Resolve and validate payment method. Cash on delivery is the safe fallback.
+    let effectivePaymentMethod = String(payment_method || 'cash_on_delivery').trim() || 'cash_on_delivery';
+    if (walletUsed > 0) {
+      effectivePaymentMethod = amountDue > 0 ? 'wallet+cash_on_delivery' : 'wallet';
+    } else if (effectivePaymentMethod === 'wallet') {
+      effectivePaymentMethod = 'cash_on_delivery';
+    } else if (effectivePaymentMethod !== 'cash_on_delivery') {
+      const allowedMethods = await base44.asServiceRole.entities.PaymentMethod.filter({ name: effectivePaymentMethod, is_active: true }, 'sort_order', 1).catch(() => []);
+      if (!allowedMethods.length) return Response.json({ error: 'طريقة الدفع غير متاحة حالياً' }, { status: 400 });
+    }
+
     // ── 15. Generate order number ──
     const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}`;
 
@@ -244,7 +255,7 @@ export default async function(req) {
       currency,
       status: 'pending',
       status_history: [{ status: 'pending', date: new Date().toISOString() }],
-      payment_method: payment_method || '',
+      payment_method: effectivePaymentMethod,
       address: effectiveAddress,
       notes: notes || '',
       shipping_zone: shippingZoneName,
