@@ -30,6 +30,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import AdminProducts from './pages/admin/AdminProducts';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminOrders from './pages/admin/AdminOrders';
+import AdminSubscriptions from './pages/admin/AdminSubscriptions';
 import AdminSlides from './pages/admin/AdminSlides';
 import AdminMarquee from './pages/admin/AdminMarquee';
 import AdminOffers from './pages/admin/AdminOffers';
@@ -147,6 +148,7 @@ const AuthenticatedApp = () => {
           <Route path="products" element={<AdminProducts />} />
           <Route path="categories" element={<AdminCategories />} />
           <Route path="orders" element={<AdminOrders />} />
+          <Route path="subscriptions" element={<AdminSubscriptions />} />
           <Route path="slides" element={<AdminSlides />} />
           <Route path="marquee" element={<AdminMarquee />} />
           <Route path="offers" element={<AdminOffers />} />
