@@ -170,7 +170,7 @@ export default function SmartChatOverlay({ onClose, settings }) {
     ).join('\n');
 
     const productList = products.slice(0, 60).map(p =>
-      `[ID:${p.id}] ${p.title} | ${p.brand || ''} | ${p.price} $ | ${p.store_key} | ${p.storage || ''} | ${p.is_bestseller ? 'bestseller' : ''} | ${p.is_new ? 'جديد' : ''}`
+      `[ID:${p.id}] ${p.title} | ${p.brand || ''} | ${p.price} $ | ${p.store_key} | ${p.flavor || p.volume || ''} | ${p.is_bestseller ? 'bestseller' : ''} | ${p.is_new ? 'جديد' : ''}`
     ).join('\n');
 
     const userContext = user
