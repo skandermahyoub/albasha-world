@@ -62,6 +62,7 @@ export default async function(req: Request) {
     if (body?.is_featured === true) query.is_featured = true;
     if (body?.is_bestseller === true) query.is_bestseller = true;
     if (body?.is_new === true) query.is_new = true;
+    if (body?.is_coming_soon === true) query.is_coming_soon = true;
     if (Array.isArray(body?.ids) && body.ids.length) query.id = { $in: body.ids.map(String).slice(0, 200) };
     const search = String(body?.search || '').trim().slice(0, 100);
     if (search) {
