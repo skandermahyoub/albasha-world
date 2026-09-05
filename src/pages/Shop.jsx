@@ -35,7 +35,7 @@ export default function Shop() {
     const load = async () => {
       const [s, p, c] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.entities.Product.list('-created_date', 1000).catch(() => []),
+        base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 1000 }).then(res => res.data?.products || []).catch(() => []),
         base44.entities.Category.list('sort_order').catch(() => []),
       ]);
       setSettings(s[0] || {});
