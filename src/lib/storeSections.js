@@ -3,28 +3,11 @@
  * All components MUST import from here — never hardcode store keys.
  *
  * Canonical keys: shisha, vape, boutique, perfume, pets
- * Legacy keys (emad_*) are migrated once via data migration + resolveStoreKey().
  */
 
 import { Cigarette, Gift, Droplet, Wine, PawPrint, Tag } from 'lucide-react';
 
 export const STORE_KEYS = ['shisha', 'vape', 'boutique', 'perfume', 'pets'];
-
-export const STORE_KEY_MIGRATION = {
-  emad_phones: 'shisha',
-  emad_home: 'vape',
-  emad_laptops: 'boutique',
-  emad_accessories: 'perfume',
-  emad_offers: 'pets',
-};
-
-export const STORE_KEY_ALIASES = {
-  shisha: ['emad_phones'],
-  vape: ['emad_home'],
-  boutique: ['emad_laptops'],
-  perfume: ['emad_accessories'],
-  pets: ['emad_offers'],
-};
 
 export const STORE_SECTIONS = [
   {
@@ -130,14 +113,13 @@ export const STORE_DETAILS = Object.fromEntries(
   STORE_SECTIONS.map(s => [s.key, s])
 );
 
-/** Resolve any key (legacy or new) to the canonical new key */
+/** Resolve a store key to one of the canonical sections. */
 export function resolveStoreKey(key) {
   if (!key) return null;
-  if (STORE_KEYS.includes(key)) return key;
-  return STORE_KEY_MIGRATION[key] || key;
+  return STORE_KEYS.includes(key) ? key : null;
 }
 
-/** Get a full section object by any key (legacy or new) */
+/** Get a full section object by canonical key. */
 export function getStoreSection(key) {
   const resolved = resolveStoreKey(key);
   return STORE_SECTIONS.find(s => s.key === resolved) || null;
