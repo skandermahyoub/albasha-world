@@ -25,10 +25,10 @@ export default function SurveyPage() {
   useEffect(() => {
     Promise.all([
       base44.entities.StoreSettings.list().catch(() => []),
-      base44.entities.Survey.filter({ id }).catch(() => []),
+      base44.functions.invoke('get-public-survey', { id }).then(res => res.data?.survey || null).catch(() => null),
     ]).then(([s, surv]) => {
       setSettings(s[0] || {});
-      setSurvey(surv[0] || null);
+      setSurvey(surv || null);
       setLoading(false);
     });
   }, [id]);
@@ -52,7 +52,8 @@ export default function SurveyPage() {
       answer: Array.isArray(answers[q.id]) ? answers[q.id].join(', ') : (answers[q.id] || ''),
       answers: Array.isArray(answers[q.id]) ? answers[q.id] : [],
     }));
-    await base44.entities.SurveyResponse.create({ survey_id: survey.id, answers: formattedAnswers, respondent_name: name });
+    const res = await base44.functions.invoke('submit-survey-response', { survey_id: survey.id, answers: formattedAnswers, respondent_name: name });
+    if (!res.data?.success) return toast.error(res.data?.error || 'تعذر إرسال الإجابات');
     setSubmitted(true);
     toast.success('شكراً على مشاركتك!');
   };
