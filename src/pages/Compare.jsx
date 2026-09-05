@@ -21,10 +21,10 @@ export default function Compare() {
     const load = async () => {
       const [s, p] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 1000 }).then(res => res.data?.products || []).catch(() => []),
+        compareList.length ? base44.functions.invoke('get-public-products', { ids: compareList, limit: Math.min(compareList.length, 20) }).then(res => res.data?.products || []).catch(() => []) : Promise.resolve([]),
       ]);
       setSettings(s[0] || {});
-      setProducts(p.filter(pr => pr.status === 'active' && compareList.includes(pr.id)));
+      setProducts(p.filter(pr => compareList.includes(pr.id)));
     };
     load();
   }, [compareList]);
