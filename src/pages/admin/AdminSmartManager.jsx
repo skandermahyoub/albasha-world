@@ -7,7 +7,10 @@ import useCurrency from '@/lib/useCurrency';
 import {
   calculateNetRevenue,
   calculateTotalExpenses,
-  calculateEstimatedProfit,
+  calculateCOGS,
+  calculateGrossProfit,
+  calculateNetProfit,
+  isCostDataComplete,
 } from '@/lib/financialMetrics';
 
 export default function AdminSmartManager() {
@@ -37,21 +40,27 @@ export default function AdminSmartManager() {
 
   const netRevenue = useMemo(() => calculateNetRevenue(orders, transactions), [orders, transactions]);
   const totalExpenses = useMemo(() => calculateTotalExpenses(expenses), [expenses]);
-  const estimatedProfit = useMemo(() => calculateEstimatedProfit(netRevenue, totalExpenses), [netRevenue, totalExpenses]);
+  const cogs = useMemo(() => calculateCOGS(orders, transactions), [orders, transactions]);
+  const grossProfit = useMemo(() => calculateGrossProfit(netRevenue, cogs), [netRevenue, cogs]);
+  const netProfit = useMemo(() => calculateNetProfit(netRevenue, cogs, totalExpenses), [netRevenue, cogs, totalExpenses]);
+  const costDataComplete = useMemo(() => isCostDataComplete(orders), [orders]);
   const lowStock = useMemo(() => products.filter(p => (p.stock ?? 0) > 0 && (p.stock ?? 0) <= 5), [products]);
   const deadStock = useMemo(() => products.filter(p => (p.stock ?? 0) > 0 && !(p.sales_count > 0)), [products]);
   const topSellers = useMemo(() => [...products].sort((a, b) => (b.sales_count || 0) - (a.sales_count || 0)).slice(0, 5), [products]);
 
   const contextSummary = useMemo(() => {
     return `- صافي الإيرادات: ${currency.format(netRevenue)}
+- تكلفة البضاعة المباعة COGS: ${currency.format(cogs)}
+- إجمالي الربح: ${currency.format(grossProfit)}
 - إجمالي النفقات التشغيلية: ${currency.format(totalExpenses)}
-- الربح التقديري: ${currency.format(estimatedProfit)}
+- صافي الربح: ${currency.format(netProfit)}
+- اكتمال بيانات تكلفة الطلبات التاريخية: ${costDataComplete ? 'مكتمل' : 'غير مكتمل لبعض الطلبات القديمة'}
 - عدد الطلبات الكلي: ${orders.length}
 - عدد المنتجات على وشك النفاد (مخزون 5 أو أقل): ${lowStock.length} — أمثلة: ${lowStock.slice(0, 5).map(p => p.title).join('، ') || 'لا يوجد'}
 - عدد المنتجات الراكدة (بدون أي مبيعات): ${deadStock.length} — أمثلة: ${deadStock.slice(0, 5).map(p => p.title).join('، ') || 'لا يوجد'}
 - أفضل 5 منتجات مبيعاً: ${topSellers.map(p => `${p.title} (${p.sales_count || 0} مبيعة)`).join('، ') || 'لا يوجد'}
 - نفقات حسب التصنيف: ${expenses.length ? Object.entries(expenses.reduce((m, e) => { m[e.category] = (m[e.category] || 0) + e.amount; return m; }, {})).map(([k, v]) => `${k}: ${currency.format(v)}`).join('، ') : 'لا يوجد'}`;
-  }, [netRevenue, totalExpenses, estimatedProfit, orders, lowStock, deadStock, topSellers, expenses, currency]);
+  }, [netRevenue, cogs, grossProfit, totalExpenses, netProfit, costDataComplete, orders, lowStock, deadStock, topSellers, expenses, currency]);
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
 
@@ -64,7 +73,7 @@ export default function AdminSmartManager() {
       <StoreHealthCards
         revenueLabel={currency.format(netRevenue)}
         expensesLabel={currency.format(totalExpenses)}
-        profitLabel={currency.format(estimatedProfit)}
+        profitLabel={currency.format(netProfit)}
         lowStockCount={lowStock.length}
         deadStockCount={deadStock.length}
       />
