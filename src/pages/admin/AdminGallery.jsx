@@ -3,25 +3,49 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AdminGallery() {
   const [photos, setPhotos] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: '', category: '', description: '', image: '' });
+  const [uploading, setUploading] = useState(false);
 
   const load = () => base44.entities.Gallery.list('sort_order', 200).then(setPhotos).catch(() => []);
   useEffect(() => { load(); }, []);
 
   const handleAdd = async () => {
-    if (!form.image.trim()) return toast.error('أدخل رابط الصورة');
+    if (!form.image.trim()) return toast.error('أدخل رابط الصورة أو ارفع صورة');
     await base44.entities.Gallery.create({ image: form.image.trim(), title: form.title, category: form.category, description: form.description });
     toast.success('تمت إضافة الصورة');
     setOpen(false);
     setForm({ title: '', category: '', description: '', image: '' });
     load();
   };
+
+  const handleUpload = async (e) => {
+    const files = Array.from(e.target.files || []).filter(f => f.type?.startsWith('image/'));
+    if (!files.length) return;
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const { file_url } = await base44.integrations.Core.UploadFile({ file });
+        if (file_url) {
+          await base44.entities.Gallery.create({ image: file_url, title: form.title, category: form.category, description: form.description });
+        }
+      }
+      toast.success(`تم رفع ${files.length} صورة`);
+      setOpen(false);
+      setForm({ title: '', category: '', description: '', image: '' });
+      load();
+    } catch {
+      toast.error('فشل رفع بعض الصور');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
+    }
+  }; 
 
   const handleDelete = async (id) => {
     if (!confirm('حذف الصورة؟')) return;
@@ -57,9 +81,14 @@ export default function AdminGallery() {
             <Input placeholder="العنوان (اختياري)" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
             <Input placeholder="التصنيف (اختياري)" value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} />
             <Input placeholder="وصف الصورة (اختياري)" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
-            <Input placeholder="رابط الصورة *" value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} />
-            <Button onClick={handleAdd} className="w-full">إضافة الصورة</Button>
-            <p className="text-[10px] text-muted-foreground text-center">يتم حفظ الرابط فقط، دون استخدام خدمة رفع أو رصيد تكاملات.</p>
+            <label className="block w-full inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent cursor-pointer transition-colors">
+              <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" />
+              {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImageIcon className="w-4 h-4" />}
+              {uploading ? 'جاري الرفع...' : 'رفع صورة أو عدة صور'}
+            </label>
+            <div className="text-center text-xs text-muted-foreground">أو</div>
+            <Input placeholder="رابط الصورة" value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} />
+            <Button onClick={handleAdd} className="w-full">إضافة من الرابط</Button>
           </div>
         </DialogContent>
       </Dialog>
