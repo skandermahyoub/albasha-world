@@ -15,9 +15,9 @@ export default function SurveyPopup() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    base44.entities.Survey.filter({ show_popup: true, status: 'active' }, '-created_date', 1)
-      .then(results => {
-        const s = results[0];
+    base44.functions.invoke('get-public-survey', { popup: true })
+      .then(res => {
+        const s = res.data?.survey;
         if (!s) return;
         const key = `survey_popup_${s.id}`;
         if (sessionStorage.getItem(key)) return;
@@ -51,7 +51,8 @@ export default function SurveyPopup() {
       answer: Array.isArray(answers[q.id]) ? answers[q.id].join(', ') : (answers[q.id] || ''),
       answers: Array.isArray(answers[q.id]) ? answers[q.id] : [],
     }));
-    await base44.entities.SurveyResponse.create({ survey_id: survey.id, answers: formattedAnswers, respondent_name: name });
+    const res = await base44.functions.invoke('submit-survey-response', { survey_id: survey.id, answers: formattedAnswers, respondent_name: name });
+    if (!res.data?.success) return toast.error(res.data?.error || 'تعذر إرسال الإجابات');
     toast.success('شكراً على مشاركتك!');
     setSubmitted(true);
     setTimeout(dismiss, 2000);
