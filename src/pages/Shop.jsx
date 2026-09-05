@@ -13,6 +13,8 @@ import AISearch from '@/components/AISearch';
 import { revertExpiredDiscounts } from '@/lib/discountUtils';
 import { getStores } from '@/lib/navLinks';
 
+const PAGE_SIZE = 48;
+
 export default function Shop() {
   const urlParams = new URLSearchParams(window.location.search);
   const initialCategory = urlParams.get('category') || 'all';
@@ -30,30 +32,45 @@ export default function Shop() {
   const [selectedCat, setSelectedCat] = useState(initialCategory);
   const [selectedStore, setSelectedStore] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextSkip, setNextSkip] = useState(null);
+  const [hasMore, setHasMore] = useState(false);
 
   useEffect(() => {
-    const load = async () => {
-      const [s, p, c] = await Promise.all([
-        base44.entities.StoreSettings.list().catch(() => []),
-        base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 1000 }).then(res => res.data?.products || []).catch(() => []),
-        base44.entities.Category.list('sort_order').catch(() => []),
-      ]);
+    Promise.all([
+      base44.entities.StoreSettings.list().catch(() => []),
+      base44.entities.Category.list('sort_order').catch(() => []),
+    ]).then(([s, c]) => {
       setSettings(s[0] || {});
-      const active = p.filter(pr => pr.status === 'active');
-      const reverted = await revertExpiredDiscounts(active);
-      setProducts(reverted);
-      setCategories(c);
-      setLoading(false);
-    };
-    load();
+      setCategories(c.filter(cat => cat.is_active !== false));
+    });
   }, []);
 
-  const filtered = products.filter(p => {
-    const matchSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase());
-    const matchCat = selectedCat === 'all' || p.category_id === selectedCat;
-    const matchStore = selectedStore === 'all' || p.store_key === selectedStore;
-    return matchSearch && matchCat && matchStore;
-  });
+  const fetchProducts = async ({ append = false, skip = 0 } = {}) => {
+    append ? setLoadingMore(true) : setLoading(true);
+    const res = await base44.functions.invoke('get-public-products', {
+      sort: '-created_date',
+      limit: PAGE_SIZE,
+      skip,
+      search: search.trim(),
+      store_key: selectedStore === 'all' ? undefined : selectedStore,
+      category_id: selectedCat === 'all' ? undefined : selectedCat,
+    }).catch(() => null);
+    const data = res?.data || {};
+    const normalized = await revertExpiredDiscounts(data.products || []);
+    setProducts(prev => append ? [...prev, ...normalized] : normalized);
+    setHasMore(data.has_more === true);
+    setNextSkip(data.next_skip ?? null);
+    setLoading(false);
+    setLoadingMore(false);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => fetchProducts({ append: false, skip: 0 }), 250);
+    return () => clearTimeout(timer);
+  }, [search, selectedStore, selectedCat]);
+
+  const filtered = products;
 
   return (
     <div className="min-h-screen bg-background">
