@@ -243,6 +243,19 @@ export default function StorePage() {
                 </motion.div>
                 </AnimatePresence>
 
+        {hasMore && nextSkip !== null && (
+          <div className="flex justify-center py-8">
+            <button
+              type="button"
+              disabled={loadingMore}
+              onClick={() => fetchProducts({ append: true, skip: nextSkip })}
+              className="px-6 py-2.5 rounded-xl border border-border bg-card hover:border-primary/50 font-medium text-sm disabled:opacity-50"
+            >
+              {loadingMore ? 'جاري تحميل المزيد...' : 'تحميل المزيد من المنتجات'}
+            </button>
+          </div>
+        )}
+
                 {!loading && filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <meta.icon className="w-16 h-16 opacity-30 text-muted-foreground" />
