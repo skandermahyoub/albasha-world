@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   ChevronDown, ChevronUp, Package, ShoppingCart, Star, Settings,
   Users, BarChart2, Tag, Image, Bell, MessageSquare, Gift, Heart,
-  BookOpen, Layers, Trophy, Video, Globe, Wand2, ArrowRight,
+  BookOpen, Layers, Trophy, Video, Globe, ArrowRight,
   Smartphone, Zap, Wallet, Percent, Headphones, Truck
 } from 'lucide-react';
 import StickyHeader from '@/components/layout/StickyHeader';
@@ -187,24 +187,9 @@ const SECTIONS = [
     path: '/admin/blog',
     desc: 'محتوى يجذب العملاء ويبني الثقة',
     steps: [
-      'اكتب مقالات عن مقارنات الأجهزة، نصائح الشراء، مراجعات المنتجات',
-      'استخدم الذكاء الاصطناعي (زر "توليد بالذكاء الاصطناعي") لكتابة المقالات تلقائياً',
-      'أضف صورة بارزة لكل مقال',
+      'اكتب مقالات عن المنتجات، نصائح الشراء، ومراجعات الفئات المختلفة',
+      'اكتب المحتوى مباشرة وأضف صورة بارزة عبر رابط الصورة',
       'المقالات المنشورة تظهر في قسم "المجلة" في الرئيسية',
-    ],
-  },
-  {
-    icon: Wand2,
-    color: 'bg-purple-500',
-    title: 'أدوات الذكاء الاصطناعي',
-    path: '/admin/ai-tools',
-    desc: 'وظّف الذكاء الاصطناعي لتطوير متجرك',
-    steps: [
-      'توليد وصف المنتجات: أدخل اسم المنتج واحصل على وصف تسويقي احترافي',
-      'توليد صور المنتجات بالذكاء الاصطناعي لكل قسم (شيشة، بوتيك، عطور، فيب، حيوانات أليفة...)',
-      'كتابة مقالات المدونة تلقائياً بنقرة واحدة',
-      'تحليل مشاعر التقييمات: افهم رأي عملائك بعمق',
-      'اقتراح منتجات مشابهة للعملاء في الشات الذكي',
     ],
   },
   {
