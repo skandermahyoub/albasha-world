@@ -7,7 +7,7 @@ import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Trophy, ThumbsUp, Share2, Sparkles } from 'lucide-react';
+import { Camera, Trophy, ThumbsUp, Share2, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { useStoreSettings } from '@/lib/useStoreSettings';
@@ -33,13 +33,14 @@ export default function Contests() {
     });
   }, []);
 
-  const submitEntry = async () => {
-    if (!selectedContest || !imageUrl.trim()) return toast.error('أدخل رابط الصورة');
+  const submitEntry = async (imageOverride = '') => {
+    const finalImage = (imageOverride || imageUrl).trim();
+    if (!selectedContest || !finalImage) return toast.error('ارفع صورة أو أدخل رابط الصورة');
     setSubmitting(true);
     const user = await base44.auth.me().catch(() => null);
     const submitted = await base44.functions.invoke('submit-contest-entry', {
       contest_id: selectedContest.id,
-      image: imageUrl.trim(),
+      image: finalImage,
       caption,
     });
     if (!submitted.data?.success) {
@@ -56,6 +57,23 @@ export default function Contests() {
     setCaption('');
     setImageUrl('');
     setSubmitting(false);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSubmitting(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error('no file url');
+      setImageUrl(file_url);
+      await submitEntry(file_url);
+    } catch {
+      toast.error('فشل رفع الصورة');
+      setSubmitting(false);
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const handleShare = async (entry) => {
@@ -125,13 +143,20 @@ export default function Contests() {
               </div>
             )}
 
-            {/* مشاركة عبر رابط صورة — بدون أي خدمة رفع أو رصيد تكاملات */}
+            {/* المشاركة */}
             <div className="bg-card rounded-2xl p-6 border border-border/50 mb-8">
               <h3 className="font-heading font-bold text-lg mb-3">شارك في المسابقة</h3>
-              <Input placeholder="رابط الصورة" value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="mb-3" />
               <Textarea placeholder="وصف صورتك..." value={caption} onChange={e => setCaption(e.target.value)} rows={2} className="mb-3" />
-              <Button disabled={submitting || !imageUrl.trim()} onClick={submitEntry}>
-                {submitting ? 'جاري الإرسال...' : 'إرسال المشاركة'}
+              <label className="cursor-pointer block mb-3">
+                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                <Button disabled={submitting} asChild className="w-full">
+                  <span><Camera className="w-4 h-4 ml-2" /> {submitting ? 'جاري الرفع...' : 'رفع صورة والمشاركة'}</span>
+                </Button>
+              </label>
+              <div className="text-center text-xs text-muted-foreground mb-2">أو</div>
+              <Input placeholder="رابط الصورة" value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="mb-3" />
+              <Button disabled={submitting || !imageUrl.trim()} onClick={() => submitEntry()} variant="outline" className="w-full">
+                {submitting ? 'جاري الإرسال...' : 'إرسال المشاركة من الرابط'}
               </Button>
             </div>
 
