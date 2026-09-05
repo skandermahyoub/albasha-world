@@ -74,7 +74,7 @@ export default function AdminOrders() {
       base44.functions.invoke('get-admin-orders', {}).then(res => res.data?.orders || []).catch(() => []),
       base44.entities.StoreSettings.list().catch(() => []),
       base44.entities.Product.list('-created_date', 500).catch(() => []),
-      base44.entities.CustomerProfile.list('-created_date', 500).catch(() => []),
+      base44.entities.CustomerProfile.filter({ is_archived: false }, '-created_date', 500).catch(() => []),
     ]);
     setOrders(o);
     setSettings(s[0] || {});
