@@ -23,7 +23,7 @@ export default function Checkout() {
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [walletBalance, setWalletBalance] = useState(0);
   const [shippingZones, setShippingZones] = useState([]);
-  const [form, setForm] = useState({ name: '', phone: '', address: '', notes: '', payment: '', shipping_zone_id: '' });
+  const [form, setForm] = useState({ name: '', phone: '', address: '', notes: '', payment: 'cash_on_delivery', shipping_zone_id: '' });
   const [submitting, setSubmitting] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [couponCode, setCouponCode] = useState('');
@@ -307,9 +307,17 @@ export default function Checkout() {
           )}
 
           {/* Payment Methods */}
-          {paymentMethods.length > 0 && (
-            <div className="bg-card rounded-xl p-4 border border-border/50 space-y-3">
+          <div className="bg-card rounded-xl p-4 border border-border/50 space-y-3">
               <h3 className="font-heading font-bold">طريقة الدفع</h3>
+              {paymentMethods.length === 0 && (
+                <div
+                  onClick={() => setForm(f => ({ ...f, payment: 'cash_on_delivery' }))}
+                  className={`p-3 rounded-lg border-2 cursor-pointer transition-all ${form.payment === 'cash_on_delivery' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/30'}`}
+                >
+                  <p className="font-bold text-sm">الدفع عند الاستلام</p>
+                  <p className="text-xs text-muted-foreground">يمكن للإدارة إضافة وسائل دفع أخرى من لوحة التحكم لاحقاً.</p>
+                </div>
+              )}
               {paymentMethods.map(pm => (
                 <div
                   key={pm.id}
@@ -331,8 +339,7 @@ export default function Checkout() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
+          </div>
 
           {/* Coupon */}
           <div className="bg-card rounded-xl p-4 border border-border/50 space-y-2">
