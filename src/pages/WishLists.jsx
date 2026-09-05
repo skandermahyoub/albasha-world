@@ -32,13 +32,11 @@ export default function WishLists() {
 
   useEffect(() => {
     const load = async () => {
-      const [s, me, p] = await Promise.all([
+      const [s, me] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
         base44.auth.me().catch(() => null),
-        base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 1000 }).then(res => res.data?.products || []).catch(() => []),
       ]);
       setSettings(s[0] || {});
-      setAllProducts(p.filter(product => product.status === 'active'));
       setUser(me);
       if (me) {
         const wl = await base44.entities.WishList.filter({ user_email: me.email }).catch(() => []);
@@ -49,6 +47,26 @@ export default function WishLists() {
     };
     load();
   }, []);
+
+  useEffect(() => {
+    const loadSelectedProducts = async () => {
+      const ids = selectedList?.product_ids || [];
+      if (!ids.length) {
+        setAllProducts([]);
+        return;
+      }
+      const chunks = [];
+      for (let i = 0; i < ids.length; i += 200) chunks.push(ids.slice(i, i + 200));
+      const pages = await Promise.all(chunks.map(chunk =>
+        base44.functions.invoke('get-public-products', { ids: chunk, limit: chunk.length })
+          .then(res => res.data?.products || [])
+          .catch(() => [])
+      ));
+      const byId = new Map(pages.flat().map(product => [product.id, product]));
+      setAllProducts(ids.map(id => byId.get(id)).filter(Boolean));
+    };
+    loadSelectedProducts();
+  }, [selectedList?.id, JSON.stringify(selectedList?.product_ids || [])]);
 
   const createList = async () => {
     if (!newName.trim() || !user) return;
@@ -90,9 +108,7 @@ export default function WishLists() {
     toast.success('تم نسخ رابط المشاركة');
   };
 
-  const listProducts = selectedList
-    ? allProducts.filter(p => (selectedList.product_ids || []).includes(p.id))
-    : [];
+  const listProducts = selectedList ? allProducts : [];
 
   if (loading) return (
     <div className="min-h-screen bg-background flex items-center justify-center">
