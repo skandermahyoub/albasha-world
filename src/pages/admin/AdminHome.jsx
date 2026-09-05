@@ -42,7 +42,7 @@ export default function AdminHome() {
       base44.entities.Order.list('-created_date', 500).catch(() => []),
       base44.entities.Review.list().catch(() => []),
       base44.entities.ContactMessage.list().catch(() => []),
-      base44.entities.CustomerProfile.list().catch(() => []),
+      base44.entities.CustomerProfile.filter({ is_archived: false }).catch(() => []),
       base44.entities.GiftCard.list().catch(() => []),
       base44.entities.ProductReview.list().catch(() => []),
       base44.entities.StoreSettings.list().catch(() => []),
