@@ -129,7 +129,7 @@ export default async function(req: Request) {
     const safeSkip = Math.max(0, Math.min(Number(skip) || 0, 50000));
 
     const hiddenFilter: any = entity === 'Order'
-      ? { source: { $ne: 'test' } }
+      ? { source: { $ne: 'test' }, admin_archived: { $ne: true } }
       : entity === 'CustomerProfile'
         ? { is_archived: { $ne: true } }
         : ['Product', 'Category', 'Brand'].includes(entity)
