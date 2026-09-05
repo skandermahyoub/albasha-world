@@ -51,8 +51,6 @@ import AdminVideos from './pages/admin/AdminVideos';
 import AdminCRM from './pages/admin/AdminCRM';
 import AdminEmployees from './pages/admin/AdminEmployees';
 import AdminStoreConfigs from './pages/admin/AdminStoreConfigs';
-import AdminAITools from './pages/admin/AdminAITools';
-import AdminImageGallery from './pages/admin/AdminImageGallery';
 import AdminStoreIdentity from './pages/admin/AdminStoreIdentity';
 import AdminCoupons from './pages/admin/AdminCoupons';
 import AdminGiftCards from './pages/admin/AdminGiftCards';
@@ -169,8 +167,6 @@ const AuthenticatedApp = () => {
           <Route path="crm" element={<AdminCRM />} />
           <Route path="employees" element={<AdminEmployees />} />
           <Route path="store-configs" element={<AdminStoreConfigs />} />
-          <Route path="ai-tools" element={<AdminAITools />} />
-          <Route path="image-gallery" element={<AdminImageGallery />} />
           <Route path="store-identity" element={<AdminStoreIdentity />} />
           <Route path="coupons" element={<AdminCoupons />} />
           <Route path="gift-cards" element={<AdminGiftCards />} />
