@@ -18,8 +18,8 @@ export function canStaff(access, section, operation = 'view') {
   const permission = access.permissions?.[section];
   if (section === 'notifications') {
     if (operation === 'view') return ['view', 'send', 'full'].includes(permission);
-    if (operation === 'send' || operation === 'add' || operation === 'edit') return ['send', 'full'].includes(permission);
-    if (operation === 'delete') return permission === 'full';
+    if (operation === 'send') return ['send', 'full'].includes(permission);
+    if (operation === 'add' || operation === 'edit' || operation === 'delete' || operation === 'full') return permission === 'full';
     return false;
   }
   if (operation === 'view') return VIEW_LEVELS.includes(permission);
