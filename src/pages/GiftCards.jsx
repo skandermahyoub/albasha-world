@@ -37,7 +37,7 @@ export default function GiftCards() {
       setSettings(s[0] || {});
       setUser(me);
       if (me) {
-        const cards = await base44.entities.GiftCard.filter({ issued_by_email: me.email }).catch(() => []);
+        const cards = await base44.functions.invoke('get-my-gift-cards', {}).then(res => res.data?.cards || []).catch(() => []);
         setMyCards(cards);
       }
     };
@@ -63,7 +63,7 @@ export default function GiftCards() {
       toast.success('تم استلام طلب بطاقة الهداية! سيتم تفعيلها بعد معالجة الدفع.');
       setSent(true);
       setLoading(false);
-      const cards = await base44.entities.GiftCard.filter({ issued_by_email: user.email }).catch(() => []);
+      const cards = await base44.functions.invoke('get-my-gift-cards', {}).then(res => res.data?.cards || []).catch(() => []);
       setMyCards(cards);
     } catch (err) {
       toast.error('حدث خطأ في الاتصال');
@@ -73,9 +73,10 @@ export default function GiftCards() {
 
   const checkCardBalance = async () => {
     if (!checkCode.trim()) return;
-    const cards = await base44.entities.GiftCard.filter({ code: checkCode.toUpperCase() }).catch(() => []);
-    setCheckedCard(cards[0] || null);
-    if (!cards[0]) toast.error('كود غير صحيح');
+    const res = await base44.functions.invoke('get-gift-card-status', { code: checkCode.toUpperCase() }).catch(() => null);
+    const card = res?.data?.success ? res.data.card : null;
+    setCheckedCard(card);
+    if (!card) toast.error(res?.data?.error || 'كود غير صحيح');
   };
 
   return (
