@@ -158,7 +158,8 @@ export default async function(req: Request) {
         if ((entity === 'Order' && result?.source === 'test') ||
             (entity === 'CustomerProfile' && result?.is_archived === true) ||
             (['Product', 'Category', 'Brand'].includes(entity) && result?.is_seed === true) ||
-            (entity === 'InventoryMovement' && result?.is_test === true)) {
+            (entity === 'InventoryMovement' && result?.is_test === true) ||
+            (entity === 'SystemTransaction' && result?.is_test === true)) {
           return Response.json({ error: 'السجل مؤرشف وغير متاح في التشغيل الحالي' }, { status: 404 });
         }
         break;
