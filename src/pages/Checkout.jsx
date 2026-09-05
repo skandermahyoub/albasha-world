@@ -11,8 +11,6 @@ import { Check, Copy, MessageCircle, Wallet, MapPin, Anchor, Truck, Shield, Shie
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
-const SHIPPING_ORIGIN = 'خور مكسر';
-
 export default function Checkout() {
   const { isDark, toggle } = useTheme();
   const { items, total, count, clearCart, appliedCoupon, setAppliedCoupon, discountAmount, discountedTotal } = useCart();
@@ -57,7 +55,7 @@ export default function Checkout() {
 
   const loyaltyDiscount = useLoyaltyPoints ? Math.min(loyaltyPoints / 100, discountedTotal) : 0;
   const selectedZone = shippingZones.find(z => z.id === form.shipping_zone_id);
-  const shippingOrigin = settings?.shipping_origin_name || 'خور مكسر';
+  const shippingOrigin = settings?.shipping_origin_name || '';
   const insuranceEnabled = settings?.shipping_insurance_enabled !== false;
   const freeShippingEnabled = settings?.free_shipping_enabled === true;
   const freeShippingThreshold = Number(settings?.free_shipping_threshold) || 0;
@@ -174,7 +172,7 @@ export default function Checkout() {
         window.open(`https://wa.me/${whatsappNum.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
       }
 
-      toast.success(`تم إرسال طلبك بنجاح! رقم الطلب: ${od.order_number}`);
+      toast.success(whatsappNum ? `تم تأكيد طلبك وفتح واتساب. رقم الطلب: ${od.order_number}` : `تم تأكيد طلبك بنجاح! رقم الطلب: ${od.order_number}`);
       navigate(`/order-tracking?order=${od.order_number}`);
     } catch (err) {
       toast.error('حدث خطأ في الاتصال. تحقق من اتصالك وحاول مرة أخرى.');
@@ -264,7 +262,7 @@ export default function Checkout() {
                         );
                       })}
                     </div>
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Anchor className="w-3 h-3" /> جميع الشحنات تنطلق من {shippingOrigin}</p>
+                    {shippingOrigin && <p className="text-[11px] text-muted-foreground flex items-center gap-1"><Anchor className="w-3 h-3" /> جميع الشحنات تنطلق من {shippingOrigin}</p>}
                   </div>
                 )}
 
@@ -419,8 +417,8 @@ export default function Checkout() {
           </div>
 
           <Button onClick={handleSubmit} className="w-full h-12 text-base" disabled={submitting}>
-            <MessageCircle className="w-5 h-5 ml-2" />
-            {submitting ? 'جاري الإرسال...' : 'تأكيد وإرسال عبر واتساب'}
+            {settings?.whatsapp_number ? <MessageCircle className="w-5 h-5 ml-2" /> : <Check className="w-5 h-5 ml-2" />}
+            {submitting ? 'جاري التأكيد...' : settings?.whatsapp_number ? 'تأكيد وإرسال عبر واتساب' : 'تأكيد الطلب'}
           </Button>
         </div>
       </div>
