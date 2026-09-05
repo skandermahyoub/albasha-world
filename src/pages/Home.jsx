@@ -66,7 +66,7 @@ export default function Home() {
         base44.entities.HeroSlide.list('sort_order').catch(() => []),
         base44.entities.MarqueeText.list('sort_order').catch(() => []),
         base44.entities.SpecialOffer.list('sort_order').catch(() => []),
-        base44.entities.Product.list('-created_date', 500).catch(() => []),
+        base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 500 }).then(res => res.data?.products || []).catch(() => []),
         base44.functions.invoke('get-public-reviews', { context: 'store' }).then(res => res.data?.reviews || []).catch(() => []),
         base44.entities.Brand.list('sort_order').catch(() => []),
         base44.functions.invoke('get-public-blog-posts', { limit: 10 }).then(res => res.data?.posts || []).catch(() => []),
