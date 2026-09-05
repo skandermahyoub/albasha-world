@@ -25,7 +25,7 @@ export default function Videos() {
     Promise.all([
       base44.entities.StoreSettings.list().catch(() => []),
       base44.entities.VideoGallery.list('sort_order').catch(() => []),
-      base44.entities.Product.list('-sales_count', 30).catch(() => []),
+      base44.functions.invoke('get-public-products', { sort: '-sales_count', limit: 30 }).then(res => res.data?.products || []).catch(() => []),
     ]).then(([s, v, p]) => {
       setSettings(s[0] || {});
       const active = v.filter(x => x.is_active !== false);
