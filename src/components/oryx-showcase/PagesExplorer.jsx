@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
-import { Smartphone, Laptop, Watch, Home, Tag, ShoppingCart, Package, Heart, GitCompare, Truck, BookOpen, Trophy, Image, Video, ListChecks, Gift, BookMarked, Wallet, UserCog, RotateCcw, TicketCheck, ClipboardList, User } from 'lucide-react';
+import { Cigarette, Wine, Droplet, PawPrint, ShoppingCart, Package, Heart, GitCompare, Truck, BookOpen, Trophy, Image, Video, ListChecks, Gift, BookMarked, Wallet, UserCog, RotateCcw, TicketCheck, ClipboardList, User } from 'lucide-react';
 
 const STORES = [
-  { icon: Smartphone, name: 'الباشا شيشة', color: 'text-blue-500 bg-blue-50' },
-  { icon: Laptop, name: 'الباشا فيب', color: 'text-purple-500 bg-purple-50' },
-  { icon: Watch, name: 'الباشا بوتيك', color: 'text-green-500 bg-green-50' },
-  { icon: Home, name: 'الباشا بيرفيوم', color: 'text-orange-500 bg-orange-50' },
-  { icon: Tag, name: 'الباشا بيتس', color: 'text-red-500 bg-red-50' },
+  { icon: Cigarette, name: 'الباشا شيشة', color: 'text-rose-600 bg-rose-50' },
+  { icon: Wine, name: 'الباشا فيب', color: 'text-pink-600 bg-pink-50' },
+  { icon: Gift, name: 'الباشا بوتيك', color: 'text-fuchsia-600 bg-fuchsia-50' },
+  { icon: Droplet, name: 'الباشا بيرفيوم', color: 'text-purple-600 bg-purple-50' },
+  { icon: PawPrint, name: 'الباشا بيتس', color: 'text-orange-600 bg-orange-50' },
 ];
 
 const PAGES = [
