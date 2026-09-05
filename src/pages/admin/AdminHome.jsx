@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Package, ShoppingCart, Users, Star, MessageSquare, TrendingUp, DollarSign, BarChart2, Wand2, Gift, RotateCcw } from 'lucide-react';
+import { Package, ShoppingCart, Users, Star, MessageSquare, TrendingUp, DollarSign, BarChart2, Gift, RotateCcw } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -98,7 +98,6 @@ export default function AdminHome() {
     { to: '/admin/products', label: 'إضافة منتج', icon: Package, color: 'bg-purple-500/10 text-purple-600' },
     { to: '/admin/orders', label: 'الطلبات', icon: ShoppingCart, color: 'bg-blue-500/10 text-blue-600' },
     { to: '/admin/crm', label: 'CRM', icon: Users, color: 'bg-orange-500/10 text-orange-600' },
-    { to: '/admin/ai-tools', label: 'أدوات AI', icon: Wand2, color: 'bg-pink-500/10 text-pink-600' },
     { to: '/admin/store-configs', label: 'النشاطات', icon: BarChart2, color: 'bg-orange-500/10 text-orange-600' },
     { to: '/admin/banners', label: 'البانرات', icon: TrendingUp, color: 'bg-yellow-500/10 text-yellow-600' },
     { to: '/admin/gift-cards', label: 'بطاقات الهدايا', icon: Gift, color: 'bg-pink-500/10 text-pink-600' },
