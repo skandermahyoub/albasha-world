@@ -48,7 +48,7 @@ export default function SmartPersonalization({ products, onAddCart, onToggleFav,
           </div>
         </div>
         <span className="text-xs bg-primary/10 text-primary px-2.5 py-1 rounded-full flex items-center gap-1">
-          <TrendingUp className="w-3 h-3" /> ذكاء اصطناعي
+          <TrendingUp className="w-3 h-3" /> حسب التصفح
         </span>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 overflow-x-auto">
