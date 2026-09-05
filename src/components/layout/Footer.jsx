@@ -13,7 +13,8 @@ function NewsletterForm() {
     if (!phone.trim()) return toast.error('أدخل رقم الهاتف');
     setLoading(true);
     try {
-      await base44.entities.Subscriber.create({ phone: phone.trim(), name: name.trim() });
+      const res = await base44.functions.invoke('subscribe', { phone: phone.trim(), name: name.trim() });
+      if (!res.data?.success) throw new Error(res.data?.error || 'تعذر الاشتراك');
       toast.success('تم الاشتراك بنجاح! سنوافيك بأحدث العروض');
       setPhone(''); setName('');
     } catch (err) {
