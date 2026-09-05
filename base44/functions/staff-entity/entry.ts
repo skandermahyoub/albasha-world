@@ -40,18 +40,18 @@ const CONTEXT_ENTITY_ACCESS: Record<string, Record<string, 'full' | 'view'>> = {
     Product: 'full', Category: 'full', SpecialOffer: 'full', Bundle: 'full', Brand: 'full', StoreSettings: 'view',
   },
   orders: {
-    Order: 'full', InventoryMovement: 'full', CashierShift: 'full', AbandonedCart: 'full', ReturnRequest: 'full', Subscription: 'full',
+    Order: 'view', InventoryMovement: 'view', CashierShift: 'full', AbandonedCart: 'full', ReturnRequest: 'full', Subscription: 'full',
     Product: 'view', Category: 'view', CustomerProfile: 'view', StoreSettings: 'view',
   },
   customers: {
-    CustomerProfile: 'full', ContactMessage: 'full', Review: 'full', ProductReview: 'full', ClientRating: 'full', Subscriber: 'full', Ticket: 'full',
+    CustomerProfile: 'view', ContactMessage: 'full', Review: 'full', ProductReview: 'full', ClientRating: 'full', Subscriber: 'full', Ticket: 'full',
     Product: 'view', Survey: 'view', Order: 'view', StoreSettings: 'view',
   },
   crm: {
     CustomerProfile: 'full', Order: 'view', Product: 'view', StoreSettings: 'view',
   },
   accounting: {
-    Expense: 'full', SystemTransaction: 'full', WalletTransaction: 'full',
+    Expense: 'full', SystemTransaction: 'view', WalletTransaction: 'view',
     Order: 'view', Product: 'view', CustomerProfile: 'view', InventoryMovement: 'view', CashierShift: 'view', StoreSettings: 'view',
   },
   reports: {
@@ -100,6 +100,16 @@ export default async function(req: Request) {
     }
     if (contextMode === 'view' && operation !== 'view') {
       return Response.json({ error: 'البيانات المساندة متاحة للعرض فقط في هذه الصفحة' }, { status: 403 });
+    }
+
+    // CRM may edit only CRM-owned fields; financial/account ownership fields are backend-owned.
+    if (entity === 'CustomerProfile' && context_section === 'crm' && operation !== 'view') {
+      if (action !== 'update' || !data || typeof data !== 'object') {
+        return Response.json({ error: 'ملف العميل في CRM يسمح بالتحديث المقيد فقط' }, { status: 403 });
+      }
+      const allowed = new Set(['notes', 'interaction_history', 'last_interaction', 'tier', 'admin_rating', 'tags', 'preferred_store']);
+      const invalid = Object.keys(data).filter(key => !allowed.has(key));
+      if (invalid.length) return Response.json({ error: 'توجد حقول محمية لا يمكن تعديلها من CRM' }, { status: 403 });
     }
 
     const access = await requireStaffPermission(base44, user, section, operation);
