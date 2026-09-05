@@ -137,8 +137,8 @@ export default function BlogPostPage() {
         setRelatedPosts(allPosts.filter(pp => pp.id !== currentPost.id && pp.status === 'published' && pp.category === currentPost.category).slice(0, 3));
         // جلب منتجات مرتبطة بتصنيف المقال للعرض كـ Shoppable
         if (currentPost.category) {
-          base44.entities.Product.filter({ store_key: currentPost.category, status: 'active' }, '-sales_count', 3)
-            .then(setShoppableProducts).catch(() => {});
+          base44.functions.invoke('get-public-products', { store_key: currentPost.category, sort: '-sales_count', limit: 3 })
+            .then(res => setShoppableProducts(res.data?.products || [])).catch(() => {});
         }
       }
       setLoading(false);
