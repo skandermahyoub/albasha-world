@@ -16,17 +16,12 @@ export default function LiveActivityBar() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [orders, products] = await Promise.all([
-          base44.entities.Order.list('-created_date', 5).catch(() => []),
+        const [activity, products] = await Promise.all([
+          base44.functions.invoke('get-public-activity', {}).then(res => res.data || {}).catch(() => ({})),
           base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 200 }).then(res => res.data?.products || []).catch(() => []),
         ]);
 
-        const available = orders.filter(
-          o => o.status === 'delivered' || o.status === 'confirmed' || o.status === 'preparing'
-        );
-        if (available.length > 0) {
-          setRecentOrder(available[0]);
-        }
+        setRecentOrder(activity?.has_recent_order ? { status: activity.recent_status } : null);
         setActiveProducts(products.filter(p => p.status === 'active' || !p.status).length);
       } catch {
         // silent fail
@@ -58,7 +53,7 @@ export default function LiveActivityBar() {
               className="flex items-center gap-1.5 text-muted-foreground"
             >
               <Eye className="w-3.5 h-3.5 text-primary" />
-              طلب جديد: <b className="text-foreground">{recentOrder.order_number}</b>
+              تم تسجيل طلب جديد مؤخراً
             </motion.span>
           </AnimatePresence>
         </>
