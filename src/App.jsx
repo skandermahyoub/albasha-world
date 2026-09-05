@@ -6,9 +6,6 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { StoreSettingsProvider, useStoreSettings } from '@/lib/useStoreSettings';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import { migrateLocalStorage } from '@/lib/localStorageMigration';
-
-migrateLocalStorage();
 
 // Pages
 import Home from './pages/Home';
