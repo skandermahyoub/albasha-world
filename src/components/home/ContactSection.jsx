@@ -16,7 +16,11 @@ export default function ContactSection({ settings }) {
     e.preventDefault();
     if (!form.name || !form.phone || !form.message) return toast.error('يرجى ملء جميع الحقول');
     setSending(true);
-    await base44.entities.ContactMessage.create(form);
+    const res = await base44.functions.invoke('submit-contact', form);
+    if (!res.data?.success) {
+      setSending(false);
+      return toast.error(res.data?.error || 'تعذر إرسال الرسالة');
+    }
     toast.success('تم إرسال رسالتك بنجاح!');
     setForm({ name: '', phone: '', message: '' });
     setSending(false);
@@ -24,7 +28,8 @@ export default function ContactSection({ settings }) {
 
   const handleSubscribe = async () => {
     if (!subPhone) return toast.error('أدخل رقم هاتفك');
-    await base44.entities.Subscriber.create({ phone: subPhone });
+    const res = await base44.functions.invoke('subscribe', { phone: subPhone });
+    if (!res.data?.success) return toast.error(res.data?.error || 'تعذر الاشتراك');
     toast.success('تم الاشتراك بنجاح!');
     setSubPhone('');
   };
