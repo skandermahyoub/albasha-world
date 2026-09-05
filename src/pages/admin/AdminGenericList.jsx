@@ -8,13 +8,18 @@ import { Plus, Pencil, Trash2, Image as ImageIcon, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import AIImageField from '@/components/admin/AIImageField';
+import { useAdminPermissions, pathToPermissionKey } from '@/lib/useAdminPermissions';
 
-export default function AdminGenericList({ entityName, title, fields = [], aiImagePrompt, imageType = 'product' }) {
+export default function AdminGenericList({ entityName, title, fields = [], aiImagePrompt, imageType = 'product', readOnly = false }) {
   const [items, setItems] = useState([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
-
+  const { can } = useAdminPermissions();
+  const permissionSection = typeof window !== 'undefined' ? pathToPermissionKey(window.location.pathname) : null;
+  const canAdd = !readOnly && (!permissionSection || can(permissionSection, 'add'));
+  const canEditItem = !readOnly && (!permissionSection || can(permissionSection, 'edit'));
+  const canDeleteItem = !readOnly && (!permissionSection || can(permissionSection, 'delete'));
 
   const entity = base44.entities[entityName];
   const load = () => entity.list('-created_date', 100).then(setItems).catch(() => []);
@@ -50,7 +55,7 @@ export default function AdminGenericList({ entityName, title, fields = [], aiIma
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading font-bold text-2xl">{title}</h1>
-        <Button onClick={() => { setEditing(null); setForm({}); setOpen(true); }}><Plus className="w-4 h-4 ml-2" /> إضافة</Button>
+        {canAdd && <Button onClick={() => { setEditing(null); setForm({}); setOpen(true); }}><Plus className="w-4 h-4 ml-2" /> إضافة</Button>}
       </div>
 
       <div className="space-y-2">
@@ -62,10 +67,10 @@ export default function AdminGenericList({ entityName, title, fields = [], aiIma
               <p className="font-bold text-sm truncate">{item.title || item.name || item.text || item.comment}</p>
               <p className="text-xs text-muted-foreground truncate">{item.subtitle || item.status || ''} {item.sort_order !== undefined && item.sort_order !== null && ` · ترتيب: ${item.sort_order}`}</p>
             </div>
-            <div className="flex gap-1 shrink-0">
-              <Button variant="ghost" size="icon" onClick={() => { setEditing(item); setForm(item); setOpen(true); }}><Pencil className="w-4 h-4" /></Button>
-              <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button>
-            </div>
+            {(canEditItem || canDeleteItem) && <div className="flex gap-1 shrink-0">
+              {canEditItem && <Button variant="ghost" size="icon" onClick={() => { setEditing(item); setForm(item); setOpen(true); }}><Pencil className="w-4 h-4" /></Button>}
+              {canDeleteItem && <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)} className="text-destructive"><Trash2 className="w-4 h-4" /></Button>}
+            </div>}
           </div>
         ))}
         {items.length === 0 && <p className="text-center text-muted-foreground py-10">لا توجد عناصر</p>}
