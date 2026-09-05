@@ -61,7 +61,7 @@ const navItems = [
   { to: '/admin/purchase-orders', label: 'أوامر الشراء', icon: ClipboardList },
   { to: '/admin/audit-log', label: 'سجل النشاط', icon: ScrollText },
   { to: '/admin/tickets', label: 'نظام التذاكر', icon: Ticket },
-  { to: '/admin/dev-roadmap', label: 'نظام أوريكس V3.4', icon: Map },
+  { to: '/admin/dev-roadmap', label: 'نظام أوريكس V5', icon: Map },
   { to: '/admin/system-admins', label: 'مديري النظام', icon: ShieldCheck },
   { to: '/admin/system-accounts', label: 'حسابات النظام', icon: Wallet },
 ];
