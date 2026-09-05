@@ -218,16 +218,12 @@ export default function AdminProducts() {
     toast.success('تم إدخال الباركود في المنتج');
   };
 
-  const filteredProducts = products.filter(p => {
-    const matchSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase()) || p.brand?.toLowerCase().includes(search.toLowerCase());
-    const matchStore = filterStore === 'all' || p.store_key === filterStore;
-    return matchSearch && matchStore;
-  });
+  const filteredProducts = products;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h1 className="font-heading font-bold text-2xl">المنتجات ({products.length})</h1>
+        <h1 className="font-heading font-bold text-2xl">المنتجات <span className="text-sm text-muted-foreground">({products.length} معروض)</span></h1>
         <Button onClick={() => { setEditing(null); setForm({ status: 'active', show_price: true, show_cart_btn: true, show_fav_btn: true, show_compare_btn: true }); setOpen(true); }}>
           <Plus className="w-4 h-4 ml-2" /> إضافة منتج
         </Button>
@@ -287,6 +283,14 @@ export default function AdminProducts() {
           </div>
         ))}
       </div>
+
+      {hasMore && nextSkip !== null && (
+        <div className="flex justify-center mt-4">
+          <Button variant="outline" disabled={loadingMore} onClick={() => loadProducts({ append: true, skip: nextSkip })}>
+            {loadingMore ? 'جاري تحميل المزيد...' : 'تحميل 100 منتج إضافي'}
+          </Button>
+        </div>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
