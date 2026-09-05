@@ -13,7 +13,11 @@ import {
   calculateRefunds,
   calculateNetRevenue,
   calculateTotalExpenses,
-  calculateEstimatedProfit,
+  calculateCOGS,
+  calculateGrossProfit,
+  calculateNetProfit,
+  calculateOrderCOGS,
+  isCostDataComplete,
   getOrderDeliveryDate,
   validateTransactionCompleteness,
 } from '@/lib/financialMetrics';
@@ -55,7 +59,10 @@ export default function AdminAccounting() {
   const refunds = useMemo(() => calculateRefunds(orders, transactions), [orders, transactions]);
   const netRevenue = useMemo(() => calculateNetRevenue(orders, transactions), [orders, transactions]);
   const totalExpenses = useMemo(() => calculateTotalExpenses(expenses), [expenses]);
-  const estimatedProfit = useMemo(() => calculateEstimatedProfit(netRevenue, totalExpenses), [netRevenue, totalExpenses]);
+  const cogs = useMemo(() => calculateCOGS(orders, transactions), [orders, transactions]);
+  const grossProfit = useMemo(() => calculateGrossProfit(netRevenue, cogs), [netRevenue, cogs]);
+  const netProfit = useMemo(() => calculateNetProfit(netRevenue, cogs, totalExpenses), [netRevenue, cogs, totalExpenses]);
+  const costDataComplete = useMemo(() => isCostDataComplete(orders), [orders]);
 
   const monthlyData = useMemo(() => {
     const map = {};
@@ -63,21 +70,29 @@ export default function AdminAccounting() {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      map[key] = { key, label: d.toLocaleDateString('ar', { month: 'short', year: 'numeric' }), revenue: 0, expenses: 0 };
+      map[key] = { key, label: d.toLocaleDateString('ar', { month: 'short', year: 'numeric' }), revenue: 0, cogs: 0, expenses: 0 };
     }
     // Revenue from transactions (preferred) or order delivery date
     const txnValidation = validateTransactionCompleteness(orders, transactions);
     if (txnValidation.isComplete) {
+      const orderByNumber = Object.fromEntries(orders.filter(o => o.order_number).map(o => [o.order_number, o]));
       transactions.filter(t => t.type === 'order_profit' || t.type === 'order_return').forEach(t => {
         const d = new Date(t.date || t.created_date);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        if (map[key]) map[key].revenue += t.amount || 0;
+        if (map[key]) {
+          map[key].revenue += t.amount || 0;
+          const orderCost = calculateOrderCOGS(orderByNumber[t.order_number]);
+          map[key].cogs += t.type === 'order_return' ? -orderCost : orderCost;
+        }
       });
     } else {
-      orders.filter(o => o.status === 'delivered' || o.status === 'returned').forEach(o => {
+      orders.filter(o => o.status === 'delivered').forEach(o => {
         const d = new Date(getOrderDeliveryDate(o) || o.created_date);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        if (map[key]) map[key].revenue += o.total || 0;
+        if (map[key]) {
+          map[key].revenue += o.total || 0;
+          map[key].cogs += calculateOrderCOGS(o);
+        }
       });
     }
     expenses.forEach(e => {
@@ -120,7 +135,7 @@ export default function AdminAccounting() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <div className="bg-card border border-border rounded-xl p-4">
           <div className="flex items-center gap-2 text-orange-600 mb-1"><DollarSign className="w-4 h-4" /> <span className="text-xs font-medium">إجمالي المبيعات</span></div>
           <p className="text-2xl font-bold">{currency.format(grossSales)}</p>
@@ -137,24 +152,39 @@ export default function AdminAccounting() {
           <p className="text-[10px] text-muted-foreground mt-0.5">مبيعات − مرتجعات</p>
         </div>
         <div className="bg-card border border-border rounded-xl p-4">
+          <div className="flex items-center gap-2 text-amber-600 mb-1"><TrendingDown className="w-4 h-4" /> <span className="text-xs font-medium">تكلفة البضاعة COGS</span></div>
+          <p className="text-2xl font-bold">{currency.format(cogs)}</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5">تكلفة تاريخية للسلع المباعة</p>
+        </div>
+        <div className="bg-card border border-border rounded-xl p-4">
           <div className="flex items-center gap-2 text-red-600 mb-1"><TrendingDown className="w-4 h-4" /> <span className="text-xs font-medium">النفقات التشغيلية</span></div>
           <p className="text-2xl font-bold">{currency.format(totalExpenses)}</p>
-          <p className="text-[10px] text-muted-foreground mt-0.5">إجمالي المسروفات</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5">إجمالي المصروفات</p>
         </div>
       </div>
 
-      {/* Estimated Profit */}
+      {/* Profit */}
       <div className="bg-card border border-border rounded-xl p-4 mb-6">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2 text-primary">
-            <Wallet className="w-5 h-5" />
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-bold">الربح التقديري</p>
-              <p className="text-[10px] text-muted-foreground">صافي الإيرادات − النفقات (تكلفة البضاعة غير متوفرة)</p>
+              <p className="text-sm font-bold">إجمالي الربح</p>
+              <p className="text-[10px] text-muted-foreground">صافي الإيرادات − تكلفة البضاعة</p>
             </div>
+            <p className={`text-2xl font-bold ${grossProfit >= 0 ? 'text-orange-600' : 'text-red-600'}`}>{currency.format(grossProfit)}</p>
           </div>
-          <p className={`text-3xl font-bold ${estimatedProfit >= 0 ? 'text-orange-600' : 'text-red-600'}`}>{currency.format(estimatedProfit)}</p>
+          <div className="flex items-center justify-between gap-3 md:border-r md:border-border md:pr-4">
+            <div className="flex items-center gap-2 text-primary">
+              <Wallet className="w-5 h-5" />
+              <div>
+                <p className="text-sm font-bold">صافي الربح</p>
+                <p className="text-[10px] text-muted-foreground">إجمالي الربح − النفقات التشغيلية</p>
+              </div>
+            </div>
+            <p className={`text-3xl font-bold ${netProfit >= 0 ? 'text-orange-600' : 'text-red-600'}`}>{currency.format(netProfit)}</p>
+          </div>
         </div>
+        {!costDataComplete && <p className="mt-3 text-xs text-amber-600">تنبيه: بعض الطلبات القديمة سبقت حفظ تكلفة البضاعة التاريخية؛ مؤشرات الربح تصبح كاملة تلقائياً للطلبات الجديدة.</p>}
       </div>
 
       {/* Sales Wallet */}
@@ -167,10 +197,11 @@ export default function AdminAccounting() {
           {monthlyData.map(m => (
             <div key={m.key} className="flex items-center justify-between text-sm py-1.5 border-b border-border/30 last:border-0">
               <span className="text-muted-foreground">{m.label}</span>
-              <div className="flex gap-4">
-                <span className="text-orange-600">+{currency.format(m.revenue)}</span>
-                <span className="text-red-600">-{currency.format(m.expenses)}</span>
-                <span className={`font-bold ${m.revenue - m.expenses >= 0 ? 'text-primary' : 'text-red-600'}`}>{currency.format(m.revenue - m.expenses)}</span>
+              <div className="flex gap-4 flex-wrap justify-end">
+                <span className="text-orange-600">إيراد {currency.format(m.revenue)}</span>
+                <span className="text-amber-600">COGS {currency.format(m.cogs)}</span>
+                <span className="text-red-600">مصروف {currency.format(m.expenses)}</span>
+                <span className={`font-bold ${m.revenue - m.cogs - m.expenses >= 0 ? 'text-primary' : 'text-red-600'}`}>صافي {currency.format(m.revenue - m.cogs - m.expenses)}</span>
               </div>
             </div>
           ))}
