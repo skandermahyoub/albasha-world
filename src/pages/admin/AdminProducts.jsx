@@ -15,6 +15,9 @@ import AIImageField from '@/components/admin/AIImageField';
 import { getStores } from '@/lib/navLinks';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 
+const PAGE_SIZE = 100;
+const escapeRegex = (value = '') => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 export default function AdminProducts() {
   const { settings } = useStoreSettings();
   const [products, setProducts] = useState([]);
@@ -28,6 +31,9 @@ export default function AdminProducts() {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [imgUrlInput, setImgUrlInput] = useState('');
+  const [hasMore, setHasMore] = useState(false);
+  const [nextSkip, setNextSkip] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const toggleSelect = (id) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
@@ -73,27 +79,59 @@ export default function AdminProducts() {
 
   const LOW_STOCK_THRESHOLD = 5;
 
-  const loadData = async () => {
-    const [p, c, b] = await Promise.all([
-      base44.entities.Product.list('-created_date', 1000).catch(() => []),
+  const loadMeta = async () => {
+    const [c, b] = await Promise.all([
       base44.entities.Category.list('sort_order').catch(() => []),
       base44.entities.Brand.list('sort_order').catch(() => []),
     ]);
-    setProducts(p);
     setCategories(c);
     setBrands(b.filter(brand => brand.is_active !== false));
+  };
 
-    // تنبيه المخزون المنخفض
-    const lowStock = p.filter(prod => prod.stock !== undefined && prod.stock !== null && prod.stock <= LOW_STOCK_THRESHOLD && prod.status === 'active');
-    if (lowStock.length > 0) {
-      toast.warning(`⚠️ ${lowStock.length} منتج بمخزون منخفض (${LOW_STOCK_THRESHOLD} أو أقل)`, {
-        duration: 6000,
-        description: lowStock.slice(0, 3).map(p => `• ${p.title}: ${p.stock} متبقي`).join('\n'),
-      });
+  const loadProducts = async ({ append = false, skip = 0, showStockWarning = false } = {}) => {
+    if (append) setLoadingMore(true);
+    const query = {};
+    if (filterStore !== 'all') query.store_key = filterStore;
+    if (search.trim()) {
+      const term = escapeRegex(search.trim().slice(0, 100));
+      query.$or = [
+        { title: { $regex: term, $options: 'i' } },
+        { brand: { $regex: term, $options: 'i' } },
+        { sku: { $regex: term, $options: 'i' } },
+      ];
+    }
+    const rows = await base44.entities.Product.filter(query, '-created_date', PAGE_SIZE + 1, skip).catch(() => []);
+    const page = rows.slice(0, PAGE_SIZE);
+    setProducts(prev => append ? [...prev, ...page] : page);
+    setHasMore(rows.length > PAGE_SIZE);
+    setNextSkip(rows.length > PAGE_SIZE ? skip + page.length : null);
+    setLoadingMore(false);
+
+    if (showStockWarning) {
+      const lowStock = page.filter(prod => prod.stock !== undefined && prod.stock !== null && prod.stock <= LOW_STOCK_THRESHOLD && prod.status === 'active');
+      if (lowStock.length > 0) {
+        toast.warning(`⚠️ ${lowStock.length} منتج ظاهر بمخزون منخفض (${LOW_STOCK_THRESHOLD} أو أقل)`, {
+          duration: 6000,
+          description: lowStock.slice(0, 3).map(p => `• ${p.title}: ${p.stock} متبقي`).join('\n'),
+        });
+      }
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  const loadData = () => loadProducts({ append: false, skip: 0 });
+
+  useEffect(() => {
+    loadMeta();
+    loadProducts({ append: false, skip: 0, showStockWarning: true });
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSelectedIds([]);
+      loadProducts({ append: false, skip: 0 });
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [search, filterStore]);
 
   const handleSave = async () => {
     if (!form.title) return toast.error('أدخل اسم المنتج');
