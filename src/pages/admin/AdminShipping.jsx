@@ -39,7 +39,7 @@ export default function AdminShipping() {
   const [freeEnabled, setFreeEnabled] = useState(false);
   const [freeThreshold, setFreeThreshold] = useState('');
   const [insuranceEnabled, setInsuranceEnabled] = useState(true);
-  const [originName, setOriginName] = useState('خور مكسر');
+  const [originName, setOriginName] = useState('');
   const [savingSettings, setSavingSettings] = useState(false);
 
   const load = async () => {
@@ -57,7 +57,7 @@ export default function AdminShipping() {
       setFreeEnabled(settings.free_shipping_enabled || false);
       setFreeThreshold(settings.free_shipping_threshold || '');
       setInsuranceEnabled(settings.shipping_insurance_enabled !== false);
-      setOriginName(settings.shipping_origin_name || 'خور مكسر');
+      setOriginName(settings.shipping_origin_name || '');
     }
   }, [settings]);
 
@@ -101,7 +101,7 @@ export default function AdminShipping() {
         free_shipping_enabled: freeEnabled,
         free_shipping_threshold: Number(freeThreshold) || 0,
         shipping_insurance_enabled: insuranceEnabled,
-        shipping_origin_name: originName.trim() || 'خور مكسر',
+        shipping_origin_name: originName.trim(),
       };
       if (settingsId) {
         await base44Client.entities.StoreSettings.update(settingsId, payload);
@@ -135,7 +135,7 @@ export default function AdminShipping() {
           </div>
           <div className="flex-1">
             <p className="font-bold text-sm">نقطة الانطلاق للشحن</p>
-            <Input value={originName} onChange={e => setOriginName(e.target.value)} placeholder="خور مكسر" className="mt-1 max-w-xs" />
+            <Input value={originName} onChange={e => setOriginName(e.target.value)} placeholder="مثال: اسم الفرع أو المدينة" className="mt-1 max-w-xs" />
           </div>
         </div>
 
