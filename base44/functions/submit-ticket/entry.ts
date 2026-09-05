@@ -22,7 +22,7 @@ export default async function(req) {
       if (!orders.length) return Response.json({ error: 'الطلب المرتبط لا يخص حسابك' }, { status: 403 });
     }
 
-    const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email }, '-created_date', 1).catch(() => []);
+    const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email, is_archived: false }, '-created_date', 1).catch(() => []);
     const profile = profiles[0];
     const ticketNumber = `TKT-${Date.now().toString(36).toUpperCase()}`;
     const ticket = await base44.asServiceRole.entities.Ticket.create({
