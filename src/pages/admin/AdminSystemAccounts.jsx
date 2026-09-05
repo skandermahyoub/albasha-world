@@ -21,7 +21,7 @@ export default function AdminSystemAccounts() {
   const [loading, setLoading] = useState(true);
   const [openDeposit, setOpenDeposit] = useState(false);
   const [openWithdraw, setOpenWithdraw] = useState(false);
-  const [form, setForm] = useState({ amount: '', performed_by: '', reason: '' });
+  const [form, setForm] = useState({ amount: '', reason: '' });
   const [filterType, setFilterType] = useState('all');
 
   const load = async () => {
@@ -94,29 +94,19 @@ export default function AdminSystemAccounts() {
 
   const handleDeposit = async () => {
     if (!form.amount || parseFloat(form.amount) <= 0) return toast.error('أدخل مبلغاً صحيحاً');
-    await base44.entities.SystemTransaction.create({
-      type: 'deposit',
-      amount: parseFloat(form.amount),
-      performed_by: form.performed_by || 'الإدارة',
-      reason: form.reason,
-      date: new Date().toISOString(),
-    });
+    const res = await base44.functions.invoke('system-cash-adjustment', { type: 'deposit', amount: parseFloat(form.amount), reason: form.reason });
+    if (!res.data?.success) return toast.error(res.data?.error || 'تعذر تسجيل الإيداع');
     toast.success('تم الإيداع');
-    setOpenDeposit(false); setForm({ amount: '', performed_by: '', reason: '' }); load();
+    setOpenDeposit(false); setForm({ amount: '', reason: '' }); load();
   };
 
   const handleWithdraw = async () => {
     if (!form.amount || parseFloat(form.amount) <= 0) return toast.error('أدخل مبلغاً صحيحاً');
     if (parseFloat(form.amount) > balance) return toast.error('الرصيد غير كافٍ');
-    await base44.entities.SystemTransaction.create({
-      type: 'withdrawal',
-      amount: parseFloat(form.amount),
-      performed_by: form.performed_by || 'الإدارة',
-      reason: form.reason,
-      date: new Date().toISOString(),
-    });
+    const res = await base44.functions.invoke('system-cash-adjustment', { type: 'withdrawal', amount: parseFloat(form.amount), reason: form.reason });
+    if (!res.data?.success) return toast.error(res.data?.error || 'تعذر تسجيل السحب');
     toast.success('تم السحب');
-    setOpenWithdraw(false); setForm({ amount: '', performed_by: '', reason: '' }); load();
+    setOpenWithdraw(false); setForm({ amount: '', reason: '' }); load();
   };
 
   const filtered = filterType === 'all' ? transactions : transactions.filter(t => t.type === filterType);
@@ -140,10 +130,10 @@ export default function AdminSystemAccounts() {
           <p className="text-sm text-muted-foreground mt-1">متابعة الأرباح والتسويات المالية</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => { setForm({ amount: '', performed_by: '', reason: '' }); setOpenDeposit(true); }} variant="outline" className="border-blue-300 text-blue-600">
+          <Button onClick={() => { setForm({ amount: '', reason: '' }); setOpenDeposit(true); }} variant="outline" className="border-blue-300 text-blue-600">
             <ArrowDownCircle className="w-4 h-4 ml-1" /> إيداع
           </Button>
-         <Button onClick={() => { setForm({ amount: '', performed_by: '', reason: '' }); setOpenWithdraw(true); }} variant="outline" className="border-red-300 text-red-600">
+         <Button onClick={() => { setForm({ amount: '', reason: '' }); setOpenWithdraw(true); }} variant="outline" className="border-red-300 text-red-600">
             <ArrowUpCircle className="w-4 h-4 ml-1" /> سحب
           </Button>
         </div>
@@ -289,7 +279,6 @@ export default function AdminSystemAccounts() {
           <DialogHeader><DialogTitle className="flex items-center gap-2"><ArrowDownCircle className="w-5 h-5 text-blue-600" /> إيداع مبلغ</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <Input type="number" placeholder="المبلغ *" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
-            <Input placeholder="اسم الحساب المنفذ" value={form.performed_by} onChange={e => setForm(f => ({ ...f, performed_by: e.target.value }))} />
             <Textarea placeholder="سبب الإيداع (اختياري)" value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} rows={2} />
             <Button onClick={handleDeposit} className="w-full">تأكيد الإيداع</Button>
           </div>
@@ -305,7 +294,6 @@ export default function AdminSystemAccounts() {
               الرصيد المتاح: <span className="font-bold text-primary">{currency.format(balance)}</span>
             </div>
             <Input type="number" placeholder="المبلغ *" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} />
-            <Input placeholder="اسم الحساب المنفذ *" value={form.performed_by} onChange={e => setForm(f => ({ ...f, performed_by: e.target.value }))} />
             <Textarea placeholder="سبب السحب (اختياري)" value={form.reason} onChange={e => setForm(f => ({ ...f, reason: e.target.value }))} rows={2} />
             <Button onClick={handleWithdraw} className="w-full bg-red-600 hover:bg-red-700 text-white">تأكيد السحب</Button>
           </div>
