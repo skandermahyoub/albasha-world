@@ -28,7 +28,7 @@ export default function SmartRecommendations({ currentProduct, allProducts, onAd
       <div className="flex items-center gap-2 mb-5">
         <Sparkles className="w-5 h-5 text-primary" />
         <h2 className="font-heading font-bold text-xl">قد يعجبك أيضاً</h2>
-        <span className="text-xs text-muted-foreground bg-primary/10 text-primary px-2 py-0.5 rounded-full">ذكاء اصطناعي</span>
+        <span className="text-xs text-muted-foreground bg-primary/10 text-primary px-2 py-0.5 rounded-full">اقتراحات مرتبطة</span>
       </div>
       <motion.div
         initial={{ opacity: 0 }}
