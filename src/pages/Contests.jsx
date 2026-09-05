@@ -125,18 +125,14 @@ export default function Contests() {
               </div>
             )}
 
-            {/* Upload */}
+            {/* مشاركة عبر رابط صورة — بدون أي خدمة رفع أو رصيد تكاملات */}
             <div className="bg-card rounded-2xl p-6 border border-border/50 mb-8">
               <h3 className="font-heading font-bold text-lg mb-3">شارك في المسابقة</h3>
+              <Input placeholder="رابط الصورة" value={imageUrl} onChange={e => setImageUrl(e.target.value)} className="mb-3" />
               <Textarea placeholder="وصف صورتك..." value={caption} onChange={e => setCaption(e.target.value)} rows={2} className="mb-3" />
-              <label className="cursor-pointer">
-                <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
-                <Button disabled={uploading} asChild>
-                  <span>
-                    <Camera className="w-4 h-4 ml-2" /> {uploading ? 'جاري الرفع...' : 'رفع صورة'}
-                  </span>
-                </Button>
-              </label>
+              <Button disabled={submitting || !imageUrl.trim()} onClick={submitEntry}>
+                {submitting ? 'جاري الإرسال...' : 'إرسال المشاركة'}
+              </Button>
             </div>
 
             {/* Gallery */}
