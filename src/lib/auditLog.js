@@ -13,15 +13,11 @@ import { base44 } from '@/api/base44Client';
  */
 export async function logAction({ action, entityType, entityId, entityName, description, oldValue, newValue }) {
   try {
-    let me = null;
-    try { me = await base44.auth.me(); } catch {}
-    await base44.entities.AuditLog.create({
+    await base44.functions.invoke('record-audit-log', {
       action: action || 'other',
       entity_type: entityType || '',
       entity_id: entityId || '',
       entity_name: entityName || '',
-      performed_by: me?.full_name || me?.email || 'النظام',
-      performed_by_email: me?.email || '',
       description: description || '',
       old_value: oldValue ? JSON.stringify(oldValue) : '',
       new_value: newValue ? JSON.stringify(newValue) : '',
