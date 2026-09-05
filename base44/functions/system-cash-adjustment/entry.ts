@@ -15,7 +15,7 @@ export default async function(req: Request) {
     const reason = String(body?.reason || '').trim().slice(0, 500);
     if (!type || amount <= 0 || amount > 1000000000) return Response.json({ error: 'بيانات العملية غير صحيحة' }, { status: 400 });
 
-    const transactions = await base44.asServiceRole.entities.SystemTransaction.list('-created_date', 5000).catch(() => []);
+    const transactions = await base44.asServiceRole.entities.SystemTransaction.filter({ is_test: { $ne: true } }, '-created_date', 5000).catch(() => []);
     const balance = transactions.reduce((sum: number, t: any) => {
       const value = Number(t.amount) || 0;
       if (t.type === 'withdrawal') return sum - value;
