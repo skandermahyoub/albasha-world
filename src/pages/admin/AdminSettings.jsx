@@ -124,13 +124,7 @@ export default function AdminSettings() {
           <div>
             <label className="text-sm text-muted-foreground block mb-1">شعار المتجر (يظهر في كل مكان)</label>
             {settings.logo_url && <img src={settings.logo_url} alt="logo" className="w-20 h-20 rounded-full object-cover mb-2 border-2 border-primary/30" />}
-            <div className="flex gap-2">
-              <label className="flex-1 inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors">
-                <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-                <ImageIcon className="w-4 h-4 ml-2" /> {uploadingLogo ? 'جاري الرفع...' : 'رفع شعار'}
-              </label>
-              <Input placeholder="أو رابط الشعار" value={settings.logo_url || ''} onChange={e => u('logo_url', e.target.value)} className="flex-1" />
-            </div>
+            <Input placeholder="رابط الشعار" value={settings.logo_url || ''} onChange={e => u('logo_url', e.target.value)} />
           </div>
 
           {/* Favicon */}
@@ -138,11 +132,7 @@ export default function AdminSettings() {
             <label className="text-sm text-muted-foreground block mb-1">أيقونة المتصفح (Favicon)</label>
             <div className="flex gap-2 items-center">
               {settings.favicon_url && <img src={settings.favicon_url} alt="favicon" className="w-8 h-8 rounded object-cover" />}
-              <label className="flex-1 inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors">
-                <input type="file" accept="image/*" onChange={handleFaviconUpload} className="hidden" />
-                <ImageIcon className="w-4 h-4 ml-2" /> {uploadingFavicon ? 'جاري الرفع...' : 'رفع أيقونة'}
-              </label>
-              <Input placeholder="أو رابط" value={settings.favicon_url || ''} onChange={e => u('favicon_url', e.target.value)} className="flex-1" />
+              <Input placeholder="رابط الأيقونة" value={settings.favicon_url || ''} onChange={e => u('favicon_url', e.target.value)} className="flex-1" />
             </div>
           </div>
 
@@ -214,29 +204,6 @@ export default function AdminSettings() {
               </div>
             </div>
           ))}
-        </section>
-
-        {/* مساعد المتجر الذكي */}
-        <section className="bg-card rounded-xl p-4 border border-border/50 space-y-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Bot className="w-5 h-5 text-primary" />
-            <h3 className="font-heading font-bold">مساعد المتجر الذكي</h3>
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground block mb-1">شخصية المساعد وتعليماته</label>
-            <Textarea placeholder="اكتب تعليمات المساعد الذكي: صف متجرك، ماذا يبيع، كيف يجب أن يتحدث مع العملاء..." value={settings.chat_persona || ''} onChange={e => u('chat_persona', e.target.value)} rows={4} className="text-sm" />
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground block mb-1">اقتراحات الشات السريعة</label>
-            <p className="text-[10px] text-muted-foreground mb-2">أسئلة جاهزة تظهر للعملاء عند فتح الشات</p>
-            {(tc.quick_suggestions || []).map((sug, i) => (
-              <div key={i} className="flex gap-2 mb-2">
-                <Input placeholder={`اقتراح ${i + 1}`} value={sug} onChange={e => uSuggestion(i, e.target.value)} className="h-8 text-sm flex-1" />
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive shrink-0" onClick={() => removeSuggestion(i)}><X className="w-4 h-4" /></Button>
-              </div>
-            ))}
-            <Button variant="outline" size="sm" onClick={addSuggestion} className="w-full"><Plus className="w-3 h-3 ml-1" /> إضافة اقتراح</Button>
-          </div>
         </section>
 
         {/* بطاقة المنتج */}
