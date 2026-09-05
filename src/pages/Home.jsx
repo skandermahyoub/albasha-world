@@ -32,6 +32,7 @@ import DailyDealBanner from '@/components/home/DailyDealBanner';
 import CategoryProductsSection from '@/components/home/CategoryProductsSection';
 import CategoryGrid from '@/components/home/CategoryGrid';
 import FloatingCategories from '@/components/FloatingCategories';
+import { STORE_KEYS } from '@/lib/storeSections';
 
 // Lazy-loaded below-the-fold sections for faster initial render
 const ShortVideosSection = lazy(() => import('@/components/home/ShortVideosSection'));
@@ -62,26 +63,35 @@ export default function Home() {
 
   useEffect(() => {
     const loadData = async () => {
-      const [slidesData, marqueeData, offersData, productsData, reviewsData, brandsData, postsData, bundlesData, bannersData] = await Promise.all([
+      const productRequests = [
+        ...STORE_KEYS.map(store_key => ({ store_key, sort: '-created_date', limit: 12 })),
+        { is_bestseller: true, sort: '-sales_count', limit: 8 },
+        { is_featured: true, sort: '-created_date', limit: 8 },
+        { is_new: true, sort: '-created_date', limit: 8 },
+        { is_coming_soon: true, sort: '-created_date', limit: 8 },
+      ];
+      const [slidesData, marqueeData, offersData, productPages, reviewsData, brandsData, postsData, bundlesData, bannersData] = await Promise.all([
         base44.entities.HeroSlide.list('sort_order').catch(() => []),
         base44.entities.MarqueeText.list('sort_order').catch(() => []),
         base44.entities.SpecialOffer.list('sort_order').catch(() => []),
-        base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 500 }).then(res => res.data?.products || []).catch(() => []),
+        Promise.all(productRequests.map(params => base44.functions.invoke('get-public-products', params).then(res => res.data?.products || []).catch(() => []))),
         base44.functions.invoke('get-public-reviews', { context: 'store' }).then(res => res.data?.reviews || []).catch(() => []),
         base44.entities.Brand.list('sort_order').catch(() => []),
         base44.functions.invoke('get-public-blog-posts', { limit: 10 }).then(res => res.data?.posts || []).catch(() => []),
         base44.entities.Bundle.list('-created_date', 10).catch(() => []),
         base44.entities.AdvertBanner.list('sort_order').catch(() => []),
       ]);
+      const productMap = new Map();
+      productPages.flat().forEach(product => { if (product?.id) productMap.set(product.id, product); });
       setSlides(slidesData);
       setMarqueeItems(marqueeData);
       setOffers(offersData);
-      setProducts(productsData.filter(product => product.status === 'active'));
+      setProducts([...productMap.values()]);
       setReviews(reviewsData);
-      setBrands(brandsData);
+      setBrands(brandsData.filter(brand => brand.is_active !== false));
       setPosts(postsData);
-      setBundles(bundlesData);
-      setBanners(bannersData);
+      setBundles(bundlesData.filter(bundle => bundle.is_active !== false));
+      setBanners(bannersData.filter(banner => banner.is_active !== false));
     };
     loadData();
   }, []);
