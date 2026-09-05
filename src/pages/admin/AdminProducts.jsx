@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Image as ImageIcon, Search, Smartphone, Monitor, Headphones, Zap, Tag, Cigarette, Gift, Droplet, Wine, PawPrint, Camera, Eye, EyeOff, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Smartphone, Monitor, Headphones, Zap, Tag, Cigarette, Gift, Droplet, Wine, PawPrint, Camera, Eye, EyeOff, X } from 'lucide-react';
 import { toast } from 'sonner';
 import BarcodeScannerModal from '@/components/admin/BarcodeScannerModal';
 import { logAction } from '@/lib/auditLog';
@@ -58,21 +58,6 @@ export default function AdminProducts() {
     toast.success(`تم تحديث ${selectedIds.length} منتج`);
     setSelectedIds([]);
     loadData();
-  };
-
-  const handleMultiImageUpload = async (e) => {
-    const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/') && f.size < 5 * 1024 * 1024);
-    if (!files.length) return toast.error('صور غير صالحة (يجب أن تكون صورة أقل من 5 ميجابايت)');
-    toast.info(`جاري رفع ${files.length} صور...`);
-    const urls = [];
-    for (const file of files) {
-      try {
-        const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        urls.push(file_url);
-      } catch (err) {}
-    }
-    setForm(f => ({ ...f, images: [...(f.images || []), ...urls] }));
-    toast.success(`تم رفع ${urls.length} صورة`);
   };
 
   const STORES = getStores(settings?.theme_config || {}).map(s => ({ ...s, label: s.name }));
@@ -190,20 +175,6 @@ export default function AdminProducts() {
     });
     toast.success('تم حذف المنتج');
     loadData();
-  };
-
-  const handleUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      toast.info('جاري رفع الصورة...');
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setForm(f => ({ ...f, image: file_url }));
-      toast.success('تم رفع الصورة بنجاح');
-    } catch (err) {
-      toast.error('فشل رفع الصورة - تأكد من اشتراك Builder+');
-      console.error('Upload error:', err);
-    }
   };
 
   const openEdit = (product) => {
@@ -448,10 +419,7 @@ export default function AdminProducts() {
                   ))}
                 </div>
               )}
-              <label className="block w-full inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors">
-                <input type="file" accept="image/*" multiple onChange={handleMultiImageUpload} className="hidden" />
-                <ImageIcon className="w-4 h-4 ml-2" /> رفع صور للمعرض
-              </label>
+              <p className="text-[10px] text-muted-foreground">أضف صور المعرض كرابط مباشر، دون استخدام خدمات رفع أو رصيد تكاملات.</p>
               <div className="flex gap-2">
                 <Input
                   placeholder="أو الصق رابط صورة للمعرض"
