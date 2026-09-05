@@ -169,7 +169,8 @@ export default function Checkout() {
           ? `\nمنطقة التوصيل: ${selectedZone?.zone_name || 'غير محدد'} — يدفع عند الاستلام`
           : od.shipping_fee > 0 ? `\nرسوم الشحن: +${currency.format(od.shipping_fee)}` : '';
         const walletLine = od.wallet_used > 0 ? `\nمن المحفظة: -${currency.format(od.wallet_used)}` : '';
-        const msg = `طلب جديد #${od.order_number}\n\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالعنوان: ${form.address || 'غير محدد'}\n\n${itemsList}${discountLine}${shippingLine}${walletLine}\n\nالإجمالي: ${currency.format(od.total)}\nطريقة الدفع: ${form.payment || 'غير محدد'}`;
+        const paymentLabel = od.payment_method === 'cash_on_delivery' ? 'الدفع عند الاستلام' : od.payment_method === 'wallet+cash_on_delivery' ? 'المحفظة + الباقي عند الاستلام' : od.payment_method === 'wallet' ? 'المحفظة الرقمية' : (od.payment_method || form.payment || 'غير محدد');
+        const msg = `طلب جديد #${od.order_number}\n\nالاسم: ${form.name}\nالهاتف: ${form.phone}\nالعنوان: ${form.address || 'غير محدد'}\n\n${itemsList}${discountLine}${shippingLine}${walletLine}\n\nالإجمالي: ${currency.format(od.total)}\nطريقة الدفع: ${paymentLabel}`;
         window.open(`https://wa.me/${whatsappNum.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
       }
 
