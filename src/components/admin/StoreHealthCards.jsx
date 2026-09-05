@@ -9,7 +9,7 @@ export default function StoreHealthCards({ revenueLabel, expensesLabel, profitLa
   const cards = [
     { label: 'صافي الإيرادات', value: revenueLabel, icon: TrendingUp, color: 'text-orange-600' },
     { label: 'النفقات التشغيلية', value: expensesLabel, icon: TrendingDown, color: 'text-red-600' },
-    { label: 'الربح التقديري', value: profitLabel, icon: Wallet, color: profitLabel?.startsWith('-') ? 'text-red-600' : 'text-orange-600' },
+    { label: 'صافي الربح', value: profitLabel, icon: Wallet, color: profitLabel?.startsWith('-') ? 'text-red-600' : 'text-orange-600' },
     { label: 'منتجات على وشك النفاد', value: lowStockCount, icon: PackageX, color: 'text-orange-500' },
     { label: 'منتجات راكدة (بدون مبيعات)', value: deadStockCount, icon: PackageSearch, color: 'text-muted-foreground' },
   ];
