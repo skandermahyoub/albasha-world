@@ -22,6 +22,7 @@ const navItems = [
   { to: '/admin/products', label: 'المنتجات', icon: Package },
   { to: '/admin/categories', label: 'التصنيفات', icon: Tags },
   { to: '/admin/orders', label: 'الطلبات', icon: ShoppingCart },
+  { to: '/admin/subscriptions', label: 'الاشتراكات الدورية', icon: Repeat },
   { to: '/admin/cashier', label: 'نقطة البيع (الكاشير)', icon: ScanBarcode },
   { to: '/admin/accounting', label: 'النظام المحاسبي', icon: Calculator },
   { to: '/admin/smart-manager', label: 'المدير الذكي', icon: Brain },
