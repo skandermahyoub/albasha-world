@@ -48,9 +48,9 @@ async function reverseFinancials(base44: any, order: any, actor: string, reason:
   if (walletUsed > 0 && email) {
     const priorRefund = await base44.asServiceRole.entities.WalletTransaction.filter({ customer_email: email, type: 'refund', order_id: order.order_number }, '-created_date', 1).catch(() => []);
     if (!priorRefund.length) {
-      const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: email }, '-created_date', 1).catch(() => []);
+      const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: email, is_archived: false }, '-created_date', 1).catch(() => []);
       let profile = profiles[0];
-      if (!profile) profile = await base44.asServiceRole.entities.CustomerProfile.create({ user_email: email, name: order.customer_name || '', full_name: order.customer_name || '', wallet_balance: 0 });
+      if (!profile) profile = await base44.asServiceRole.entities.CustomerProfile.create({ user_email: email, is_archived: false, name: order.customer_name || '', full_name: order.customer_name || '', wallet_balance: 0 });
       const newBalance = (Number(profile.wallet_balance) || 0) + walletUsed;
       await base44.asServiceRole.entities.CustomerProfile.update(profile.id, { wallet_balance: newBalance });
       await base44.asServiceRole.entities.WalletTransaction.create({ customer_email: email, type: 'refund', amount: walletUsed, balance_after: newBalance, description: `${reason} الطلب #${order.order_number}`, order_id: order.order_number, status: 'completed' });
@@ -104,7 +104,7 @@ async function reverseFinancials(base44: any, order: any, actor: string, reason:
   // Customer metrics are counted only on delivery. Legacy orders that already earned points
   // are also treated as having had their customer metrics counted.
   if (email && (order.customer_metrics_updated || Number(order.loyalty_points_earned) > 0)) {
-    const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: email }, '-created_date', 1).catch(() => []);
+    const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: email, is_archived: false }, '-created_date', 1).catch(() => []);
     const profile = profiles[0];
     if (profile) {
       await base44.asServiceRole.entities.CustomerProfile.update(profile.id, {
@@ -219,9 +219,9 @@ export default async function(req: Request) {
           }
         }
 
-        const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: order.customer_email }, '-created_date', 1).catch(() => []);
+        const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: order.customer_email, is_archived: false }, '-created_date', 1).catch(() => []);
         let profile = profiles[0];
-        if (!profile) profile = await base44.asServiceRole.entities.CustomerProfile.create({ user_email: order.customer_email, name: order.customer_name || '', full_name: order.customer_name || '', phone: order.customer_phone || '', address: order.address || '' });
+        if (!profile) profile = await base44.asServiceRole.entities.CustomerProfile.create({ user_email: order.customer_email, is_archived: false, name: order.customer_name || '', full_name: order.customer_name || '', phone: order.customer_phone || '', address: order.address || '' });
         await base44.asServiceRole.entities.CustomerProfile.update(profile.id, { total_spent: (Number(profile.total_spent) || 0) + (Number(order.total) || 0), orders_count: (Number(profile.orders_count) || 0) + 1 });
       }
 
