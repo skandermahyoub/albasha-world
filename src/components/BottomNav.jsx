@@ -3,7 +3,6 @@ import { Home, ShoppingCart, User, X, LayoutGrid, Menu } from 'lucide-react';
 import { useCart } from '@/lib/useCart';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import SmartChatOverlay from '@/components/chat/SmartChatOverlay';
 import { getNavLinks, getStores } from '@/lib/navLinks';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 import { useAuth } from '@/lib/AuthContext';
@@ -16,7 +15,6 @@ export default function BottomNav({ settings: propSettings }) {
   const settings = { ...ctxSettings, ...propSettings };
   const location = useLocation();
   const { count } = useCart();
-  const [chatOpen, setChatOpen] = useState(false);
   const [storesOpen, setStoresOpen] = useState(false);
 
   // Dynamic nav links & stores based on theme_config
@@ -39,8 +37,6 @@ export default function BottomNav({ settings: propSettings }) {
 
   return (
     <>
-      <AnimatePresence>{chatOpen && <SmartChatOverlay onClose={() => setChatOpen(false)} settings={settings} />}</AnimatePresence>
-
       {/* Side Drawer Menu */}
       <AnimatePresence>
         {storesOpen && (
@@ -130,17 +126,14 @@ export default function BottomNav({ settings: propSettings }) {
             if (!item) {
               // Center chat button
               return (
-                <button
-                  key="chat"
-                  onClick={() => setChatOpen(true)}
+                <Link
+                  key="shop-center"
+                  to="/shop"
                   className="relative -mt-5 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 flex items-center justify-center flex-col"
+                  aria-label="المتجر"
                 >
-                  {settings?.logo_url ? (
-                    <img src={settings.logo_url} alt="chat" className="w-8 h-8 object-contain rounded-full" />
-                  ) : (
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                  )}
-                </button>
+                  <LayoutGrid className="w-6 h-6" />
+                </Link>
               );
             }
             if (item.action) {
