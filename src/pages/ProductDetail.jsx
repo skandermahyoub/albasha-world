@@ -37,8 +37,8 @@ export default function ProductDetail() {
     const load = async () => {
       const [s, products, allProds] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.entities.Product.filter({ id, status: 'active' }).catch(() => []),
-        base44.entities.Product.list('-sales_count', 50).catch(() => []),
+        base44.functions.invoke('get-public-products', { id, limit: 1 }).then(res => res.data?.products || []).catch(() => []),
+        base44.functions.invoke('get-public-products', { sort: '-sales_count', limit: 50 }).then(res => res.data?.products || []).catch(() => []),
       ]);
       setSettings(s[0] || {});
       const p = products[0] || null;
