@@ -29,7 +29,7 @@ export default async function(req) {
     const open = existing.find(r => !['rejected','completed','refunded'].includes(r.status));
     if (open) return Response.json({ error: 'يوجد طلب إرجاع مفتوح لهذا المنتج بالفعل', return_id: open.id }, { status: 409 });
 
-    const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email }, '-created_date', 1).catch(() => []);
+    const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email, is_archived: false }, '-created_date', 1).catch(() => []);
     const profile = profiles[0];
     const requestNumber = `RET-${Date.now().toString(36).toUpperCase()}`;
     const record = await base44.asServiceRole.entities.ReturnRequest.create({
