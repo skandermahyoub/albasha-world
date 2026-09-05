@@ -5,7 +5,7 @@ export default async function(req) {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user?.email) return Response.json({ error: 'تسجيل الدخول مطلوب' }, { status: 401 });
-    const orders = await base44.asServiceRole.entities.Order.filter({ customer_email: user.email, source: { $ne: 'test' } }, '-created_date', 100);
+    const orders = await base44.asServiceRole.entities.Order.filter({ customer_email: user.email, source: { $ne: 'test' }, admin_archived: { $ne: true } }, '-created_date', 100);
     const safeOrders = orders.map((order: any) => ({
       id: order.id,
       order_number: order.order_number,
