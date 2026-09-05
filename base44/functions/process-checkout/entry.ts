@@ -54,7 +54,7 @@ export default async function(req) {
     const userEmail = user?.email || customer_email || '';
     let profileRecord = null;
     if (user?.email) {
-      const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email });
+      const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email, is_archived: false }, '-created_date', 1);
       profileRecord = profiles[0] || null;
     }
     const effectiveCustomerName = customer_name || profileRecord?.full_name || profileRecord?.name || user?.full_name || '';
