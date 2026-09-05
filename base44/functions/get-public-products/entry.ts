@@ -60,10 +60,20 @@ export default async function(req: Request) {
     if (body?.store_key) query.store_key = String(body.store_key).slice(0, 60);
     if (body?.category_id) query.category_id = String(body.category_id).slice(0, 120);
     if (Array.isArray(body?.ids) && body.ids.length) query.id = { $in: body.ids.map(String).slice(0, 200) };
-    const limit = Math.max(1, Math.min(Number(body?.limit) || 100, 1000));
+    const limit = Math.max(1, Math.min(Number(body?.limit) || 48, 200));
+    const skip = Math.max(0, Math.min(Number(body?.skip) || 0, 50000));
     const sort = SORTS.has(body?.sort) ? body.sort : '-created_date';
-    const rows = await base44.asServiceRole.entities.Product.filter(query, sort, limit).catch(() => []);
-    return Response.json({ success: true, products: rows.map(publicProduct) });
+    const rows = await base44.asServiceRole.entities.Product.filter(query, sort, limit + 1, skip).catch(() => []);
+    const hasMore = rows.length > limit;
+    const page = rows.slice(0, limit);
+    return Response.json({
+      success: true,
+      products: page.map(publicProduct),
+      skip,
+      limit,
+      has_more: hasMore,
+      next_skip: hasMore ? skip + page.length : null,
+    });
   } catch (error: any) {
     return Response.json({ error: error?.message || 'تعذر تحميل المنتجات' }, { status: 500 });
   }
