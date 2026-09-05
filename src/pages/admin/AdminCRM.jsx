@@ -39,7 +39,7 @@ export default function AdminCRM() {
 
   const load = async () => {
     const [c, o, p] = await Promise.all([
-      base44.entities.CustomerProfile.list('-created_date', 200).catch(() => []),
+      base44.entities.CustomerProfile.filter({ is_archived: false }, '-created_date', 200).catch(() => []),
       base44.entities.Order.list('-created_date', 500).catch(() => []),
       base44.entities.Product.list('-created_date', 500).catch(() => []),
     ]);
