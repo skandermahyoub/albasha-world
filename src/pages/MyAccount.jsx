@@ -6,7 +6,7 @@ import Footer from '@/components/layout/Footer';
 import BottomNav from '@/components/BottomNav';
 import { useCart } from '@/lib/useCart';
 import { motion } from 'framer-motion';
-import { User, Package, Star, ChevronLeft, LogOut, Heart, Gift, ShoppingBag, Crown, Wallet, Users2, Undo2, Ticket as TicketIcon } from 'lucide-react';
+import { User, Package, Star, ChevronLeft, LogOut, Heart, Gift, ShoppingBag, Crown, Wallet, Users2, Undo2, Ticket as TicketIcon, Repeat, Pause, Play, XCircle } from 'lucide-react';
 import LevelProgressBar from '@/components/home/LevelProgressBar';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,8 @@ export default function MyAccount() {
   const [orders, setOrders] = useState([]);
   const [loyalty, setLoyalty] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [subscriptionBusy, setSubscriptionBusy] = useState(null);
   const [tab, setTab] = useState('overview');
   const [loading, setLoading] = useState(true);
 
@@ -33,14 +35,16 @@ export default function MyAccount() {
       setSettings(s[0] || {});
       setUser(me);
       if (me) {
-        const [o, lp, profileRes] = await Promise.all([
+        const [o, lp, profileRes, subs] = await Promise.all([
           base44.functions.invoke('get-my-orders', {}).then(res => res.data?.orders || []).catch(() => []),
           base44.entities.LoyaltyPoints.filter({ user_email: me.email }).catch(() => []),
           base44.functions.invoke('get-my-profile', {}).then(res => res.data?.profile || null).catch(() => null),
+          base44.functions.invoke('get-my-subscriptions', {}).then(res => res.data?.subscriptions || []).catch(() => []),
         ]);
         setOrders(o);
         setLoyalty(lp[0] || null);
         setProfile(profileRes);
+        setSubscriptions(subs);
       }
       setLoading(false);
     };
@@ -70,6 +74,29 @@ export default function MyAccount() {
     } catch {
       toast.error('تعذر حفظ بياناتك');
     }
+  };
+
+  const manageSubscription = async (subscription, action) => {
+    if (!subscription?.id || subscriptionBusy) return;
+    setSubscriptionBusy(subscription.id + ':' + action);
+    try {
+      const res = await base44.functions.invoke('manage-subscription', { action, subscription_id: subscription.id });
+      if (!res.data?.success) return toast.error(res.data?.error || 'تعذر تحديث الاشتراك');
+      const refreshed = await base44.functions.invoke('get-my-subscriptions', {}).then(r => r.data?.subscriptions || []).catch(() => subscriptions);
+      setSubscriptions(refreshed);
+      toast.success(action === 'pause' ? 'تم إيقاف الاشتراك مؤقتاً' : action === 'resume' ? 'تم استئناف الاشتراك' : 'تم إلغاء الاشتراك');
+    } catch {
+      toast.error('تعذر تحديث الاشتراك');
+    } finally {
+      setSubscriptionBusy(null);
+    }
+  };
+
+  const SUBSCRIPTION_FREQ = { weekly: 'أسبوعياً', biweekly: 'كل أسبوعين', monthly: 'شهرياً' };
+  const SUBSCRIPTION_STATUS = {
+    active: { label: 'نشط', cls: 'bg-green-100 text-green-700' },
+    paused: { label: 'متوقف مؤقتاً', cls: 'bg-amber-100 text-amber-700' },
+    cancelled: { label: 'ملغي', cls: 'bg-red-100 text-red-700' },
   };
 
   const STATUS_MAP = {
@@ -132,6 +159,7 @@ export default function MyAccount() {
           {[
             { key: 'overview', label: 'نظرة عامة', icon: User },
             { key: 'orders', label: 'طلباتي', icon: Package },
+            { key: 'subscriptions', label: 'اشتراكاتي', icon: Repeat },
             { key: 'loyalty', label: 'نقاطي', icon: Star },
           ].map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
@@ -269,6 +297,49 @@ export default function MyAccount() {
                 </div>
               </div>
             ))}
+          </motion.div>
+        )}
+
+        {/* Subscriptions */}
+        {tab === 'subscriptions' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+            {subscriptions.length === 0 ? (
+              <div className="text-center py-12 bg-card border border-border/50 rounded-2xl">
+                <Repeat className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="font-medium">لا توجد اشتراكات دورية</p>
+                <p className="text-xs text-muted-foreground mt-1">المنتجات التي تدعم الاشتراك ستظهر لك هنا بعد تفعيلها.</p>
+                <Link to="/shop"><Button size="sm" className="mt-4">تصفح المنتجات</Button></Link>
+              </div>
+            ) : subscriptions.map(sub => {
+              const status = SUBSCRIPTION_STATUS[sub.status] || SUBSCRIPTION_STATUS.active;
+              const busy = subscriptionBusy?.startsWith(sub.id + ':');
+              return (
+                <div key={sub.id} className="bg-card border border-border/50 rounded-xl p-4">
+                  <div className="flex gap-3 items-start">
+                    {sub.product_image ? <img src={sub.product_image} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" /> : <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center shrink-0"><Package className="w-5 h-5 text-muted-foreground" /></div>}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="font-bold text-sm truncate">{sub.product_title}</p>
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full shrink-0 ${status.cls}`}>{status.label}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{SUBSCRIPTION_FREQ[sub.frequency] || sub.frequency} · الكمية {sub.quantity || 1} · خصم {sub.discount_percent || 0}%</p>
+                      <p className="text-sm font-bold text-primary mt-1">{sub.price} {settings?.currency || 'USD'}</p>
+                      {sub.next_delivery && sub.status === 'active' && <p className="text-[11px] text-muted-foreground mt-1">التوصيل القادم: {new Date(sub.next_delivery).toLocaleDateString('ar-SA')}</p>}
+                    </div>
+                  </div>
+                  {sub.status !== 'cancelled' && (
+                    <div className="flex gap-2 mt-3 pt-3 border-t border-border/40">
+                      {sub.status === 'active' ? (
+                        <Button size="sm" variant="outline" disabled={busy} onClick={() => manageSubscription(sub, 'pause')} className="flex-1"><Pause className="w-3.5 h-3.5 ml-1" /> إيقاف مؤقت</Button>
+                      ) : (
+                        <Button size="sm" variant="outline" disabled={busy} onClick={() => manageSubscription(sub, 'resume')} className="flex-1"><Play className="w-3.5 h-3.5 ml-1" /> استئناف</Button>
+                      )}
+                      <Button size="sm" variant="outline" disabled={busy} onClick={() => manageSubscription(sub, 'cancel')} className="flex-1 text-destructive border-destructive/30"><XCircle className="w-3.5 h-3.5 ml-1" /> إلغاء</Button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </motion.div>
         )}
 
