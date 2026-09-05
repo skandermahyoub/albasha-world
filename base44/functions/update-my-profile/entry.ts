@@ -14,13 +14,14 @@ export default async function(req: Request) {
     }
     if (!Object.keys(data).length) return Response.json({ error: 'لا توجد بيانات قابلة للتحديث' }, { status: 400 });
 
-    const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email }, '-created_date', 1);
+    const profiles = await base44.asServiceRole.entities.CustomerProfile.filter({ user_email: user.email, is_archived: false }, '-created_date', 1);
     let profile;
     if (profiles.length) {
       profile = await base44.asServiceRole.entities.CustomerProfile.update(profiles[0].id, data);
     } else {
       profile = await base44.asServiceRole.entities.CustomerProfile.create({
         user_email: user.email,
+        is_archived: false,
         name: user.full_name || String(data.full_name || ''),
         ...data,
       });
