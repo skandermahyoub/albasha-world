@@ -168,7 +168,14 @@ export default function Footer({ settings: propSettings }) {
       <div className="relative border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col items-center gap-2">
           <p className="text-white/30 text-xs">© {new Date().getFullYear()} {storeName}. {settings?.copyright_text || 'جميع الحقوق محفوظة'}</p>
-          <p className="text-white/20 text-[10px]">هذا التطبيق يعمل بنظام أوركس إس إس الإصدار 3.2 — oryx.business</p>
+          <a
+            href="https://oryx.business"
+            target="_blank"
+            rel="noreferrer"
+            className="text-white/30 hover:text-primary text-[10px] transition-colors"
+          >
+            مدعوم بواسطة أوريكس لتطوير الأعمال والحلول الذكية
+          </a>
         </div>
       </div>
     </footer>
