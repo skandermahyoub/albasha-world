@@ -28,7 +28,7 @@ export default async function(req) {
         return Response.json({ error: 'المنتج غير موجود' }, { status: 404 });
       }
       if (product.status !== 'active') {
-        return Response.json({ error: 'المنتج غير متاح لل اشتراك' }, { status: 400 });
+        return Response.json({ error: 'المنتج غير متاح للاشتراك' }, { status: 400 });
       }
       if (!product.is_subscribable) {
         return Response.json({ error: 'المنتج لا يدعم الاشتراك' }, { status: 400 });
