@@ -7,7 +7,12 @@ export function useAdminPermissions() {
     if (superAdmin) return true;
     if (!isStaff || !section) return false;
     const permission = permissions[section];
-    if (section === 'notifications') return level === 'view' ? ['view', 'send', 'full'].includes(permission) : ['send', 'full'].includes(permission);
+    if (section === 'notifications') {
+      if (level === 'view') return ['view', 'send', 'full'].includes(permission);
+      if (level === 'send') return ['send', 'full'].includes(permission);
+      if (['add', 'edit', 'delete', 'full'].includes(level)) return permission === 'full';
+      return false;
+    }
     return levels.indexOf(permission) >= levels.indexOf(level);
   };
   return { permissions: superAdmin ? { _super: true } : permissions, loading, isStaff, can, canView: section => can(section, 'view'), canEdit: section => can(section, 'edit'), canDelete: section => can(section, 'delete'), canFull: section => can(section, 'full') };
