@@ -23,6 +23,58 @@ const ACTION_OPERATION: Record<string, string> = {
   delete: 'delete',
 };
 
+// Page-context access. "full" means the entity is native to that section and
+// follows the staff member's permission level. "view" means supporting data is
+// readable only and can never be mutated through that page context.
+const CONTEXT_ENTITY_ACCESS: Record<string, Record<string, 'full' | 'view'>> = {
+  settings: {
+    StoreSettings: 'full', HeroSlide: 'full', AdvertBanner: 'full', HomeHighlight: 'full', MarqueeText: 'full',
+    Gallery: 'full', VideoGallery: 'full', GeneratedImage: 'full', PaymentMethod: 'full', AuditLog: 'view', SystemAdmin: 'view',
+    Product: 'view', Category: 'view',
+  },
+  stores: {
+    StoreConfig: 'full', Supplier: 'full', PurchaseOrder: 'full', StoreSettings: 'full',
+    Product: 'view', Category: 'view',
+  },
+  products: {
+    Product: 'full', Category: 'full', SpecialOffer: 'full', Bundle: 'full', Brand: 'full', StoreSettings: 'view',
+  },
+  orders: {
+    Order: 'full', InventoryMovement: 'full', CashierShift: 'full', AbandonedCart: 'full', ReturnRequest: 'full', Subscription: 'full',
+    Product: 'view', Category: 'view', CustomerProfile: 'view', StoreSettings: 'view',
+  },
+  customers: {
+    CustomerProfile: 'full', ContactMessage: 'full', Review: 'full', ProductReview: 'full', ClientRating: 'full', Subscriber: 'full', Ticket: 'full',
+    Product: 'view', Survey: 'view', Order: 'view', StoreSettings: 'view',
+  },
+  crm: {
+    CustomerProfile: 'full', Order: 'view', Product: 'view', StoreSettings: 'view',
+  },
+  accounting: {
+    Expense: 'full', SystemTransaction: 'full', WalletTransaction: 'full',
+    Order: 'view', Product: 'view', CustomerProfile: 'view', InventoryMovement: 'view', CashierShift: 'view', StoreSettings: 'view',
+  },
+  reports: {
+    Affiliate: 'full', AffiliateCommission: 'full',
+    Order: 'view', Product: 'view', SystemTransaction: 'view', StoreSettings: 'view',
+  },
+  employees: { Employee: 'full' },
+  blog: {
+    BlogPost: 'full', Survey: 'full', SurveyResponse: 'full', Contest: 'full', ContestEntry: 'full', SocialPost: 'full',
+    Product: 'view', StoreSettings: 'view',
+  },
+  delivery: {
+    ShippingZone: 'full', DeliveryAgent: 'full', DeliveryAssignment: 'full',
+    Order: 'view', CustomerProfile: 'view', StoreSettings: 'view',
+  },
+  coupons: {
+    Coupon: 'full', GiftCard: 'full', CouponUsage: 'full', GiftCardTransaction: 'full', Product: 'view', StoreSettings: 'view',
+  },
+  notifications: {
+    Notification: 'full', CustomerProfile: 'view', StoreSettings: 'view',
+  },
+};
+
 export default async function(req: Request) {
   try {
     const base44 = createClientFromRequest(req);
@@ -30,12 +82,25 @@ export default async function(req: Request) {
     if (!user) return Response.json({ error: 'تسجيل الدخول مطلوب' }, { status: 401 });
 
     const body = await req.json();
-    const { entity, action, query = {}, sort = null, limit = 50, id = null, data = null, records = null } = body || {};
+    const { entity, action, context_section = null, query = {}, sort = null, limit = 50, id = null, data = null, records = null } = body || {};
     if (!entity || !action) return Response.json({ error: 'الكيان والإجراء مطلوبان' }, { status: 400 });
 
-    const section = ENTITY_SECTIONS[entity];
+    const baseSection = ENTITY_SECTIONS[entity];
     const operation = ACTION_OPERATION[action];
-    if (!section || !operation) return Response.json({ error: 'هذا الإجراء غير مسموح' }, { status: 403 });
+    if (!baseSection || !operation) return Response.json({ error: 'هذا الإجراء غير مسموح' }, { status: 403 });
+
+    let section = baseSection;
+    let contextMode: 'full' | 'view' = 'full';
+    if (context_section && CONTEXT_ENTITY_ACCESS[context_section]?.[entity]) {
+      section = context_section;
+      contextMode = CONTEXT_ENTITY_ACCESS[context_section][entity];
+    }
+    if (context_section && !CONTEXT_ENTITY_ACCESS[context_section]?.[entity]) {
+      return Response.json({ error: 'هذا الكيان غير متاح في سياق الصفحة الحالية' }, { status: 403 });
+    }
+    if (contextMode === 'view' && operation !== 'view') {
+      return Response.json({ error: 'البيانات المساندة متاحة للعرض فقط في هذه الصفحة' }, { status: 403 });
+    }
 
     const access = await requireStaffPermission(base44, user, section, operation);
     if (!access) return Response.json({ error: 'صلاحية غير كافية' }, { status: 403 });
