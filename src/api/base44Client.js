@@ -17,9 +17,23 @@ const sdkClient = createClient({
 
 const staffEntityCache = new Map();
 const inAdminArea = () => typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+const currentAdminContext = () => {
+  if (typeof window === 'undefined') return null;
+  const path = window.location.pathname;
+  if (path === '/admin' || path === '/admin/') return null;
+  const route = path.replace(/^\/admin\//, '').split('/')[0];
+  const map = {
+    settings: 'settings', 'store-configs': 'stores', 'store-identity': 'stores', products: 'products', categories: 'products', offers: 'products', bundles: 'products', brands: 'products',
+    'ai-tools': 'settings', 'image-gallery': 'settings', slides: 'settings', banners: 'settings', 'home-highlights': 'settings', marquee: 'settings', gallery: 'settings', videos: 'settings', 'dev-roadmap': 'settings', 'audit-log': 'settings', 'system-admins': 'settings', 'system-accounts': 'accounting', payments: 'settings',
+    orders: 'orders', cashier: 'orders', 'abandoned-carts': 'orders', returns: 'orders', subscriptions: 'orders', accounting: 'accounting', 'smart-manager': 'accounting', wallets: 'accounting', erp: 'reports', affiliates: 'reports',
+    crm: 'crm', messages: 'customers', reviews: 'customers', subscribers: 'customers', tickets: 'customers', employees: 'employees', blog: 'blog', contests: 'blog', surveys: 'blog', 'social-posts': 'blog',
+    delivery: 'delivery', shipping: 'delivery', suppliers: 'stores', 'purchase-orders': 'stores', coupons: 'coupons', 'gift-cards': 'coupons', notifications: 'notifications'
+  };
+  return map[route] || null;
+};
 
 async function staffInvoke(entity, action, payload = {}) {
-  const res = await sdkClient.functions.invoke('staff-entity', { entity, action, ...payload });
+  const res = await sdkClient.functions.invoke('staff-entity', { entity, action, context_section: currentAdminContext(), ...payload });
   if (!res?.data?.success) {
     const err = new Error(res?.data?.error || 'تعذر تنفيذ العملية');
     err.status = res?.status;
