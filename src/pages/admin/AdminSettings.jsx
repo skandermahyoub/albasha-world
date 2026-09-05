@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Save, Image as ImageIcon, Link2, Palette, Store as StoreIcon, Phone, Share2, FileText, Bot, Plus, X, Navigation, Tags } from 'lucide-react';
+import { Save, Link2, Palette, Store as StoreIcon, Phone, Share2, FileText, Navigation, Tags } from 'lucide-react';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 
 import { logAction } from '@/lib/auditLog';
@@ -35,8 +35,6 @@ export default function AdminSettings() {
   const [settings, setSettings] = useState(null);
   const [settingsId, setSettingsId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
-  const [uploadingFavicon, setUploadingFavicon] = useState(false);
 
   useEffect(() => {
     if (ctxSettings) {
@@ -76,65 +74,12 @@ export default function AdminSettings() {
     toast.success('تم حفظ الإعدادات وتطبيقها على كامل المتجر');
   };
 
-  const handleLogoUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('حجم الصورة كبير جداً (الحد 5 ميجابايت). اختر صورة أصغر.');
-      e.target.value = '';
-      return;
-    }
-    setUploadingLogo(true);
-    try {
-      toast.info('جاري رفع الشعار...');
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      if (!file_url) throw new Error('لم يُرجع الخادم رابطاً للصورة');
-      setSettings(s => ({ ...s, logo_url: file_url }));
-      toast.success('تم رفع الشعار! لا تنسَ الحفظ.');
-    } catch (err) {
-      console.error('Logo upload error:', err);
-      const msg = err?.message || String(err) || 'خطأ غير معروف';
-      const hint = /credit|quota|limit|402|403/i.test(msg) ? ' — يبدو أن أرصدة التكاملات نفدت أو غير كافية' : '';
-      toast.error('فشل رفع الشعار: ' + msg + hint, { duration: 8000 });
-    }
-    e.target.value = '';
-    setUploadingLogo(false);
-  };
-
-  const handleFaviconUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('حجم الأيقونة كبير جداً (الحد 2 ميجابايت).');
-      e.target.value = '';
-      return;
-    }
-    setUploadingFavicon(true);
-    try {
-      toast.info('جاري رفع الأيقونة...');
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      if (!file_url) throw new Error('لم يُرجع الخادم رابطاً');
-      setSettings(s => ({ ...s, favicon_url: file_url }));
-      toast.success('تم رفع الأيقونة! لا تنسَ الحفظ.');
-    } catch (err) {
-      console.error('Favicon upload error:', err);
-      const msg = err?.message || String(err) || 'خطأ غير معروف';
-      const hint = /credit|quota|limit|402|403/i.test(msg) ? ' — يبدو أن أرصدة التكاملات نفدت أو غير كافية' : '';
-      toast.error('فشل رفع الأيقونة: ' + msg + hint, { duration: 8000 });
-    }
-    e.target.value = '';
-    setUploadingFavicon(false);
-  };
-
   const u = (key, val) => setSettings(s => ({ ...s, [key]: val }));
   const uRate = (key, val) => setSettings(s => ({ ...s, exchange_rates: { ...s.exchange_rates, [key]: parseFloat(val) || 0 } }));
   const uTheme = (key, val) => setSettings(s => ({ ...s, theme_config: { ...(s.theme_config || {}), [key]: val } }));
   const uNavLabel = (key, val) => setSettings(s => ({ ...s, theme_config: { ...s.theme_config, nav_labels: { ...(s.theme_config?.nav_labels || {}), [key]: val } } }));
   const uStoreName = (key, val) => setSettings(s => ({ ...s, theme_config: { ...s.theme_config, store_names: { ...(s.theme_config?.store_names || {}), [key]: val } } }));
   const uStoreIcon = (key, val) => setSettings(s => ({ ...s, theme_config: { ...s.theme_config, store_icons: { ...(s.theme_config?.store_icons || {}), [key]: val } } }));
-  const uSuggestion = (idx, val) => setSettings(s => { const arr = [...(s.theme_config?.quick_suggestions || [])]; arr[idx] = val; return { ...s, theme_config: { ...s.theme_config, quick_suggestions: arr } }; });
-  const addSuggestion = () => setSettings(s => ({ ...s, theme_config: { ...s.theme_config, quick_suggestions: [...(s.theme_config?.quick_suggestions || []), ''] } }));
-  const removeSuggestion = (idx) => setSettings(s => ({ ...s, theme_config: { ...s.theme_config, quick_suggestions: (s.theme_config?.quick_suggestions || []).filter((_, i) => i !== idx) } }));
 
   if (loading || !settings) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
 
