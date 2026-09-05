@@ -11,9 +11,9 @@ import {
   LayoutDashboard, Package, Tags, ShoppingCart, Image, Type,
   Megaphone, Star, Building2, FileText, MessageSquare, CreditCard,
   Settings, Trophy, Layers, Moon, Sun, ArrowRight, Users, Bell, BarChart2,
-  Video, UserCheck, Wand2, Store, Megaphone as BannerIcon, UserCog, Gift, Repeat, Facebook, ScanBarcode, Calculator, Brain,
+  Video, UserCheck, Store, Megaphone as BannerIcon, UserCog, Gift, Repeat, Facebook, ScanBarcode, Calculator, Brain,
   Users2, ShoppingCart as CartIcon, Wallet, Truck, Undo2, Truck as TruckIcon, ClipboardList, ScrollText, Ticket, Map,
-  Sparkles, Palette, Ship, ShieldCheck, BadgeCheck
+  Palette, Ship, ShieldCheck, BadgeCheck
 } from 'lucide-react';
 
 const navItems = [
@@ -25,7 +25,7 @@ const navItems = [
   { to: '/admin/subscriptions', label: 'الاشتراكات الدورية', icon: Repeat },
   { to: '/admin/cashier', label: 'نقطة البيع (الكاشير)', icon: ScanBarcode },
   { to: '/admin/accounting', label: 'النظام المحاسبي', icon: Calculator },
-  { to: '/admin/smart-manager', label: 'المدير الذكي', icon: Brain },
+  { to: '/admin/smart-manager', label: 'مركز أداء المتجر', icon: Brain },
   { to: '/admin/slides', label: 'السلايدر', icon: Image },
   { to: '/admin/banners', label: 'البانرات الإعلانية', icon: BannerIcon },
   { to: '/admin/home-highlights', label: 'مميزات الرئيسية', icon: BadgeCheck },
@@ -47,8 +47,6 @@ const navItems = [
   { to: '/admin/crm', label: 'نظام CRM', icon: UserCheck },
   { to: '/admin/employees', label: 'الموظفين', icon: UserCog },
   { to: '/admin/store-configs', label: 'إعدادات الأقسام (الفروع)', icon: Store },
-  { to: '/admin/ai-tools', label: 'أدوات الذكاء الاصطناعي', icon: Wand2 },
-  { to: '/admin/image-gallery', label: 'معرض صور الذكاء', icon: Sparkles },
   { to: '/admin/store-identity', label: 'هوية النشاطات', icon: Palette },
   { to: '/admin/coupons', label: 'كوبونات الخصم', icon: Ticket },
   { to: '/admin/gift-cards', label: 'بطاقات الهدايا', icon: Gift },
