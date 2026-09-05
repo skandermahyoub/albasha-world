@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import AIImageField from '@/components/admin/AIImageField';
 
@@ -31,20 +31,6 @@ export default function AdminSlides() {
     else await base44.entities.HeroSlide.create({ ...form, is_active: true });
     toast.success(editing ? 'تم التحديث' : 'تم الإضافة');
     setOpen(false); setForm({}); setEditing(null); load();
-  };
-
-  const handleUpload = async (e) => {
-    const file = e.target.files?.[0]; 
-    if (!file) return;
-    try {
-      toast.info('جاري رفع الصورة...');
-      const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      setForm(f => ({ ...f, image: file_url }));
-      toast.success('تم رفع الصورة بنجاح');
-    } catch (err) {
-      toast.error('فشل رفع الصورة - تأكد من اشتراك Builder+');
-      console.error('Upload error:', err);
-    }
   };
 
   return (
