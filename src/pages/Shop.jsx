@@ -136,6 +136,19 @@ export default function Shop() {
             ))}
         </div>
 
+        {hasMore && nextSkip !== null && (
+          <div className="flex justify-center pb-10">
+            <button
+              type="button"
+              disabled={loadingMore}
+              onClick={() => fetchProducts({ append: true, skip: nextSkip })}
+              className="px-6 py-2.5 rounded-xl border border-border bg-card hover:border-primary/50 font-medium text-sm disabled:opacity-50"
+            >
+              {loadingMore ? 'جاري تحميل المزيد...' : 'تحميل المزيد من المنتجات'}
+            </button>
+          </div>
+        )}
+
         {!loading && filtered.length === 0 && (
           <p className="text-center text-muted-foreground py-20">لا توجد منتجات</p>
         )}
