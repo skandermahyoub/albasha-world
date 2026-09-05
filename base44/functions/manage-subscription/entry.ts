@@ -89,8 +89,8 @@ export default async function(req) {
         return Response.json({ error: 'معرف الاشتراك مطلوب' }, { status: 400 });
       }
 
-      // Use user-scoped SDK so RLS ensures ownership
-      const subs = await base44.entities.Subscription.filter({ id: subscription_id });
+      // Ownership is verified server-side by the authenticated email.
+      const subs = await base44.asServiceRole.entities.Subscription.filter({ id: subscription_id, user_email: user.email });
       const sub = subs[0];
       if (!sub) {
         return Response.json({ error: 'الاشتراك غير موجود' }, { status: 404 });
@@ -109,7 +109,7 @@ export default async function(req) {
       if (!subscription_id) {
         return Response.json({ error: 'معرف الاشتراك مطلوب' }, { status: 400 });
       }
-      const subs = await base44.entities.Subscription.filter({ id: subscription_id });
+      const subs = await base44.asServiceRole.entities.Subscription.filter({ id: subscription_id, user_email: user.email });
       const sub = subs[0];
       if (!sub) {
         return Response.json({ error: 'الاشتراك غير موجود' }, { status: 404 });
@@ -126,7 +126,7 @@ export default async function(req) {
       if (!subscription_id) {
         return Response.json({ error: 'معرف الاشتراك مطلوب' }, { status: 400 });
       }
-      const subs = await base44.entities.Subscription.filter({ id: subscription_id });
+      const subs = await base44.asServiceRole.entities.Subscription.filter({ id: subscription_id, user_email: user.email });
       const sub = subs[0];
       if (!sub) {
         return Response.json({ error: 'الاشتراك غير موجود' }, { status: 404 });
