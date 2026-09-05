@@ -59,7 +59,19 @@ export default async function(req: Request) {
     if (body?.id) query.id = String(body.id).slice(0, 120);
     if (body?.store_key) query.store_key = String(body.store_key).slice(0, 60);
     if (body?.category_id) query.category_id = String(body.category_id).slice(0, 120);
+    if (body?.is_featured === true) query.is_featured = true;
+    if (body?.is_bestseller === true) query.is_bestseller = true;
+    if (body?.is_new === true) query.is_new = true;
     if (Array.isArray(body?.ids) && body.ids.length) query.id = { $in: body.ids.map(String).slice(0, 200) };
+    const search = String(body?.search || '').trim().slice(0, 100);
+    if (search) {
+      const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      query.$or = [
+        { title: { $regex: escaped, $options: 'i' } },
+        { brand: { $regex: escaped, $options: 'i' } },
+        { sku: { $regex: escaped, $options: 'i' } },
+      ];
+    }
     const limit = Math.max(1, Math.min(Number(body?.limit) || 48, 200));
     const skip = Math.max(0, Math.min(Number(body?.skip) || 0, 50000));
     const sort = SORTS.has(body?.sort) ? body.sort : '-created_date';
