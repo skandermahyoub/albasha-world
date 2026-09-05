@@ -90,7 +90,7 @@ export default function SmartChatOverlay({ onClose, settings }) {
 
   useEffect(() => {
     Promise.all([
-      base44.entities.Product.list('-sales_count', 80).catch(() => []),
+      base44.functions.invoke('get-public-products', { sort: '-sales_count', limit: 80 }).then(res => res.data?.products || []).catch(() => []),
       base44.auth.me().catch(() => null),
     ]).then(([p, me]) => {
       setProducts(p.filter(x => x.status === 'active'));
