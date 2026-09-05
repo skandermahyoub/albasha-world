@@ -52,16 +52,37 @@ export default async function(req: Request) {
     let result: any;
     const safeLimit = Math.max(1, Math.min(Number(limit) || 50, 1000));
 
+    const hiddenFilter: any = entity === 'Order'
+      ? { source: { $ne: 'test' } }
+      : entity === 'CustomerProfile'
+        ? { is_archived: { $ne: true } }
+        : ['Product', 'Category', 'Brand'].includes(entity)
+          ? { is_seed: { $ne: true } }
+          : entity === 'InventoryMovement'
+            ? { is_test: { $ne: true } }
+            : null;
+    const scopedQuery = hiddenFilter
+      ? (query && Object.keys(query).length ? { $and: [hiddenFilter, query] } : hiddenFilter)
+      : (query || {});
+
     switch (action) {
       case 'list':
-        result = await api.list(sort || undefined, safeLimit);
+        result = hiddenFilter
+          ? await api.filter(hiddenFilter, sort || undefined, safeLimit)
+          : await api.list(sort || undefined, safeLimit);
         break;
       case 'filter':
-        result = await api.filter(query || {}, sort || undefined, safeLimit);
+        result = await api.filter(scopedQuery, sort || undefined, safeLimit);
         break;
       case 'get':
         if (!id) return Response.json({ error: 'المعرف مطلوب' }, { status: 400 });
         result = await api.get(id);
+        if ((entity === 'Order' && result?.source === 'test') ||
+            (entity === 'CustomerProfile' && result?.is_archived === true) ||
+            (['Product', 'Category', 'Brand'].includes(entity) && result?.is_seed === true) ||
+            (entity === 'InventoryMovement' && result?.is_test === true)) {
+          return Response.json({ error: 'السجل مؤرشف وغير متاح في التشغيل الحالي' }, { status: 404 });
+        }
         break;
       case 'create':
         if (!data || typeof data !== 'object') return Response.json({ error: 'البيانات مطلوبة' }, { status: 400 });
