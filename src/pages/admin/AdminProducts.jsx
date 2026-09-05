@@ -19,6 +19,7 @@ export default function AdminProducts() {
   const { settings } = useStoreSettings();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [editing, setEditing] = useState(null);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({});
@@ -73,12 +74,14 @@ export default function AdminProducts() {
   const LOW_STOCK_THRESHOLD = 5;
 
   const loadData = async () => {
-    const [p, c] = await Promise.all([
+    const [p, c, b] = await Promise.all([
       base44.entities.Product.list('-created_date', 1000).catch(() => []),
       base44.entities.Category.list('sort_order').catch(() => []),
+      base44.entities.Brand.list('sort_order').catch(() => []),
     ]);
     setProducts(p);
     setCategories(c);
+    setBrands(b.filter(brand => brand.is_active !== false));
 
     // تنبيه المخزون المنخفض
     const lowStock = p.filter(prod => prod.stock !== undefined && prod.stock !== null && prod.stock <= LOW_STOCK_THRESHOLD && prod.status === 'active');
@@ -97,30 +100,36 @@ export default function AdminProducts() {
     if (!form.price || form.price <= 0) return toast.error('أدخل سعراً صحيحاً (أكبر من صفر)');
     if (!form.store_key) return toast.error('اختر المتجر أولاً');
     if (!form.category_id) return toast.error('اختر التصنيف أولاً');
+    const normalizedForm = {
+      ...form,
+      slug: form.slug || String(form.title).trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\u0600-\u06FF-]/g, ''),
+      cost_price: Math.max(0, Number(form.cost_price) || 0),
+      stock: Math.max(0, Number(form.stock) || 0),
+    };
     if (editing) {
       const oldPrice = editing.price;
-      await base44.entities.Product.update(editing.id, form);
+      await base44.entities.Product.update(editing.id, normalizedForm);
       // تسجيل في سجل النشاط
       logAction({
         action: oldPrice !== form.price ? 'price_change' : 'update',
         entityType: 'Product',
         entityId: editing.id,
-        entityName: form.title,
+        entityName: normalizedForm.title,
         description: oldPrice !== form.price
-          ? `تغيير سعر المنتج "${form.title}" من ${oldPrice} إلى ${form.price}`
-          : `تعديل المنتج "${form.title}"`,
+          ? `تغيير سعر المنتج "${normalizedForm.title}" من ${oldPrice} إلى ${normalizedForm.price}`
+          : `تعديل المنتج "${normalizedForm.title}"`,
         oldValue: editing,
-        newValue: form,
+        newValue: normalizedForm,
       });
       toast.success('تم تحديث المنتج');
     } else {
-      const created = await base44.entities.Product.create({ ...form, status: form.status || 'active' });
+      const created = await base44.entities.Product.create({ ...normalizedForm, status: normalizedForm.status || 'active' });
       logAction({
         action: 'create',
         entityType: 'Product',
         entityId: created?.id,
-        entityName: form.title,
-        description: `إضافة منتج جديد: "${form.title}" بسعر ${form.price}`,
+        entityName: normalizedForm.title,
+        description: `إضافة منتج جديد: "${normalizedForm.title}" بسعر ${normalizedForm.price}`,
       });
       toast.success('تم إضافة المنتج');
     }
@@ -272,13 +281,31 @@ export default function AdminProducts() {
             <Input placeholder="وصف مختصر" value={form.subtitle || ''} onChange={e => setForm(f => ({ ...f, subtitle: e.target.value }))} />
             <Textarea placeholder="الوصف التفصيلي" value={form.description || ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} />
             <div className="grid grid-cols-2 gap-3">
-              <Input type="number" placeholder="السعر بالدولار *" value={form.price || ''} onChange={e => setForm(f => ({ ...f, price: parseFloat(e.target.value) }))} />
-              <Input type="number" placeholder="السعر القديم بالدولار" value={form.old_price || ''} onChange={e => setForm(f => ({ ...f, old_price: parseFloat(e.target.value) }))} />
+              <Input type="number" min="0" step="0.01" placeholder="سعر البيع بالدولار *" value={form.price ?? ''} onChange={e => setForm(f => ({ ...f, price: parseFloat(e.target.value) }))} />
+              <Input type="number" min="0" step="0.01" placeholder="تكلفة الوحدة بالدولار" value={form.cost_price ?? ''} onChange={e => setForm(f => ({ ...f, cost_price: parseFloat(e.target.value) }))} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Input type="number" min="0" step="0.01" placeholder="السعر القديم بالدولار" value={form.old_price ?? ''} onChange={e => setForm(f => ({ ...f, old_price: parseFloat(e.target.value) }))} />
+              <Input placeholder="وحدة البيع (قطعة، علبة، 250 جم...)" value={form.unit || ''} onChange={e => setForm(f => ({ ...f, unit: e.target.value }))} />
             </div>
             {form.old_price && form.old_price > 0 && (
               <Input type="date" placeholder="تاريخ انتهاء الخصم" value={form.discount_end_date || ''} onChange={e => setForm(f => ({ ...f, discount_end_date: e.target.value }))} />
             )}
-            <Input placeholder="العلامة التجارية" value={form.brand || ''} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))} />
+            <Select value={form.brand_id || 'none'} onValueChange={v => {
+              if (v === 'none') return setForm(f => ({ ...f, brand_id: '', brand: '' }));
+              const selected = brands.find(b => b.id === v);
+              setForm(f => ({ ...f, brand_id: v, brand: selected?.name || '' }));
+            }}>
+              <SelectTrigger><SelectValue placeholder="العلامة التجارية" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">بدون علامة تجارية</SelectItem>
+                {brands.map(b => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="Slug للرابط (اختياري)" value={form.slug || ''} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} />
+              <Input placeholder="رابط مصدر المنتج (إداري)" value={form.source_url || ''} onChange={e => setForm(f => ({ ...f, source_url: e.target.value }))} />
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <Input type="number" placeholder="المخزون" value={form.stock ?? ''} onChange={e => setForm(f => ({ ...f, stock: parseInt(e.target.value) }))} />
               <Input type="number" placeholder="حد تنبيه المخزون (5)" value={form.stock_alert_threshold ?? ''} onChange={e => setForm(f => ({ ...f, stock_alert_threshold: parseInt(e.target.value) }))} />
