@@ -40,14 +40,6 @@ export default function AdminBlog() {
   const openNew = () => { setEditing(null); setForm({ status: 'draft', tags: [] }); setTagInput(''); setOpen(true); };
   const openEdit = (post) => { setEditing(post); setForm({ ...post }); setTagInput(''); setOpen(true); };
 
-  const handleUpload = async (e) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    toast.info('جاري الرفع...');
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    setForm(f => ({ ...f, image: file_url }));
-    toast.success('تم رفع الصورة');
-  };
-
   const addTag = () => {
     const t = tagInput.trim();
     if (!t) return;
