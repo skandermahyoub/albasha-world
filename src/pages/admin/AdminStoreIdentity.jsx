@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Save, Palette, Type, Store as StoreIcon } from 'lucide-react';
+import { Save, Upload, Palette, Type, Store as StoreIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 import StorePreview from '@/components/admin/StorePreview';
@@ -27,6 +27,7 @@ export default function AdminStoreIdentity() {
   const { settings, settingsId, reloadSettings } = useStoreSettings();
   const [theme, setTheme] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [uploadingStore, setUploadingStore] = useState(null);
   const [previewStore, setPreviewStore] = useState('shisha');
 
   useEffect(() => {
@@ -61,6 +62,24 @@ export default function AdminStoreIdentity() {
     }
     await reloadSettings();
     toast.success('تم حفظ الهوية البصرية وتطبيقها على كامل التطبيق');
+  };
+
+  const handleLogoUpload = async (storeKey, file) => {
+    if (!file) return;
+    setUploadingStore(storeKey);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      if (!file_url) throw new Error('no file url');
+      setTheme(t => ({
+        ...t,
+        store_themes: { ...t.store_themes, [storeKey]: { ...t.store_themes[storeKey], logo_url: file_url } },
+      }));
+      toast.success('تم رفع شعار القسم؛ لا تنسَ الحفظ');
+    } catch {
+      toast.error('فشل رفع شعار القسم');
+    } finally {
+      setUploadingStore(null);
+    }
   };
 
   const u = (key, val) => setTheme(t => ({ ...t, [key]: val }));
@@ -129,14 +148,20 @@ export default function AdminStoreIdentity() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div>
-                    <label className="text-xs text-muted-foreground block mb-1">شعار النشاط</label>
+                    <label className="text-xs text-muted-foreground block mb-1">شعار القسم/النشاط (اختياري ومستقل عن الشعار الرئيسي)</label>
                     {st.logo_url && <img src={st.logo_url} alt="" className="w-16 h-16 rounded-lg object-cover mb-2 border border-border" />}
-                    <Input
-                      value={st.logo_url || ''}
-                      onChange={e => uStore(store.key, 'logo_url', e.target.value)}
-                      placeholder="رابط الشعار"
-                      className="text-sm"
-                    />
+                    <div className="space-y-2">
+                      <label className="inline-flex w-full items-center justify-center gap-2 h-9 px-3 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent cursor-pointer">
+                        <input type="file" accept="image/*" onChange={e => handleLogoUpload(store.key, e.target.files?.[0])} className="hidden" />
+                        <Upload className="w-4 h-4" /> {uploadingStore === store.key ? 'جاري الرفع...' : 'رفع شعار القسم'}
+                      </label>
+                      <Input
+                        value={st.logo_url || ''}
+                        onChange={e => uStore(store.key, 'logo_url', e.target.value)}
+                        placeholder="أو رابط شعار القسم"
+                        className="text-sm"
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground block mb-1">لون الهوية</label>
