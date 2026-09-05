@@ -5,7 +5,7 @@ const ENTITY_SECTIONS: Record<string, string> = {
   Product: 'products', Category: 'products', SpecialOffer: 'products', Bundle: 'products', Brand: 'products',
   Order: 'orders', InventoryMovement: 'orders', CashierShift: 'orders', AbandonedCart: 'orders', ReturnRequest: 'orders', Subscription: 'orders',
   CustomerProfile: 'customers', ContactMessage: 'customers', Review: 'customers', ProductReview: 'customers', ClientRating: 'customers', Subscriber: 'customers', Ticket: 'customers',
-  StoreSettings: 'settings', HeroSlide: 'settings', AdvertBanner: 'settings', HomeHighlight: 'settings', MarqueeText: 'settings', Gallery: 'settings', VideoGallery: 'settings', GeneratedImage: 'settings', PaymentMethod: 'settings', AuditLog: 'settings', SystemAdmin: 'settings',
+  StoreSettings: 'settings', HeroSlide: 'settings', AdvertBanner: 'settings', HomeHighlight: 'settings', MarqueeText: 'settings', Gallery: 'settings', VideoGallery: 'settings', PaymentMethod: 'settings', AuditLog: 'settings', SystemAdmin: 'settings',
   StoreConfig: 'stores', Supplier: 'stores', PurchaseOrder: 'stores',
   Employee: 'employees',
   Expense: 'accounting', SystemTransaction: 'accounting', WalletTransaction: 'accounting',
@@ -29,7 +29,7 @@ const ACTION_OPERATION: Record<string, string> = {
 const CONTEXT_ENTITY_ACCESS: Record<string, Record<string, 'full' | 'view'>> = {
   settings: {
     StoreSettings: 'full', HeroSlide: 'full', AdvertBanner: 'full', HomeHighlight: 'full', MarqueeText: 'full',
-    Gallery: 'full', VideoGallery: 'full', GeneratedImage: 'full', PaymentMethod: 'full', AuditLog: 'view', SystemAdmin: 'view',
+    Gallery: 'full', VideoGallery: 'full', PaymentMethod: 'full', AuditLog: 'view', SystemAdmin: 'view',
     Product: 'view', Category: 'view',
   },
   stores: {
