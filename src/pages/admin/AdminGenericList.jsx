@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Plus, Pencil, Trash2, Image as ImageIcon, X } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import AIImageField from '@/components/admin/AIImageField';
@@ -96,9 +96,26 @@ export default function AdminGenericList({ entityName, title, fields = [], aiIma
                         ))}
                       </div>
                     )}
+                    <label className="block w-full inline-flex items-center justify-center gap-2 h-9 px-4 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent cursor-pointer transition-colors">
+                      <input type="file" accept="image/*" multiple onChange={async (e) => {
+                        const files = Array.from(e.target.files || []).filter(f => f.type?.startsWith('image/') && f.size <= 5 * 1024 * 1024);
+                        if (!files.length) return toast.error('اختر صوراً صالحة');
+                        const urls = [];
+                        for (const file of files) {
+                          try {
+                            const { file_url } = await base44.integrations.Core.UploadFile({ file });
+                            if (file_url) urls.push(file_url);
+                          } catch {}
+                        }
+                        if (urls.length) setForm(f => ({ ...f, [field.key]: [...(f[field.key] || []), ...urls] }));
+                        toast.success(`تم رفع ${urls.length} صورة`);
+                        e.target.value = '';
+                      }} className="hidden" />
+                      <ImageIcon className="w-4 h-4" /> رفع صور متعددة
+                    </label>
                     <div className="flex gap-2">
                       <Input
-                        placeholder="رابط صورة إضافية"
+                        placeholder="أو رابط صورة إضافية"
                         value={imageUrlInputs[field.key] || ''}
                         onChange={e => setImageUrlInputs(prev => ({ ...prev, [field.key]: e.target.value }))}
                         className="flex-1"
