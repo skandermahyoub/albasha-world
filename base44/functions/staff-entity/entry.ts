@@ -136,7 +136,9 @@ export default async function(req: Request) {
           ? { is_seed: { $ne: true } }
           : entity === 'InventoryMovement'
             ? { is_test: { $ne: true } }
-            : null;
+            : entity === 'SystemTransaction'
+              ? { is_test: { $ne: true } }
+              : null;
     const scopedQuery = hiddenFilter
       ? (query && Object.keys(query).length ? { $and: [hiddenFilter, query] } : hiddenFilter)
       : (query || {});
