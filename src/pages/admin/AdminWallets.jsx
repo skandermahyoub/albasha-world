@@ -5,6 +5,7 @@ export default function AdminWallets() {
     <AdminGenericList
       entityName="WalletTransaction"
       title="المحفظة الرقمية والمعاملات"
+      readOnly={true}
       fields={[
         { key: 'customer_email', label: 'بريد العميل', type: 'text' },
         { key: 'type', label: 'نوع المعاملة', type: 'select', options: [
