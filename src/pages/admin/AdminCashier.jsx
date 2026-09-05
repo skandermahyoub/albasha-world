@@ -167,23 +167,6 @@ export default function AdminCashier() {
   const discountAmount = discount ? parseFloat(discount) || 0 : 0;
   const cartFinal = Math.max(0, cartTotal - discountAmount);
 
-  const createMovement = async ({ product, type, quantity, before, after, order }) => {
-    await base44.entities.InventoryMovement.create({
-      product_id: product.id,
-      product_title: product.title,
-      sku: product.sku || '',
-      type,
-      quantity,
-      stock_before: before,
-      stock_after: after,
-      unit_price: product.price || 0,
-      total: (product.price || 0) * Math.abs(quantity),
-      order_id: order?.id || '',
-      order_number: order?.order_number || '',
-      shift_id: shift?.id || '',
-    });
-  };
-
   const printInvoice = (order, silent = false) => {
     const doc = new jsPDF();
     doc.setFontSize(16);
@@ -262,10 +245,8 @@ export default function AdminCashier() {
     if (!restockSelected || !qty || qty <= 0) return toast.error('أدخل كمية صحيحة');
     setSaving(true);
     try {
-      const before = restockSelected.stock || 0;
-      const after = before + qty;
-      await base44.entities.Product.update(restockSelected.id, { stock: after });
-      await createMovement({ product: restockSelected, type: 'restock', quantity: qty, before, after });
+      const res = await base44.functions.invoke('cashier-restock-product', { product_id: restockSelected.id, quantity: qty, shift_id: shift?.id || '' });
+      if (!res.data?.success) throw new Error(res.data?.error || 'فشل تحديث المخزون');
       toast.success(`تمت إضافة ${qty} قطعة إلى المخزون`);
       setRestockSelected(null);
       setRestockQty('');
@@ -285,16 +266,16 @@ export default function AdminCashier() {
     if (!quickProduct?.store_key || !quickProduct?.category_id) return toast.error('اختر المتجر والتصنيف');
     setSaving(true);
     try {
-      const product = await base44.entities.Product.create({
+      const res = await base44.functions.invoke('cashier-create-product', {
         title: quickProduct.title,
         sku: quickProduct.sku,
         price,
         stock: qty,
         store_key: quickProduct.store_key,
         category_id: quickProduct.category_id,
-        status: 'active',
+        shift_id: shift?.id || '',
       });
-      await createMovement({ product, type: 'restock', quantity: qty, before: 0, after: qty });
+      if (!res.data?.success) throw new Error(res.data?.error || 'فشل إنشاء المنتج');
       toast.success('تم إنشاء المنتج وتسجيل المخزون');
       setQuickProduct(null);
       await loadData();
