@@ -27,11 +27,11 @@ export default function MyWallet() {
       setSettings(s[0] || {});
       setUser(me);
       if (me) {
-        const [profiles, txns] = await Promise.all([
-          base44.entities.CustomerProfile.filter({ user_email: me.email }).catch(() => []),
+        const [profileRes, txns] = await Promise.all([
+          base44.functions.invoke('get-my-profile', {}).then(res => res.data?.profile || null).catch(() => null),
           base44.entities.WalletTransaction.filter({ customer_email: me.email }, '-created_date', 50).catch(() => []),
         ]);
-        setProfile(profiles[0] || null);
+        setProfile(profileRes);
         setTransactions(txns);
       }
       setLoading(false);
