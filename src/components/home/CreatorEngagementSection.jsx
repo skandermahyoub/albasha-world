@@ -25,7 +25,7 @@ export default function CreatorEngagementSection({ settings }) {
               </span>
               <h2 className="font-heading font-bold text-2xl md:text-3xl mb-2">تابع، شارك، وادخل مجتمع جمهور {settings?.store_name || 'المتجر'}</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              هنا ستجد فيديوهات حصرية، مراجعات هواتف، عروض مفاجئة، وتعليقات الجمهور داخل التطبيق.
+              هنا ستجد فيديوهات حصرية، مراجعات منتجات، عروض مفاجئة، وتعليقات الجمهور داخل التطبيق.
             </p>
             <div className="flex flex-wrap gap-2">
               <Link to="/videos"><Button className="gap-2"><Clapperboard className="w-4 h-4" /> شاهد الفيديوهات</Button></Link>
