@@ -114,7 +114,7 @@ export default function Home() {
         description={settings?.slogan}
         image={settings?.logo_url}
       />
-      <AdaptiveNightMode isDark={isDark} />
+      <AdaptiveNightMode isDark={isDark} settings={settings} />
       <CartFlyAnimation />
       
       {/* Big Header */}

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useStoreSettings } from '@/lib/useStoreSettings';
 
 function SmokeParticle({ style }) {
   return (
@@ -40,8 +39,7 @@ const PARTICLES = Array.from({ length: 8 }, (_, i) => ({
   delay: Math.random() * 4,
 }));
 
-export default function AdaptiveNightMode({ isDark }) {
-  const { settings } = useStoreSettings();
+export default function AdaptiveNightMode({ isDark, settings }) {
   const [hour, setHour] = useState(new Date().getHours());
   const [showNightBanner, setShowNightBanner] = useState(false);
 
