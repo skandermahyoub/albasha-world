@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Star, CheckCircle, Award, ThumbsUp, MessageSquare, Send, Loader2 } from 'lucide-react';
+import { Star, CheckCircle, Award, ThumbsUp, Send, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { toast } from 'sonner';
@@ -10,7 +10,6 @@ const RATING_ITEMS = [
   { key: 'usability', label: 'سهولة الاستخدام', icon: ThumbsUp },
   { key: 'features', label: 'اكتمال المميزات', icon: CheckCircle },
   { key: 'performance', label: 'الأداء والسرعة', icon: Award },
-  { key: 'ai', label: 'الذكاء الاصطناعي', icon: MessageSquare },
 ];
 
 const MAX_COMMENT_LENGTH = 1000;
