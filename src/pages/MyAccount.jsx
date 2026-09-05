@@ -33,14 +33,14 @@ export default function MyAccount() {
       setSettings(s[0] || {});
       setUser(me);
       if (me) {
-        const [o, lp, profs] = await Promise.all([
-              base44.functions.invoke('get-my-orders', {}).then(res => res.data?.orders || []).catch(() => []),
+        const [o, lp, profileRes] = await Promise.all([
+          base44.functions.invoke('get-my-orders', {}).then(res => res.data?.orders || []).catch(() => []),
           base44.entities.LoyaltyPoints.filter({ user_email: me.email }).catch(() => []),
-          base44.entities.CustomerProfile.filter({ user_email: me.email }).catch(() => []),
+          base44.functions.invoke('get-my-profile', {}).then(res => res.data?.profile || null).catch(() => null),
         ]);
         setOrders(o);
         setLoyalty(lp[0] || null);
-        setProfile(profs[0] || null);
+        setProfile(profileRes);
       }
       setLoading(false);
     };
