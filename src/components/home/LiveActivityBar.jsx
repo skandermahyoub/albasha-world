@@ -18,7 +18,7 @@ export default function LiveActivityBar() {
       try {
         const [orders, products] = await Promise.all([
           base44.entities.Order.list('-created_date', 5).catch(() => []),
-          base44.entities.Product.list('-created_date', 200).catch(() => []),
+          base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 200 }).then(res => res.data?.products || []).catch(() => []),
         ]);
 
         const available = orders.filter(
