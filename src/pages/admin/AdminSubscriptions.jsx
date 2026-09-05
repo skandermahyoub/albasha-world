@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Repeat, Calendar, Pause, Play, Trash2, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAdminPermissions } from '@/lib/useAdminPermissions';
+import { useStoreSettings } from '@/lib/useStoreSettings';
+import useCurrency from '@/lib/useCurrency';
 
 const FREQ_LABELS = { weekly: 'أسبوعياً', biweekly: 'كل أسبوعين', monthly: 'شهرياً' };
 const STATUS_STYLES = {
@@ -14,6 +17,9 @@ const STATUS_LABELS = { active: 'نشط', paused: 'متوقف', cancelled: 'مل
 export default function AdminSubscriptions() {
   const [subs, setSubs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { canEdit } = useAdminPermissions();
+  const { settings } = useStoreSettings();
+  const currency = useCurrency(settings);
 
   const load = () => base44.entities.Subscription.list('-created_date', 100).then(s => { setSubs(s); setLoading(false); }).catch(() => setLoading(false));
   useEffect(() => { load(); }, []);
@@ -32,7 +38,8 @@ export default function AdminSubscriptions() {
   };
 
   const activeCount = subs.filter(s => s.status === 'active').length;
-  const mrr = subs.filter(s => s.status === 'active').reduce((sum, s) => sum + (s.price || 0) * (s.quantity || 1), 0);
+  const MONTHLY_FACTOR = { weekly: 52 / 12, biweekly: 26 / 12, monthly: 1 };
+  const mrr = subs.filter(s => s.status === 'active').reduce((sum, s) => sum + (s.price || 0) * (s.quantity || 1) * (MONTHLY_FACTOR[s.frequency] || 1), 0);
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
 
@@ -54,8 +61,8 @@ export default function AdminSubscriptions() {
         </div>
         <div className="bg-card rounded-xl p-4 border border-border/50">
           <Calendar className="w-5 h-5 text-orange-600 mb-2" />
-          <p className="text-2xl font-heading font-bold">{mrr.toFixed(0)}</p>
-          <p className="text-xs text-muted-foreground">دخل شهري متكرر (ر.س)</p>
+          <p className="text-2xl font-heading font-bold">{currency.format(mrr)}</p>
+          <p className="text-xs text-muted-foreground">دخل شهري متكرر تقديري</p>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border/50">
           <Package className="w-5 h-5 text-blue-600 mb-2" />
@@ -82,9 +89,9 @@ export default function AdminSubscriptions() {
             </div>
             <div className="flex flex-col items-end gap-1.5 shrink-0">
               <span className={`text-[10px] px-2 py-0.5 rounded-full ${STATUS_STYLES[sub.status]}`}>{STATUS_LABELS[sub.status]}</span>
-              <span className="text-sm font-bold">{sub.price} ر.س</span>
+              <span className="text-sm font-bold">{currency.format(sub.price || 0)}</span>
             </div>
-            {sub.status !== 'cancelled' && (
+            {sub.status !== 'cancelled' && canEdit('orders') && (
               <div className="flex gap-1 shrink-0">
                 <button onClick={() => toggleStatus(sub)} className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-accent transition-colors">
                   {sub.status === 'active' ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
