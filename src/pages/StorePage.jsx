@@ -15,6 +15,8 @@ import StoreBackgroundEffect from '@/components/home/StoreBackgroundEffect';
 import { STORE_DETAILS, getStoreColor } from '@/lib/navLinks';
 import { STORE_SECTIONS, resolveStoreKey, getStoreSection } from '@/lib/storeSections';
 
+const PAGE_SIZE = 48;
+
 const STORE_META = Object.fromEntries(
   STORE_SECTIONS.map(s => [s.key, {
     name: s.nameAr,
@@ -42,6 +44,9 @@ export default function StorePage() {
   const [selectedCat, setSelectedCat] = useState('all');
   const [activeTab, setActiveTab] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [nextSkip, setNextSkip] = useState(null);
 
   const resolvedKey = resolveStoreKey(storeKey);
   const meta = getStoreSection(storeKey) || STORE_SECTIONS[0];
@@ -58,25 +63,47 @@ export default function StorePage() {
     setSelectedCat('all');
     setSearch('');
     setActiveTab('all');
-    const load = async () => {
-      setLoading(true);
-      const [s, p, c, cfgList] = await Promise.all([
-        base44.entities.StoreSettings.list().catch(() => []),
-        base44.functions.invoke('get-public-products', { store_key: resolvedKey, sort: '-created_date', limit: 1000 }).then(res => res.data?.products || []).catch(() => []),
-        base44.entities.Category.filter({ store_key: resolvedKey }, 'sort_order').catch(() => []),
-        base44.entities.StoreConfig.filter({ store_key: resolvedKey }).catch(() => []),
-      ]);
+    if (!resolvedKey) return;
+    Promise.all([
+      base44.entities.StoreSettings.list().catch(() => []),
+      base44.entities.Category.filter({ store_key: resolvedKey }, 'sort_order').catch(() => []),
+      base44.entities.StoreConfig.filter({ store_key: resolvedKey }).catch(() => []),
+    ]).then(([s, c, cfgList]) => {
       setSettings(s[0] || {});
       setStoreConfig(cfgList[0] || null);
-      setProducts(p.filter(pr => pr.status === 'active'));
-      const parents = c.filter(cat => !cat.parent_id);
-      const subs = c.filter(cat => !!cat.parent_id);
-      setCategories(parents);
-      setSubCategories(subs);
-      setLoading(false);
-    };
-    load();
-  }, [storeKey]);
+      const activeCategories = c.filter(cat => cat.is_active !== false);
+      setCategories(activeCategories.filter(cat => !cat.parent_id));
+      setSubCategories(activeCategories.filter(cat => !!cat.parent_id));
+    });
+  }, [storeKey, resolvedKey]);
+
+  const fetchProducts = async ({ append = false, skip = 0 } = {}) => {
+    if (!resolvedKey) return;
+    append ? setLoadingMore(true) : setLoading(true);
+    const res = await base44.functions.invoke('get-public-products', {
+      store_key: resolvedKey,
+      category_id: selectedCat === 'all' ? undefined : selectedCat,
+      search: search.trim(),
+      is_bestseller: activeTab === 'bestseller' ? true : undefined,
+      is_featured: activeTab === 'featured' ? true : undefined,
+      is_new: activeTab === 'new' ? true : undefined,
+      sort: '-created_date',
+      limit: PAGE_SIZE,
+      skip,
+    }).catch(() => null);
+    const data = res?.data || {};
+    setProducts(prev => append ? [...prev, ...(data.products || [])] : (data.products || []));
+    setHasMore(data.has_more === true);
+    setNextSkip(data.next_skip ?? null);
+    setLoading(false);
+    setLoadingMore(false);
+  };
+
+  useEffect(() => {
+    if (!resolvedKey) return;
+    const timer = setTimeout(() => fetchProducts({ append: false, skip: 0 }), 250);
+    return () => clearTimeout(timer);
+  }, [resolvedKey, search, selectedCat, activeTab]);
 
   const TABS = [
     { key: 'all', label: 'الكل' },
