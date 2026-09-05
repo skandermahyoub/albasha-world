@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, Trash2, Plus, Image as ImageIcon } from 'lucide-react';
+import { Loader2, Trash2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStoreSettings } from '@/lib/useStoreSettings';
 
@@ -55,14 +55,6 @@ export default function AdminStoreConfigs() {
     updateField(storeKey, 'bg_images', imgs);
   };
 
-  const handleUploadBg = async (storeKey, e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    const newImages = [...(configs[storeKey]?.bg_images || []), file_url];
-    updateField(storeKey, 'bg_images', newImages);
-  };
-
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" /></div>;
 
   return (
@@ -70,7 +62,7 @@ export default function AdminStoreConfigs() {
       <h1 className="font-heading font-bold text-2xl mb-2">إعدادات أقسام {settings?.store_name || 'متجري'}</h1>
       <p className="text-sm text-muted-foreground mb-2">تخصيص واتساب وخلفيات كل قسم</p>
       <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 mb-6 text-sm">
-        💡 <strong>ملاحظة:</strong> أول صورة في "صور الخلفية المتغيرة" تظهر كصورة بطاقة القسم في الصفحة الرئيسية. ارفع صورة جذابة لكل قسم لتحسين مظهر المتجر.
+        💡 <strong>ملاحظة:</strong> أول رابط في "صور الخلفية المتغيرة" يظهر كصورة بطاقة القسم في الصفحة الرئيسية.
       </div>
 
       <div className="space-y-6">
@@ -125,10 +117,6 @@ export default function AdminStoreConfigs() {
                     </div>
                   ))}
                 </div>
-                <label className="block w-full inline-flex items-center justify-center gap-1 h-8 px-3 rounded-md border border-input bg-transparent text-sm font-medium hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors">
-                  <input type="file" accept="image/*" onChange={e => handleUploadBg(store.key, e)} className="hidden" />
-                  <ImageIcon className="w-3.5 h-3.5 ml-1" /> رفع صورة
-                </label>
                 <div className="flex gap-2 mt-2">
                   <Input
                     placeholder="أو الصق رابط صورة"
