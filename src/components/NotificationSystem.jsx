@@ -10,14 +10,11 @@ export default function NotificationSystem() {
   const indexRef = useRef(0);
   const timerRef = useRef(null);
 
-  const [userEmail, setUserEmail] = useState(null);
-  useEffect(() => { base44.auth.me().then(me => setUserEmail(me?.email || null)).catch(() => {}); }, []);
-
   useEffect(() => {
-    base44.entities.Notification.list('sort_order', 50)
-      .then(all => setNotifications(all.filter(n => n.is_active !== false && (!n.customer_email || n.customer_email === userEmail))))
-      .catch(() => {});
-  }, [userEmail]);
+    base44.functions.invoke('get-notifications', {})
+      .then(res => setNotifications(res.data?.notifications || []))
+      .catch(() => setNotifications([]));
+  }, []);
 
   useEffect(() => {
     if (!notifications.length) return;
