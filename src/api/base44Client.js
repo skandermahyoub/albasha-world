@@ -45,8 +45,8 @@ async function staffInvoke(entity, action, payload = {}) {
 function getStaffEntity(entity) {
   if (staffEntityCache.has(entity)) return staffEntityCache.get(entity);
   const api = {
-    list: (sort, limit) => staffInvoke(entity, 'list', { sort, limit }),
-    filter: (query, sort, limit) => staffInvoke(entity, 'filter', { query, sort, limit }),
+    list: (sort, limit, skip) => staffInvoke(entity, 'list', { sort, limit, skip }),
+    filter: (query, sort, limit, skip) => staffInvoke(entity, 'filter', { query, sort, limit, skip }),
     get: (id) => staffInvoke(entity, 'get', { id }),
     create: (data) => staffInvoke(entity, 'create', { data }),
     update: (id, data) => staffInvoke(entity, 'update', { id, data }),
