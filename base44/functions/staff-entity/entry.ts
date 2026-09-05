@@ -82,7 +82,7 @@ export default async function(req: Request) {
     if (!user) return Response.json({ error: 'تسجيل الدخول مطلوب' }, { status: 401 });
 
     const body = await req.json();
-    const { entity, action, context_section = null, query = {}, sort = null, limit = 50, id = null, data = null, records = null } = body || {};
+    const { entity, action, context_section = null, query = {}, sort = null, limit = 50, skip = 0, id = null, data = null, records = null } = body || {};
     if (!entity || !action) return Response.json({ error: 'الكيان والإجراء مطلوبان' }, { status: 400 });
 
     const baseSection = ENTITY_SECTIONS[entity];
@@ -116,6 +116,7 @@ export default async function(req: Request) {
 
     let result: any;
     const safeLimit = Math.max(1, Math.min(Number(limit) || 50, 1000));
+    const safeSkip = Math.max(0, Math.min(Number(skip) || 0, 50000));
 
     const hiddenFilter: any = entity === 'Order'
       ? { source: { $ne: 'test' } }
@@ -133,11 +134,11 @@ export default async function(req: Request) {
     switch (action) {
       case 'list':
         result = hiddenFilter
-          ? await api.filter(hiddenFilter, sort || undefined, safeLimit)
-          : await api.list(sort || undefined, safeLimit);
+          ? await api.filter(hiddenFilter, sort || undefined, safeLimit, safeSkip)
+          : await api.list(sort || undefined, safeLimit, safeSkip);
         break;
       case 'filter':
-        result = await api.filter(scopedQuery, sort || undefined, safeLimit);
+        result = await api.filter(scopedQuery, sort || undefined, safeLimit, safeSkip);
         break;
       case 'get':
         if (!id) return Response.json({ error: 'المعرف مطلوب' }, { status: 400 });
