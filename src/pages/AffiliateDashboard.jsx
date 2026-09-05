@@ -28,8 +28,8 @@ export default function AffiliateDashboard() {
       setSettings(s[0] || {});
       setUser(me);
       if (me) {
-        const affs = await base44.entities.Affiliate.filter({ customer_email: me.email }).catch(() => []);
-        setAffiliate(affs[0] || null);
+        const affiliateRes = await base44.functions.invoke('get-my-affiliate', {}).then(res => res.data?.affiliate || null).catch(() => null);
+        setAffiliate(affiliateRes);
       }
       setLoading(false);
     };
