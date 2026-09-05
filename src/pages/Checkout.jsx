@@ -43,8 +43,8 @@ export default function Checkout() {
     // تحميل رصيد المحفظة ونقاط الولاء
     base44.auth.me().then(me => {
       if (me?.email) {
-        base44.entities.CustomerProfile.filter({ user_email: me.email }).then(profiles => {
-          const profile = profiles[0];
+        base44.functions.invoke('get-my-profile', {}).then(res => {
+          const profile = res.data?.profile;
           setWalletBalance(profile?.wallet_balance || 0);
           setForm(current => ({ ...current, name: profile?.full_name || profile?.name || me.full_name || '', phone: profile?.phone || '', address: profile?.address || '' }));
         }).catch(() => {});
