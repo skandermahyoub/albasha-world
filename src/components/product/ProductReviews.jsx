@@ -143,13 +143,11 @@ export default function ProductReviews({ productId }) {
                 </button>
               </div>
             ) : (
-              <label className="inline-flex">
-                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground border border-dashed border-border rounded-lg px-3 py-2 cursor-pointer hover:border-primary hover:text-primary transition-colors">
-                  {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ImageIcon className="w-3.5 h-3.5" />}
-                  أضف صورة (اختياري)
-                </span>
-              </label>
+              <Input
+                placeholder="رابط صورة (اختياري)"
+                value={form.image_url || ''}
+                onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))}
+              />
             )}
             <Button type="submit" disabled={loading} className="gap-2 w-full">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
