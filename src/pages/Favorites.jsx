@@ -24,10 +24,10 @@ export default function Favorites() {
     const load = async () => {
       const [s, p] = await Promise.all([
         base44.entities.StoreSettings.list().catch(() => []),
-        base44.functions.invoke('get-public-products', { sort: '-created_date', limit: 1000 }).then(res => res.data?.products || []).catch(() => []),
+        favs.length ? base44.functions.invoke('get-public-products', { ids: favs.slice(0, 200), limit: Math.min(favs.length, 200) }).then(res => res.data?.products || []).catch(() => []) : Promise.resolve([]),
       ]);
       setSettings(s[0] || {});
-      setProducts(p.filter(pr => pr.status === 'active' && favs.includes(pr.id)));
+      setProducts(p.filter(pr => favs.includes(pr.id)));
     };
     load();
   }, [favs]);
