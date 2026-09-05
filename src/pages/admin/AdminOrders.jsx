@@ -146,8 +146,12 @@ export default function AdminOrders() {
 
   const confirmDelete = async () => {
     if (!deleteDialog) return;
-    await base44.entities.Order.delete(deleteDialog.id);
-    toast.success('تم حذف الطلب');
+    const res = await base44.functions.invoke('archive-order', { order_id: deleteDialog.id });
+    if (!res.data?.success) {
+      toast.error(res.data?.error || 'تعذر أرشفة الطلب');
+      return;
+    }
+    toast.success('تمت أرشفة الطلب الملغي بأمان');
     setDeleteDialog(null);
     if (expandedOrder === deleteDialog.id) setExpandedOrder(null);
     load();
@@ -323,14 +327,14 @@ export default function AdminOrders() {
                   )}
 
                   {/* حذف الطلب (للطلبات الوهمية أو الملغاة) */}
-                  {canDelete('orders') && (
+                  {canDelete('orders') && order.status === 'cancelled' && (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setDeleteDialog(order)}
                       className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 gap-2"
                     >
-                      <Trash2 className="w-3.5 h-3.5" /> حذف الطلب
+                      <Trash2 className="w-3.5 h-3.5" /> أرشفة الطلب الملغي
                     </Button>
                   )}
                 </div>
@@ -369,11 +373,11 @@ export default function AdminOrders() {
       <AlertDialog open={!!deleteDialog} onOpenChange={() => setDeleteDialog(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>حذف الطلب نهائياً</AlertDialogTitle>
+            <AlertDialogTitle>أرشفة الطلب الملغي</AlertDialogTitle>
             <AlertDialogDescription>
-              سيتم حذف الطلب{' '}
+              سيتم إخفاء الطلب{' '}
               <strong>#{deleteDialog?.order_number || deleteDialog?.id?.slice(-6)}</strong>{' '}
-              نهائياً ولا يمكن التراجع عن ذلك. هل أنت متأكد؟
+              من التشغيل اليومي مع الاحتفاظ بالسجل المالي والتدقيقي. هل أنت متأكد؟
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
